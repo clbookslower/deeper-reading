@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>마침내 특이점이 시작된다 · 제1장 · 생각학교 ASK</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Noto+Serif+KR:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;} body{margin:0;background:#090b0d;} button{-webkit-tap-highlight-color:transparent;}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState } = React;
+
+/* ─── 핵심 개념 카드 ────────────────────────────────────────────── */
+const CONCEPTS = [
+  { id:"loar", term:"수확 가속의 법칙", latin:"Law of Accelerating Returns", keyword:"기술은 스스로를 가속한다",
+    desc:"정보 기술의 가격 대비 성능은 꾸준히 기하급수적으로 증가한다. 각 세대의 기술이 다음 세대를 만드는 데 활용되는 양의 피드백 루프가 작동하기 때문이다. 무어의 법칙은 이 더 광범위한 법칙의 특수한 사례에 불과하다.",
+    example:"오늘날의 디지털 계산은 16개월마다 가격 대비 성능이 두 배씩 늘어나고 있다. 반면 우리 뇌는 10만 년마다 뇌 물질이 약 16.4cc씩 증가했을 뿐이다.", accent:"#5a9abc" },
+  { id:"sixepochs", term:"여섯 시대", latin:"Six Epochs", keyword:"지능 진화의 여섯 국면",
+    desc:"커즈와일은 우주 탄생부터 시작된 여섯 시대를 설명한다. 각 시대는 앞선 시대의 정보를 처리하면서 다음 시대를 만들어낸다. 지능의 진화는 이 과정들의 간접적 연쇄 작용을 통해 일어난다.\n① 물리·화학 ② 생명·DNA ③ 뇌 ④ 기술 ⑤ 인간 인지+디지털 융합 ⑥ 우주 각성",
+    example:"지금 인류는 네 번째 시대에 살고 있다. 내가 2029년으로 예상한, 튜링 테스트 통과가 일어나는 바로 그 순간에 우리는 다섯 번째 시대에 진입할 것이다.", accent:"#c4a35a" },
+  { id:"singularity", term:"특이점", latin:"The Singularity", keyword:"물리학에서 빌려온 은유",
+    desc:"이 불가해한 변화 속도와 규모 때문에, 우리의 미래를 제대로 묘사하려면 물리학에서 특이점 은유를 빌려오지 않을 수 없다. 블랙홀의 사건 지평선 너머처럼, 특이점 이후는 현재의 개념 체계로 예측하기 어렵다.",
+    example:"2045년 무렵에 우리의 마음은 수백만 배나 확장될 것이다. 이것이 특이점이다—단순한 기술 발전이 아니라 인간 지능 자체의 질적 전환.", accent:"#9a7abd" },
+  { id:"computronium", term:"컴퓨트로늄", latin:"computronium", keyword:"여섯 번째 시대의 물질",
+    desc:"여섯 번째 시대에는 우리의 지능이 우주 전체로 퍼져나가 보통 물질을 컴퓨트로늄으로 변화시킬 것이다. 컴퓨트로늄은 궁극적인 계산 밀도로 조직된 물질을 말한다. 우주 전체가 하나의 거대한 지능 기판이 된다는 뜻이다.",
+    example:"돌멩이도 컴퓨트로늄이 될 수 있다—물질의 원자 구조를 정보 처리 기반으로 재조직한다면. 이것이 여섯 번째 시대의 핵심이다.", accent:"#6aaa82" },
+  { id:"gnr", term:"GNR 혁명", latin:"GNR Revolution", keyword:"세 겹의 기하급수적 혁명",
+    desc:"21세기의 핵심 기술 혁명은 세 가지다—유전공학(Genetics), 나노기술(Nanotechnology), 로봇공학·AI(Robotics). 이 세 혁명은 독립적이지 않다. 서로를 가속하며 중첩된다. 각각이 수확 가속의 법칙을 따르면서, 동시에 서로의 발전을 앞당긴다.",
+    example:"AI(R)가 단백질 구조를 예측하고(G), 나노봇(N)이 그 치료제를 세포에 정밀 전달한다. AlphaFold·CRISPR·나노의학이 이미 교차하고 있다.", accent:"#c47a7a" },
+  { id:"intuition", term:"직관과 기하급수", latin:"Intuition vs. Exponential", keyword:"인간의 직관은 선형이다",
+    desc:"인간의 뇌는 선형적 변화에 최적화되어 있다. 기하급수적 성장은 직관의 범위 밖이다. 그래서 전문가들조차 기술 발전을 체계적으로 과소평가한다. 이것은 지식의 문제가 아니라 인지 구조의 문제다.",
+    example:"수련 연못: 매일 두 배로 자라 30일째 가득 찬다. 29일째 절반—우리는 '아직 여유 있다'고 생각한다. 그러나 마지막 하루에 연못 전체가 채워진다.", accent:"#aaba5a" },
+];
+
+/* ─── 핵심 논점 ──────────────────────────────────────────────────── */
+const PASSAGES = [
+  { title:"논점 1 · 각 시대는 앞선 시대의 정보를 처리하면서 다음 시대를 만들어낸다",
+    note:"p.27 '《특이점이 온다》에서 나는 의식의 기반이 정보라고 말했다'부터 p.29 여섯 번째 시대까지. '각 단계는 앞선 단계의 정보를 처리하면서 다음 단계를 만들어냈다. 따라서 지능의 진화는 다른 과정들의 간접적 연쇄 작용을 통해 일어난다'—이 문장이 1장 전체의 핵심 명제입니다.",
+    layers:[
+      { label:"핵심 주장", text:"커즈와일은 우주의 역사를 정보 처리 역량의 단계적 도약으로 읽는다.\n\n① 물리·화학: 물리 법칙과 화학 탄생\n② 생명·DNA: 분자 하나로 완전한 생명체를 정의할 수 있는 복잡성 도달\n③ 뇌: 스스로 정보를 저장하고 처리하는 신경 기관 출현\n④ 기술: 파피루스에서 하드 드라이브까지—뇌의 능력을 증강하는 기술 창조\n⑤ 융합: 생물학적 인지와 디지털 기술의 직접 융합\n⑥ 우주 각성: 지능이 보통 물질을 컴퓨트로늄으로 변화" },
+      { label:"왜 그런가", text:"각 시대의 전환은 이전 시대의 정보 처리 방식이 만들어낸 결과다. DNA는 화학이 만들어낸 분자 정보 저장 방식이고, 뇌는 DNA가 만들어낸 정보 처리 기관이다.\n\n결정적 비대칭: 뇌 물질은 10만 년마다 약 16.4cc씩 증가했지만, 오늘날 디지털 계산의 가격 대비 성능은 16개월마다 두 배씩 늘어나고 있다. 이것이 다섯 번째 시대로의 전환이 불가피한 이유다." },
+      { label:"비유로", text:"바통 릴레이가 아니다. 각 시대는 이전 시대를 소멸시키지 않고 그 위에 쌓인다—진화는 보존하면서 확장한다.\n\n그러나 속도가 달라진다: 물리·화학 시대는 수십억 년, 생명 시대는 수억 년, 뇌의 시대는 수천만 년, 기술 시대는 수천 년. 다섯 번째 시대의 전환은 수십 년이 걸릴 것이다." },
+    ]},
+  { title:"논점 2 · 지금 인류는 네 번째 시대에 살고 있다—2029년이 다섯 번째 시대의 문이다",
+    note:"p.29-30 '1999년에 출간된 《21세기 호모 사피엔스》에서 나는 2029년까지 AI가 튜링 테스트를 통과할 것이라고 예측했다'부터 '내가 2029년으로 예상한, 튜링 테스트 통과가 일어나는 바로 그 순간에 우리는 다섯 번째 시대에 진입할 것이다'까지. 튜링 테스트의 정확한 의미와 미치 케이퍼와의 내기 대목도 함께 읽어보세요.",
+    layers:[
+      { label:"핵심 주장", text:"커즈와일은 1999년(《21세기 호모 사피엔스》)부터 2029년을 예측해왔다. 튜링 테스트 통과 = AI가 사람과 같은 수준의 언어와 상식적 추론 능력을 갖추는 것.\n\n중요한 역설: 튜링 테스트를 통과하려면 AI는 많은 분야에서 '지능이 훨씬 떨어지는 것처럼' 보여야 한다. 수학 문제를 순식간에 풀면 AI임이 탄로나기 때문이다. 따라서 튜링 테스트를 통과한 AI는 실제로는 대다수 분야에서 최고의 인간보다 훨씬 뛰어날 것이다." },
+      { label:"왜 중요한가", text:"이 글을 쓰는 시점에 제미나이와 GPT-4 같은 AI 시스템들이 자신의 능력을 많은 영역으로 확장하고 있다—이것은 일반 지능을 향해 나아가는 고무적인 발걸음이다.\n\n2030년대에 완성될 한 가지 핵심 능력: 신피질의 위쪽 영역을 클라우드에 연결하는 것. 그렇게 되면 우리의 사고가 직접적으로 크게 확장된다. 이때쯤이면 우리 마음에서 비생물학적인 부분이 생물학적 부분보다 수천 배나 많은 인지 능력을 제공할 것이다." },
+      { label:"비유로", text:"물이 99도일 때와 100도일 때의 차이는 1도지만, 결과는 질적으로 다르다—액체에서 기체로.\n\n커즈와일에게 2029년은 바로 그 100도의 순간이다. 에너지는 이미 수십 년째 축적 중이다. 퀴즈나 바둑 게임에서부터 방사선학과 의약품 발견에 이르기까지—AI는 이미 인류의 가장 어려운 지적 과제들에서 최고의 경지에 이르렀다." },
+    ]},
+  { title:"논점 3 · 2045년, 마음은 수백만 배 확장된다—특이점은 물리학의 은유다",
+    note:"p.30-31 '2030년대에 완성될 한 가지 핵심 능력은 우리 신피질의 위쪽 영역을 클라우드에 연결하는 것'부터 마지막 문단까지. 특히 마지막 두 문장—'이런 진전이 기하급수적으로 일어나면서 2045년 무렵에 우리의 마음은 수백만 배나 확장될 것이다. 이 불가해한 변화 속도와 규모 때문에, 우리의 미래를 제대로 묘사하려면 물리학에서 특이점 은유를 빌려오지 않을 수 없다'를 반드시 직접 찾아 여러 번 읽어보세요.",
+    layers:[
+      { label:"핵심 주장", text:"진행 경로:\n2030년대: 신피질의 위쪽 영역이 클라우드에 연결된다. 우리의 사고가 직접적으로 크게 확장된다.\n\n이때쯤: 마음에서 비생물학적인 부분이 생물학적 부분보다 수천 배나 많은 인지 능력을 제공한다.\n\n2045년 무렵: 마음은 수백만 배나 확장된다.\n\n이 불가해한 변화 속도와 규모 때문에—우리의 미래를 제대로 묘사하려면 물리학에서 특이점 은유를 빌려오지 않을 수 없다." },
+      { label:"왜 중요한가", text:"커즈와일은 특이점을 막연한 미래상이 아니라 수치로 제시한다: '수백만 배'. 이것은 계산의 결과다—수확 가속의 법칙의 기하급수적 성장을 수십 년에 걸쳐 연장한 귀결.\n\n그러나 동시에 그는 이 수치의 한계를 안다: 이 불가해한 변화 속도와 규모 때문에 물리학 은유를 빌려올 수밖에 없다. 블랙홀의 사건 지평선 너머처럼—물리 법칙 자체가 달라지는 지점." },
+      { label:"비유로", text:"물리학의 특이점: 블랙홀 중심에서는 현재의 물리학 방정식이 무한대를 출력하고 작동을 멈춘다. 우리의 예측 능력이 '무한대'에 부딪히는 지점.\n\n커즈와일의 특이점도 마찬가지다. '수백만 배 확장된 마음'은 측정 가능한 목표치이기도 하지만, 그 너머에서 어떤 일이 일어날지를 현재의 인간 개념 체계로 묘사하는 것은 불가능하다." },
+    ]},
+];
+
+/* ─── 퀴즈 ───────────────────────────────────────────────────────── */
+const QUIZ = [
+  { q:"커즈와일이 1장에서 제시하는 여섯 시대의 순서로 올바른 것은?",
+    opts:["물리·화학 → DNA·생명 → 뇌 → 기술 → 인간인지+디지털 융합 → 우주 각성","DNA·생명 → 물리·화학 → 뇌 → 기술 → 융합 → 우주 각성","물리·화학 → 뇌 → DNA·생명 → 기술 → 융합 → 우주 각성","물리·화학 → DNA·생명 → 기술 → 뇌 → 융합 → 우주 각성"],
+    ans:0, exp:"커즈와일은 ①물리·화학 ②생명·DNA ③뇌 ④기술 ⑤인간 인지와 디지털 기술의 직접 융합(뇌-컴퓨터 인터페이스 등) ⑥우주 전체로 지능이 확산되어 보통 물질을 컴퓨트로늄으로 변화시키는 단계의 순서를 제시한다. (p.27-29)" },
+  { q:"지금 인류가 살고 있는 시대에 대한 커즈와일의 주장으로 가장 정확한 것은?",
+    opts:["인류는 이미 다섯 번째 시대에 진입했다","인류는 지금 네 번째 시대에 살고 있으며, 2029년 튜링 테스트 통과 시 다섯 번째 시대가 시작된다","인류는 세 번째와 네 번째 시대 사이의 전환점에 있다","인류는 2045년에 네 번째 시대에서 다섯 번째 시대로 넘어간다"],
+    ans:1, exp:"커즈와일은 명확하게 말한다: '지금 인류는... 네 번째 시대에 살고 있다.' 그리고 '내가 2029년으로 예상한, 튜링 테스트 통과가 일어나는 바로 그 순간에 우리는 다섯 번째 시대에 진입할 것이다.' (p.30) 2045년은 다섯 번째 시대 내에서 마음이 수백만 배 확장되는 특이점이다." },
+  { q:"튜링 테스트를 통과한 AI의 실제 능력에 대한 커즈와일의 설명으로 옳은 것은?",
+    opts:["튜링 테스트 통과 AI는 대부분의 분야에서 평균 인간 수준이다","튜링 테스트 통과 AI는 인간처럼 보이기 위해 능력을 낮춰야 하므로, 실제로는 대다수 분야에서 최고의 인간보다 훨씬 뛰어나다","튜링 테스트는 수학 능력을 주로 평가한다","튜링 테스트 통과 AI는 아직 의료 분야에서는 경쟁력이 없다"],
+    ans:1, exp:"커즈와일은 역설적 사실을 제시한다: AI가 어떤 수학 문제라도 순식간에 정확하게 풀면 AI임이 탄로난다. 따라서 튜링 테스트를 통과하려면 많은 분야에서 '지능이 떨어지는 것처럼 보여야' 한다. 이는 실제 능력이 최고의 인간을 훨씬 뛰어넘는다는 것을 의미한다. (p.30)" },
+  { q:"커즈와일이 제시하는 '컴퓨트로늄'의 정의는?",
+    opts:["인간의 뇌와 컴퓨터를 연결하는 인터페이스 장치","AI가 자기 자신을 학습하는 알고리즘","궁극적인 계산 밀도로 조직된 물질","디지털 기억을 저장하는 클라우드 서버"],
+    ans:2, exp:"커즈와일은 여섯 번째 시대를 이렇게 설명한다: '여섯 번째 시대에는 우리의 지능이 우주 전체로 퍼져나가 보통 물질을 컴퓨트로늄으로 변화시킬 것이다. 컴퓨트로늄은 궁극적인 계산 밀도로 조직된 물질을 말한다.' (p.29)" },
+];
+
+/* ─── 논증 구조 ──────────────────────────────────────────────────── */
+const ARG_STEPS = [
+  { num:"전제 1", color:"#5a9abc", title:"의식의 기반은 정보다",
+    body:"커즈와일의 출발점: 의식의 기반은 정보다.\n\n우주의 역사는 정보 처리 역량의 단계적 도약으로 이해할 수 있다. 각 시대는 앞선 시대의 정보를 처리하면서 다음 시대를 만들어낸다.\n\n이것이 '지능의 진화는 다른 과정들의 간접적 연쇄 작용을 통해 일어난다'는 명제의 의미다.",
+    key:"정보 = 우주 진화의 공통 기반" },
+  { num:"전제 2", color:"#c4a35a", title:"기술의 가격 대비 성능은 기하급수적으로 성장한다",
+    body:"결정적 비대칭:\n뇌 물질: 10만 년마다 약 16.4cc 증가\n디지털 계산: 16개월마다 가격 대비 성능 두 배\n\n이 격차가 계속 벌어지면서 다섯 번째 시대—생물학적 인지와 디지털 기술의 직접 융합—는 불가피해진다.\n\n'뇌-컴퓨터' 인터페이스: 신경 처리(초당 수백 사이클) vs 디지털 기술(초당 수십억 사이클)",
+    key:"기하급수와 선형의 교차점이 다섯 번째 시대다" },
+  { num:"추론", color:"#9a7abd", title:"2029년 튜링 테스트 통과 = 다섯 번째 시대 진입",
+    body:"1999년부터 일관된 예측: 2029년까지 AI가 튜링 테스트를 통과한다.\n\n이미 진행 중: '제미나이와 GPT-4 같은 최고 수준의 AI 시스템들이 자신의 능력을 많은 영역으로 확장하고 있는데, 이것은 일반 지능을 향해 나아가는 고무적인 발걸음이다.'\n\n지금 인류는 네 번째 시대에 살고 있다. 2029년이 다섯 번째 시대의 문이다.",
+    key:"2029 = 튜링 테스트 통과 = 다섯 번째 시대의 시작" },
+  { num:"결론", color:"#6aaa82", title:"2030년대~2045년: 마음의 수백만 배 확장",
+    body:"2030년대: 신피질의 위쪽 영역이 클라우드에 연결된다.\n→ 마음에서 비생물학적 부분이 생물학적 부분보다 수천 배나 많은 인지 능력을 제공\n\n2045년 무렵: 이런 진전이 기하급수적으로 일어나면서 우리의 마음은 수백만 배나 확장된다.\n\nAI는 경쟁자가 아니라 우리 자신의 확장된 일부가 된다.",
+    key:"2045 = 마음의 수백만 배 확장 = 특이점" },
+  { num:"함의", color:"#c47a7a", title:"물리학에서 특이점 은유를 빌려올 수밖에 없다",
+    body:"이 불가해한 변화 속도와 규모 때문에, 우리의 미래를 제대로 묘사하려면 물리학에서 특이점 은유를 빌려오지 않을 수 없다.\n\n블랙홀의 사건 지평선: 물리 방정식이 무한대를 출력하며 작동을 멈추는 지점.\n\n커즈와일의 특이점: 기하급수적 성장이 인간의 예측 능력이 '무한대'에 부딪히는 지점—수백만 배 확장된 마음의 세계는 현재의 개념 체계로 묘사하기 불가능하다.",
+    key:"특이점 = 예측 불가능성의 지점—수백만 배 확장의 귀결" },
+];
+
+/* ─── 비교 분석 ──────────────────────────────────────────────────── */
+const POSITIONS = [
+  { label:"기술 정체론", sub:"고든·코웬", color:"#5a7abc",
+    claim:"기술 발전은 과대평가되었다. 19세기~20세기 초의 대혁신(전기·내연기관·상하수도)에 비해 현재의 기술 발전이 생산성과 삶의 질에 미치는 영향은 제한적이다.",
+    problem:"정보 기술의 기하급수적 특성을 선형적 경제 지표(GDP·생산성)로 측정하는 방법론적 한계. 무료 디지털 서비스의 가치는 GDP에 잡히지 않는다. '가격 대비 성능 16개월마다 두 배'라는 현상은 선형 지표로 포착 불가능하다.",
+    quote:"로버트 고든 『미국 성장의 흥망』(2016)\n타일러 코웬 『거대한 침체』(2011)" },
+  { label:"커즈와일", sub:"수확 가속 낙관론", color:"#c4a35a",
+    claim:"수확 가속의 법칙은 50년 이상의 실증 데이터로 검증된 패턴이다. 1999년과 2005년의 예측들(2020년경 AI의 다양한 지적 성취)이 실제로 맞아들어가고 있다.",
+    problem:"일부 예측의 타이밍은 빗나갔다. 자율주행차·특정 로봇공학 예측은 지연되었다. 그러나 커즈와일은 '기하급수적 성장이 S-커브를 그릴 수 있다'는 것을 인정하면서도, 장기 궤적은 유효하다고 본다.",
+    quote:"1999년 《21세기 호모 사피엔스》·2005년 《특이점이 온다》의 30년 트랙 레코드" },
+  { label:"AI 실존위험론", sub:"보스트롬·힌튼·벤지오", color:"#7aaa6a",
+    claim:"AI의 기하급수적 발전 자체가 실존적 위험이다. 인간 수준 이상의 AI는 인류의 통제를 벗어날 수 있으며, 이는 되돌릴 수 없는 결과로 이어질 수 있다.",
+    problem:"커즈와일은 위험의 실재성에 동의하면서도 낙관한다. 기술의 이중성(핵기술도 에너지와 무기 모두가 됨)을 인정하되, 규제와 협력으로 관리 가능하다고 본다. 7장 '위험'에서 이 논의가 심화된다.",
+    quote:"닉 보스트롬 『슈퍼인텔리전스』(2014)\n제프리 힌튼의 2023년 공개 경고" },
+];
+
+/* ─── 세미나 질문 ─────────────────────────────────────────────────── */
+const SEMINAR_QS = [
+  { q:"커즈와일은 '지금 인류는 네 번째 시대에 살고 있다'고 말합니다. 그렇다면 나는 지금 이 시대를 어떻게 살고 있습니까? 기술이 나의 인지를 이미 어느 정도 증강하고 있습니까?",
+    hint:"파피루스에서 하드 드라이브까지—나는 지금 어떤 정보 저장·처리 기술을 '뇌의 확장'으로 사용하고 있습니까? 스마트폰의 메모 앱, 검색 엔진, AI 도구—이것들이 네 번째 시대의 기술입니다." },
+  { q:"커즈와일은 신피질이 클라우드에 연결되면 'AI는 경쟁자가 아니라 우리 자신의 확장된 일부가 된다'고 말합니다. 이것이 가능하다면, '나'의 경계는 어디입니까?",
+    hint:"안경·보청기는 이미 신체의 확장입니다. 스마트폰도 이미 기억의 외부 저장소입니다. 신피질이 클라우드에 연결된다면—이것은 같은 종류의 확장입니까, 아닙니까? 무엇이 달라집니까?" },
+  { q:"커즈와일이 2029년을 예측한 근거는 '수확 가속의 법칙'이라는 귀납적 패턴입니다. 과거 50년의 데이터가 미래에도 계속된다는 것을 우리는 얼마나 신뢰해야 합니까?",
+    hint:"커즈와일 본인도 인정합니다—일부 예측은 빗나갔습니다. 그러나 그는 장기 궤적은 유효하다고 봅니다. '예측의 타이밍 오차'와 '법칙 자체의 무효화'는 어떻게 구분합니까?" },
+  { q:"'여섯 번째 시대에 우리의 지능이 우주 전체로 퍼져나가 보통 물질을 컴퓨트로늄으로 변화시킨다'—이것은 과학적 주장입니까, 형이상학적 주장입니까?",
+    hint:"검증 가능합니까? 반증 가능합니까? 칼 포퍼의 기준으로 보면 이 주장은 과학입니까? 그렇다고 해서 이 주장이 의미 없어집니까?" },
+  { q:"커즈와일의 여섯 시대 이야기는 진보의 이야기입니다. 그런데 각 시대의 전환에서 무엇이 사라졌습니까? 기하급수적 발전의 수혜 바깥에 있는 사람들은 이 이야기에서 어디에 위치합니까?",
+    hint:"네 번째 시대(기술)의 혜택은 균등하게 분배되지 않았습니다. 인터넷은 실리콘밸리를 만들었고 동시에 제조업 일자리를 없앴습니다. 다섯 번째 시대의 '마음의 수백만 배 확장'은 누구에게 먼저 일어납니까?" },
+];
+
+/* ─── 스테이지 설정 ──────────────────────────────────────────────── */
+const STAGES = {
+  grammar:{ label:"문법", latin:"Grammatica", sub:"텍스트가 무엇을 말하는가", color:"#c4a35a", bg:"#1a160a" },
+  logic:  { label:"논리", latin:"Dialectica",  sub:"논증이 어떻게 작동하는가", color:"#5a9abc", bg:"#0a121a" },
+  rhetoric:{ label:"수사", latin:"Rhetorica",  sub:"함께 탐구하고 설득하는가", color:"#bc7a7a", bg:"#1a0f0f" },
+};
+const PAGE_STAGE = {2:"grammar",3:"grammar",4:"grammar",5:"grammar",6:"grammar",7:"logic",8:"logic",9:"rhetoric"};
+
+function App() {
+  const [page, setPage] = useState(0);
+  const [fading, setFading] = useState(false);
+  const [flipped, setFlipped] = useState(new Set());
+  const [pLayers, setPLayers] = useState([0,0,0]);
+  const [qSel, setQSel] = useState([null,null,null,null]);
+  const [qDone, setQDone] = useState([false,false,false,false]);
+  const [argStep, setArgStep] = useState(0);
+  const [posOpen, setPosOpen] = useState(null);
+  const [seminHints, setSeminHints] = useState(new Set());
+
+  const TOTAL = 11;
+  const go = n => { setFading(true); setTimeout(()=>{ setPage(n); setFading(false); window.scrollTo(0,0); },280); };
+  const next = () => { if(page<TOTAL-1) go(page+1); };
+  const prev = () => { if(page>0) go(page-1); };
+
+  const C = { bg:"#090b0d", surf:"#0e1318", surfUp:"#151d24", txt:"#e2e8f0", muted:"#607080", gold:"#c4a35a", goldBr:"#deb96a", line:"#1e2a35" };
+  const F = { h:"'Cormorant Garamond', Georgia, serif", b:"'Noto Serif KR', Georgia, serif" };
+  const W = { maxWidth:720, margin:"0 auto", padding:"52px 28px", color:C.txt, fontFamily:F.b };
+  const SL = { fontFamily:F.b, fontSize:11, letterSpacing:4, color:C.gold, marginBottom:18, display:"block" };
+  const BT = { fontFamily:F.h, fontSize:32, fontWeight:400, color:C.txt, lineHeight:1.25, marginBottom:8 };
+  const DIV = { width:36, height:1, background:C.gold, marginBottom:28 };
+  const BD = { fontSize:15, lineHeight:1.95, color:C.txt, fontWeight:300, fontFamily:F.b };
+  const MT = { fontSize:15, lineHeight:1.95, color:C.muted, fontWeight:300, fontFamily:F.b };
+
+  const stageKey = PAGE_STAGE[page];
+  const stage = stageKey ? STAGES[stageKey] : null;
+
+  const StageBadge = () => !stage ? null : (
+    <div style={{ display:"flex", gap:10, alignItems:"center", marginBottom:28, padding:"10px 16px", background:stage.bg, border:`1px solid ${stage.color}33`, width:"fit-content" }}>
+      <div style={{ width:6, height:6, borderRadius:"50%", background:stage.color }} />
+      <span style={{ fontFamily:F.b, fontSize:11, letterSpacing:4, color:stage.color }}>{stage.label}</span>
+      <span style={{ fontFamily:F.h, fontSize:13, color:C.muted, fontStyle:"italic" }}>{stage.latin}</span>
+      <span style={{ fontFamily:F.b, fontSize:11, color:C.muted }}>· {stage.sub}</span>
+    </div>
+  );
+
+  const renderPage = () => { switch(page) {
+
+  case 0: return (
+    <div style={{ minHeight:"100vh", display:"flex", flexDirection:"column", justifyContent:"center", alignItems:"center", textAlign:"center", padding:"48px 28px", background:C.bg, position:"relative", overflow:"hidden" }}>
+      <div style={{ position:"absolute", top:0, left:0, right:0, height:2, background:`linear-gradient(90deg,transparent,${C.gold},transparent)` }} />
+      <div style={{ position:"absolute", bottom:0, left:0, right:0, height:1, background:`linear-gradient(90deg,transparent,${C.gold}44,transparent)` }} />
+      <div style={{ position:"absolute", inset:0, backgroundImage:`radial-gradient(ellipse at 50% 55%,#0e1a28 0%,transparent 65%)`, pointerEvents:"none" }} />
+      <span style={{ fontFamily:F.b, fontSize:11, letterSpacing:6, color:C.gold, marginBottom:48, display:"block" }}>디퍼 언브랜딩살롱</span>
+      <h1 style={{ fontFamily:F.h, fontSize:"clamp(32px,7vw,52px)", fontWeight:300, color:C.txt, lineHeight:1.1, marginBottom:10 }}>마침내 특이점이 시작된다</h1>
+      <p style={{ fontFamily:F.h, fontSize:18, color:"#b0bec8", fontStyle:"italic", marginBottom:6 }}>The Singularity Is Nearer</p>
+      <p style={{ fontFamily:F.b, fontSize:12, color:"#b0bec8", letterSpacing:2 }}>Ray Kurzweil, 2024 · 비즈니스북스</p>
+      <div style={{ width:1, height:52, background:`linear-gradient(${C.gold}88,transparent)`, margin:"36px auto" }} />
+      <p style={{ fontFamily:F.b, fontSize:13, letterSpacing:5, color:C.gold, marginBottom:10 }}>소크라테스식 고전 탐구 세미나</p>
+      <p style={{ fontFamily:F.h, fontSize:19, color:"#b0bec8", fontStyle:"italic", marginBottom:16 }}>제1장</p>
+      <p style={{ fontFamily:F.h, fontSize:17, color:"#b0bec8", fontStyle:"italic", marginBottom:52 }}>우리는 여섯 단계 중 어디에 있는가?</p>
+      <button onClick={next}
+        onMouseEnter={e=>{e.currentTarget.style.background=C.gold;e.currentTarget.style.color=C.bg;}}
+        onMouseLeave={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.color=C.gold;}}
+        style={{ background:"transparent", border:`1px solid ${C.gold}`, color:C.gold, fontFamily:F.b, fontSize:12, letterSpacing:4, padding:"15px 48px", cursor:"pointer", transition:"all 0.3s" }}>
+        시작하기
+      </button>
+      <div style={{ display:"flex", gap:24, marginTop:40, justifyContent:"center" }}>
+        {[["문법","#c4a35a"],["논리","#5a9abc"],["수사","#bc7a7a"]].map(([l,col])=>(
+          <div key={l} style={{ textAlign:"center" }}>
+            <div style={{ width:5, height:5, borderRadius:"50%", background:col, margin:"0 auto 6px" }} />
+            <span style={{ fontFamily:F.b, fontSize:10, color:col, letterSpacing:3 }}>{l}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
+  case 1: return (
+    <div style={W}>
+      <span style={SL}>안내 · 트리비움으로 읽다</span>
+      <h2 style={BT}>세 단계로 읽는 법</h2>
+      <div style={DIV} />
+      <p style={{ ...BD, marginBottom:32 }}>이 세미나는 생각을 이끄는 도구, <strong style={{color:C.goldBr}}>트리비움</strong>으로 텍스트를 읽습니다—<strong style={{color:C.goldBr}}>문법, 논리, 수사</strong>. 각 단계는 텍스트를 다른 깊이로 만나는 방법입니다.</p>
+      {[
+        { key:"grammar", n:"01", label:"문법 — Grammatica", pages:"5섹션",
+          desc:"텍스트가 무엇을 말하는지 파악합니다. 커즈와일이 사용하는 개념과 언어를 내 것으로 만드는 단계입니다.",
+          items:["수확 가속의 법칙·여섯 시대·특이점·컴퓨트로늄·GNR 혁명·직관과 기하급수 개념 카드 (6종)","핵심 논점 3개 단계별 독해 (pp.27-31 기반)","이해 확인 퀴즈 4문항"] },
+        { key:"logic", n:"02", label:"논리 — Dialectica", pages:"2섹션",
+          desc:"커즈와일의 논증 구조를 단계별로 분해합니다. 기술 정체론·AI 실존위험론과의 비교를 통해 논증의 강점과 약점을 찾습니다.",
+          items:["논증 구조 5단계 시각화 (의식=정보 → 기하급수 → 2029 → 2045 → 특이점 은유)","기술 정체론 vs 커즈와일 vs AI 실존위험론 비교"] },
+        { key:"rhetoric", n:"03", label:"수사 — Rhetorica", pages:"세미나에서 함께",
+          desc:"이 단계는 세미나 현장에서 함께 합니다. 가이드에서는 토론 질문을 미리 확인합니다.",
+          items:["소크라테스식 세미나 토론 질문 5개","힌트와 함께 입장 준비"] },
+      ].map(item=>{
+        const s=STAGES[item.key];
+        return (
+          <div key={item.key} style={{ marginBottom:20, background:C.surf, padding:"22px 24px", borderLeft:`3px solid ${s.color}` }}>
+            <div style={{ display:"flex", gap:14, alignItems:"flex-start", marginBottom:14 }}>
+              <span style={{ fontFamily:F.h, fontSize:30, color:s.color, lineHeight:1, minWidth:32 }}>{item.n}</span>
+              <div>
+                <div style={{ display:"flex", gap:10, alignItems:"center", marginBottom:6 }}>
+                  <span style={{ fontFamily:F.b, fontSize:11, letterSpacing:4, color:s.color }}>{item.label}</span>
+                  <span style={{ fontFamily:F.b, fontSize:11, color:C.muted }}>· {item.pages}</span>
+                </div>
+                <p style={{ ...BD, fontSize:13, margin:0, lineHeight:1.8 }}>{item.desc}</p>
+              </div>
+            </div>
+            <div style={{ paddingLeft:46 }}>
+              {item.items.map((it,j)=>(
+                <div key={j} style={{ display:"flex", gap:10, alignItems:"flex-start", padding:"4px 0" }}>
+                  <div style={{ width:4, height:4, borderRadius:"50%", background:s.color+"88", flexShrink:0, marginTop:7 }} />
+                  <span style={{ ...MT, fontSize:13 }}>{it}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+
+  case 2: return (
+    <div style={W}>
+      <StageBadge />
+      <span style={SL}>문법 1/5 · 핵심 개념</span>
+      <h2 style={BT}>카드를 눌러 개념을 확인하세요</h2>
+      <div style={DIV} />
+      <p style={{ ...MT, marginBottom:36, fontSize:14 }}>6개 모두 열어보시길 권합니다. 지금 완전히 이해하지 않아도 됩니다—이후 독해와 퀴즈를 통해 다시 만납니다.</p>
+      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
+        {CONCEPTS.map(c=>{
+          const open=flipped.has(c.id);
+          return (
+            <div key={c.id}
+              onClick={()=>{const n=new Set(flipped);if(n.has(c.id))n.delete(c.id);else n.add(c.id);setFlipped(n);}}
+              style={{ background:open?C.surfUp:C.surf, border:`1px solid ${open?c.accent+"66":C.line}`, padding:"18px 20px", cursor:"pointer", transition:"all 0.25s" }}>
+              <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start" }}>
+                <div>
+                  <p style={{ fontFamily:F.h, fontSize:19, color:open?c.accent:C.goldBr, fontWeight:500, margin:"0 0 2px" }}>{c.term}</p>
+                  <p style={{ fontSize:11, color:C.muted, fontStyle:"italic", margin:0, letterSpacing:1 }}>{c.latin}</p>
+                </div>
+                <span style={{ color:open?C.gold:C.muted, fontSize:20, lineHeight:1, display:"block", transform:open?"rotate(45deg)":"none", transition:"transform 0.25s" }}>+</span>
+              </div>
+              {open && (
+                <div style={{ marginTop:16 }}>
+                  <p style={{ fontSize:11, color:c.accent, letterSpacing:3, marginBottom:10, fontWeight:500 }}>{c.keyword}</p>
+                  <p style={{ ...BD, fontSize:13, marginBottom:14, lineHeight:1.85, whiteSpace:"pre-line" }}>{c.desc}</p>
+                  <div style={{ background:C.surf, padding:"12px 14px" }}>
+                    <p style={{ ...MT, fontSize:12, margin:0, lineHeight:1.8 }}>✦ {c.example}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+      <div style={{ textAlign:"center", marginTop:28 }}>
+        <span style={{ ...MT, fontSize:12, letterSpacing:2 }}>{flipped.size} / {CONCEPTS.length} 확인</span>
+        <div style={{ display:"flex", justifyContent:"center", gap:6, marginTop:10 }}>
+          {CONCEPTS.map((c,i)=><div key={i} style={{ width:6, height:6, borderRadius:"50%", background:flipped.has(c.id)?C.gold:C.line, transition:"background 0.3s" }} />)}
+        </div>
+      </div>
+    </div>
+  );
+
+  case 3: case 4: case 5: {
+    const pIdx=page-3, p=PASSAGES[pIdx], layer=pLayers[pIdx];
+    return (
+      <div style={W}>
+        <StageBadge />
+        <span style={SL}>문법 {pIdx+2}/5 · 핵심 논점 {pIdx+1}/3</span>
+        <h2 style={BT}>{p.title}</h2>
+        <div style={DIV} />
+        <div style={{ background:"#0d1a0d", border:`1px solid #1e3a1e`, padding:"18px 22px", marginBottom:28 }}>
+          <p style={{ fontSize:11, color:"#4a8a4a", letterSpacing:3, marginBottom:8 }}>책에서 찾아보기</p>
+          <p style={{ ...BD, fontSize:13, margin:0, color:"#8abb8a", lineHeight:1.85 }}>{p.note}</p>
+        </div>
+        <p style={{ ...MT, fontSize:12, marginBottom:16, letterSpacing:1 }}>아래 탭을 순서대로 눌러 이해의 층을 쌓아보세요</p>
+        <div style={{ display:"flex" }}>
+          {p.layers.map((l,i)=>(
+            <button key={i} onClick={()=>setPLayers(prev=>{const n=[...prev];n[pIdx]=i;return n;})}
+              style={{ flex:1, padding:"12px 8px", background:layer===i?C.surfUp:C.surf, border:"none", borderBottom:`2px solid ${layer===i?C.gold:C.line}`, color:layer===i?C.gold:C.muted, fontFamily:F.b, fontSize:12, letterSpacing:2, cursor:"pointer", transition:"all 0.2s" }}>
+              {l.label}
+            </button>
+          ))}
+        </div>
+        <div style={{ background:C.surfUp, padding:"28px 26px", minHeight:148, borderTop:`1px solid ${C.line}`, marginBottom:32 }}>
+          <p style={{ ...BD, margin:0, lineHeight:2.1, whiteSpace:"pre-line" }}>{p.layers[layer].text}</p>
+        </div>
+        {pIdx<2 && (
+          <div style={{ display:"flex", justifyContent:"center" }}>
+            <button onClick={next} style={{ background:"transparent", border:`1px solid ${C.line}`, color:C.muted, fontFamily:F.b, fontSize:12, letterSpacing:3, padding:"10px 28px", cursor:"pointer" }}>
+              다음 논점으로 →
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  case 6: return (
+    <div style={W}>
+      <StageBadge />
+      <span style={SL}>문법 5/5 · 이해 확인</span>
+      <h2 style={BT}>이해 확인 퀴즈</h2>
+      <div style={DIV} />
+      <p style={{ ...MT, marginBottom:40, fontSize:14 }}>정답을 선택하고 '확인'을 누르면 해설이 나옵니다.</p>
+      {QUIZ.map((q,qi)=>(
+        <div key={qi} style={{ marginBottom:40 }}>
+          <div style={{ display:"flex", gap:14, marginBottom:16, alignItems:"flex-start" }}>
+            <span style={{ fontFamily:F.h, fontSize:26, color:C.gold, lineHeight:1, minWidth:32 }}>Q{qi+1}</span>
+            <p style={{ ...BD, fontWeight:400, lineHeight:1.75, margin:0 }}>{q.q}</p>
+          </div>
+          {q.opts.map((opt,oi)=>{
+            const sel=qSel[qi]===oi,done=qDone[qi],correct=oi===q.ans;
+            let bg=C.surf,border=C.line,color=C.txt;
+            if(done){if(correct){bg="#0d1a0d";border="#2a5a2a";color="#8acd8a";}else if(sel){bg="#1a0d0d";border="#5a2a2a";color="#cd8a8a";}else{color=C.muted;}}
+            else if(sel){bg=C.surfUp;border=C.gold+"88";}
+            return (
+              <div key={oi} onClick={()=>{if(!done){const n=[...qSel];n[qi]=oi;setQSel(n);}}}
+                style={{ background:bg, border:`1px solid ${border}`, padding:"13px 18px", marginBottom:8, cursor:done?"default":"pointer", display:"flex", gap:14, alignItems:"flex-start", transition:"all 0.2s" }}>
+                <span style={{ fontFamily:F.h, fontSize:16, color:done&&correct?"#3a7a3a":(done&&sel?"#7a3a3a":C.muted), minWidth:20, lineHeight:1.6 }}>{String.fromCharCode(65+oi)}</span>
+                <span style={{ ...BD, fontSize:14, color, margin:0, lineHeight:1.7 }}>{opt}</span>
+                {done&&correct&&<span style={{ marginLeft:"auto", color:"#3a7a3a", fontSize:16, flexShrink:0 }}>✓</span>}
+              </div>
+            );
+          })}
+          {!qDone[qi]&&qSel[qi]!==null&&(
+            <button onClick={()=>{const n=[...qDone];n[qi]=true;setQDone(n);}}
+              style={{ marginTop:8, padding:"10px 28px", background:"transparent", border:`1px solid ${C.gold}`, color:C.gold, fontFamily:F.b, fontSize:12, letterSpacing:3, cursor:"pointer" }}>
+              확인
+            </button>
+          )}
+          {qDone[qi]&&(
+            <div style={{ background:"#0a150a", border:`1px solid #1a301a`, padding:"16px 20px", marginTop:12 }}>
+              <p style={{ fontSize:11, color:"#4a8a4a", letterSpacing:3, marginBottom:8 }}>해설</p>
+              <p style={{ ...BD, fontSize:13, color:"#90bb90", margin:0, lineHeight:1.85 }}>{q.exp}</p>
+            </div>
+          )}
+        </div>
+      ))}
+      <div style={{ textAlign:"center", padding:"16px 0", borderTop:`1px solid ${C.line}` }}>
+        <span style={{ ...MT, fontSize:12, letterSpacing:2 }}>{qDone.filter(Boolean).length} / {QUIZ.length} 완료</span>
+      </div>
+    </div>
+  );
+
+  case 7: return (
+    <div style={W}>
+      <StageBadge />
+      <span style={SL}>논리 1/2 · 논증 구조</span>
+      <h2 style={BT}>커즈와일의 논증을 분해한다</h2>
+      <div style={DIV} />
+      <p style={{ ...MT, marginBottom:36, fontSize:14, lineHeight:1.9 }}>'다음 단계' 버튼을 눌러 커즈와일의 논증을 단계적으로 따라가보세요.</p>
+      {ARG_STEPS.slice(0,argStep+1).map((step,i)=>(
+        <div key={i} style={{ marginBottom:14, opacity:i===argStep?1:0.55, transition:"opacity 0.3s" }}>
+          <div style={{ display:"flex", alignItems:"stretch" }}>
+            <div style={{ width:4, background:step.color, flexShrink:0 }} />
+            <div style={{ background:i===argStep?C.surfUp:C.surf, padding:"20px 24px", flex:1 }}>
+              <div style={{ display:"flex", gap:12, alignItems:"center", marginBottom:10 }}>
+                <span style={{ fontFamily:F.b, fontSize:10, letterSpacing:4, color:step.color }}>{step.num}</span>
+                <span style={{ fontFamily:F.h, fontSize:18, color:i===argStep?C.txt:C.muted }}>{step.title}</span>
+              </div>
+              <p style={{ ...BD, fontSize:14, lineHeight:1.9, marginBottom:12, whiteSpace:"pre-line" }}>{step.body}</p>
+              <div style={{ padding:"10px 14px", background:C.bg, borderLeft:`2px solid ${step.color}44` }}>
+                <p style={{ ...MT, fontSize:12, margin:0, color:step.color }}>✦ {step.key}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      ))}
+      <div style={{ display:"flex", gap:14, marginTop:24, alignItems:"center" }}>
+        {argStep<ARG_STEPS.length-1 ? (
+          <button onClick={()=>setArgStep(s=>s+1)}
+            onMouseEnter={e=>{e.currentTarget.style.background=ARG_STEPS[argStep+1].color;e.currentTarget.style.color=C.bg;}}
+            onMouseLeave={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.color=ARG_STEPS[argStep+1].color;}}
+            style={{ padding:"12px 28px", background:"transparent", border:`1px solid ${ARG_STEPS[argStep+1].color}`, color:ARG_STEPS[argStep+1].color, fontFamily:F.b, fontSize:12, letterSpacing:3, cursor:"pointer", transition:"all 0.3s" }}>
+            다음 단계 →
+          </button>
+        ) : (
+          <span style={{ ...MT, fontSize:12, letterSpacing:2 }}>논증 완료</span>
+        )}
+        {argStep>0 && (
+          <button onClick={()=>setArgStep(0)} style={{ background:"transparent", border:"none", color:C.muted, fontFamily:F.b, fontSize:11, letterSpacing:2, cursor:"pointer" }}>처음부터</button>
+        )}
+        <span style={{ marginLeft:"auto", ...MT, fontSize:11 }}>{argStep+1} / {ARG_STEPS.length}</span>
+      </div>
+    </div>
+  );
+
+  case 8: return (
+    <div style={W}>
+      <StageBadge />
+      <span style={SL}>논리 2/2 · 비판적 분석</span>
+      <h2 style={BT}>커즈와일이 마주하는 반론들</h2>
+      <div style={DIV} />
+      <p style={{ ...MT, marginBottom:24, fontSize:14 }}>세 입장을 눌러 비교해보세요. 커즈와일은 어디서 갈라지는가.</p>
+      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:8, marginBottom:36 }}>
+        {POSITIONS.map((pos,i)=>{
+          const open=posOpen===i;
+          return (
+            <div key={i} onClick={()=>setPosOpen(open?null:i)}
+              style={{ background:open?C.surfUp:C.surf, border:`1px solid ${open?pos.color+"88":C.line}`, padding:"16px 14px", cursor:"pointer", transition:"all 0.25s" }}>
+              <p style={{ fontFamily:F.h, fontSize:17, color:open?pos.color:C.muted, margin:"0 0 4px", textAlign:"center" }}>{pos.label}</p>
+              <p style={{ fontSize:10, color:C.muted, fontStyle:"italic", margin:0, textAlign:"center", letterSpacing:1 }}>{pos.sub}</p>
+              {open && (
+                <div style={{ marginTop:14 }}>
+                  <div style={{ marginBottom:10, paddingBottom:10, borderBottom:`1px solid ${C.line}` }}>
+                    <p style={{ fontSize:10, color:pos.color, letterSpacing:3, marginBottom:6 }}>주장</p>
+                    <p style={{ ...BD, fontSize:12, margin:0, lineHeight:1.75 }}>{pos.claim}</p>
+                  </div>
+                  <div style={{ marginBottom:10 }}>
+                    <p style={{ fontSize:10, color:i===1?"#5a8a5a":"#8a6a4a", letterSpacing:3, marginBottom:6 }}>{i===1?"특징·한계":"반론·한계"}</p>
+                    <p style={{ ...BD, fontSize:12, margin:0, lineHeight:1.75, color:i===1?"#8abb8a":"#c4a880", whiteSpace:"pre-line" }}>{pos.problem}</p>
+                  </div>
+                  <div style={{ padding:"8px 12px", background:C.surf, borderLeft:`2px solid ${pos.color}44` }}>
+                    <p style={{ fontSize:11, color:pos.color, margin:0, whiteSpace:"pre-line" }}>{pos.quote}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+      <div style={{ background:C.surf, padding:"20px 24px" }}>
+        <p style={{ fontFamily:F.b, fontSize:11, color:STAGES.logic.color, letterSpacing:4, marginBottom:14 }}>핵심 차이</p>
+        <p style={{ ...BD, fontSize:14, lineHeight:1.9, margin:0 }}>
+          기술 정체론은 <strong style={{color:C.txt}}>현재 지표</strong>를 보고, AI 실존위험론은 <strong style={{color:C.txt}}>미래 위험</strong>을 본다. 커즈와일은 <strong style={{color:C.txt}}>50년의 기하급수 궤적</strong>을 본다. 세 입장은 서로 다른 시간 지평을 가진다—그래서 각자가 옳으면서도 불완전하다.
+        </p>
+      </div>
+    </div>
+  );
+
+  case 9: return (
+    <div style={W}>
+      <StageBadge />
+      <span style={SL}>수사 · 세미나 준비</span>
+      <h2 style={BT}>이제 함께 탐구합니다</h2>
+      <div style={DIV} />
+      <div style={{ background:"#1a0f0f", border:`1px solid ${STAGES.rhetoric.color}33`, padding:"20px 24px", marginBottom:36 }}>
+        <p style={{ fontFamily:F.b, fontSize:11, color:STAGES.rhetoric.color, letterSpacing:4, marginBottom:10 }}>수사 단계에 대하여</p>
+        <p style={{ ...BD, fontSize:14, margin:0, lineHeight:1.9 }}>
+          문법으로 텍스트를 읽고, 논리로 논증을 분석했습니다. 수사는 그것을 <strong style={{color:C.txt}}>함께 말하는 단계</strong>입니다. 소크라테스식 세미나는 정답을 향해 가는 것이 아닙니다—질문이 질문을 낳고, 생각이 생각을 밀어올리는 과정입니다.
+        </p>
+      </div>
+      <p style={{ fontFamily:F.b, fontSize:11, color:STAGES.rhetoric.color, letterSpacing:4, marginBottom:20 }}>세미나 토론 질문</p>
+      {SEMINAR_QS.map((item,i)=>{
+        const open=seminHints.has(i);
+        return (
+          <div key={i} style={{ marginBottom:20, background:C.surf, padding:"22px 26px", borderLeft:`3px solid ${STAGES.rhetoric.color}${i%2===0?"cc":"44"}` }}>
+            <div style={{ display:"flex", gap:16, alignItems:"flex-start", marginBottom:12 }}>
+              <span style={{ fontFamily:F.h, fontSize:28, color:STAGES.rhetoric.color, lineHeight:1, minWidth:34 }}>S{i+1}</span>
+              <p style={{ ...BD, fontWeight:400, lineHeight:1.8, margin:0, flex:1 }}>{item.q}</p>
+            </div>
+            <div style={{ paddingLeft:50 }}>
+              <button onClick={()=>{const n=new Set(seminHints);if(n.has(i))n.delete(i);else n.add(i);setSeminHints(n);}}
+                style={{ background:"transparent", border:"none", color:C.muted, fontFamily:F.b, fontSize:11, letterSpacing:3, cursor:"pointer", padding:0 }}>
+                {open?"힌트 접기 ↑":"힌트 보기 ↓"}
+              </button>
+              {open && (
+                <div style={{ marginTop:10, padding:"12px 16px", background:C.surfUp, borderLeft:`2px solid ${STAGES.rhetoric.color}33` }}>
+                  <p style={{ ...MT, fontSize:13, fontStyle:"italic", margin:0, lineHeight:1.8 }}>💡 {item.hint}</p>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+
+  case 10: return (
+    <div style={{ minHeight:"100vh", display:"flex", flexDirection:"column", justifyContent:"center", alignItems:"center", textAlign:"center", padding:"48px 28px", background:C.bg, position:"relative" }}>
+      <div style={{ position:"absolute", top:0, left:0, right:0, height:1, background:`linear-gradient(90deg,transparent,${C.gold}44,transparent)` }} />
+      <span style={{ fontFamily:F.b, fontSize:11, letterSpacing:6, color:C.muted, marginBottom:48, display:"block" }}>생각학교 ASK · 마침내 특이점이 시작된다</span>
+      <div style={{ width:1, height:64, background:`linear-gradient(${C.gold}88,transparent)`, margin:"0 auto 44px" }} />
+      <div style={{ background:C.surf, padding:"36px 40px", maxWidth:600, textAlign:"left", borderLeft:`3px solid ${C.gold}`, marginBottom:52 }}>
+        <p style={{ fontSize:11, color:C.gold, letterSpacing:4, marginBottom:20 }}>오늘의 마지막 문장 · Ray Kurzweil · p.31</p>
+        <p style={{ fontFamily:F.h, fontSize:"clamp(15px,2.2vw,19px)", fontStyle:"italic", color:C.txt, lineHeight:2.2, margin:0 }}>
+          "이런 진전이 기하급수적으로 일어나면서 2045년 무렵에 우리의 마음은 수백만 배나 확장될 것이다. 이 불가해한 변화 속도와 규모 때문에, 우리의 미래를 제대로 묘사하려면 물리학에서 특이점 은유를 빌려오지 않을 수 없다."
+        </p>
+        <p style={{ ...MT, fontSize:12, marginTop:20, marginBottom:0, letterSpacing:2 }}>— 『마침내 특이점이 시작된다』 제1장, p.31</p>
+      </div>
+      <div style={{ display:"flex", gap:32, marginBottom:52, justifyContent:"center" }}>
+        {[["문법","Grammar","#c4a35a"],["논리","Logic","#5a9abc"],["수사","Rhetoric","#bc7a7a"]].map(([l,e,col])=>(
+          <div key={l} style={{ textAlign:"center" }}>
+            <div style={{ width:5, height:5, borderRadius:"50%", background:col, margin:"0 auto 8px" }} />
+            <p style={{ fontFamily:F.b, fontSize:11, color:col, letterSpacing:3, marginBottom:5 }}>{l}</p>
+            <p style={{ fontFamily:F.h, fontSize:13, color:C.muted, margin:0, fontStyle:"italic" }}>{e}</p>
+          </div>
+        ))}
+      </div>
+      <button onClick={()=>go(0)} style={{ background:"transparent", border:`1px solid ${C.line}`, color:C.muted, fontFamily:F.b, fontSize:11, letterSpacing:4, padding:"12px 32px", cursor:"pointer" }}>처음으로</button>
+    </div>
+  );
+
+  default: return null;
+  }};
+
+  const navVisible = page>0 && page<10;
+  return (
+    <div style={{ background:C.bg, minHeight:"100vh" }}>
+      {navVisible && (
+        <div style={{ position:"fixed", top:0, left:0, right:0, height:2, background:C.line, zIndex:100 }}>
+          <div style={{ height:"100%", width:`${((page-1)/8)*100}%`, background:stage?stage.color:C.gold, transition:"width 0.4s ease, background 0.4s ease" }} />
+        </div>
+      )}
+      <div style={{ opacity:fading?0:1, transition:"opacity 0.28s ease", paddingTop:navVisible?2:0 }}>
+        {renderPage()}
+      </div>
+      {navVisible && (
+        <div style={{ maxWidth:720, margin:"0 auto", padding:"0 28px 52px", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+          <button onClick={prev} style={{ background:"transparent", border:"none", color:C.muted, fontFamily:F.b, fontSize:12, letterSpacing:3, cursor:"pointer", padding:"12px 0" }}>← 이전</button>
+          <div style={{ display:"flex", gap:4, alignItems:"center" }}>
+            {Array.from({length:9},(_,i)=>{
+              const ps=PAGE_STAGE[i+2], col=ps?STAGES[ps].color:C.gold, active=i===page-2, done=i<page-2;
+              return <div key={i} style={{ width:active?8:5, height:active?8:5, borderRadius:"50%", background:done||active?col:C.line, transition:"all 0.3s" }} />;
+            })}
+          </div>
+          {page<9 ? (
+            <button onClick={next} style={{ background:"transparent", border:"none", color:stage?stage.color:C.gold, fontFamily:F.b, fontSize:12, letterSpacing:3, cursor:"pointer", padding:"12px 0" }}>다음 →</button>
+          ) : (
+            <button onClick={next}
+              onMouseEnter={e=>{e.currentTarget.style.background=STAGES.rhetoric.color;e.currentTarget.style.color=C.bg;}}
+              onMouseLeave={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.color=STAGES.rhetoric.color;}}
+              style={{ background:"transparent", border:`1px solid ${STAGES.rhetoric.color}`, color:STAGES.rhetoric.color, fontFamily:F.b, fontSize:11, letterSpacing:3, padding:"10px 24px", cursor:"pointer", transition:"all 0.3s" }}>
+              마무리
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
