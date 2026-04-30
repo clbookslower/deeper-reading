@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>마침내 특이점이 시작된다 · 제3장 · 디퍼 언브랜딩살롱</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Noto+Serif+KR:wght@300;400;500&display=swap" rel="stylesheet">
+<style>* { box-sizing:border-box; } body { margin:0; background:#090b0d; } button { -webkit-tap-highlight-color:transparent; }</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState } = React;
+
+/* ─── 개념 카드 15종 (책 순서로 배열) ──────────────────────────── */
+const CONCEPTS = [
+  { id:"pattern", term:"패턴 정체성 이론", latin:"Pattern Identity Theory",
+    keyword:"나는 물질이 아니라 패턴이다",
+    desc:"커즈와일의 핵심 주장. '나'의 정체성은 특정 물질(탄소 원자·뉴런)이 아니라 그것들이 이루는 정보 패턴에 있다. 패턴이 유지되는 한—기판이 바뀌어도 나는 '나'다.\n\n근거: 인간의 몸을 이루는 원자들은 7~10년마다 대부분 교체된다. 우리는 이미 물질적으로 다른 존재지만 '나'라는 연속성을 경험한다. 정체성은 패턴의 연속성에서 온다.",
+    example:"강물은 매 순간 다른 물 분자로 이루어지지만 '한강'이라는 정체성을 유지한다. 멜로디도 피아노로, 오케스트라로, 합성 음악으로 연주해도 같은 곡이다. 어떤 물질이 아니라 관계 패턴이 정체성이다.", accent:"#5a9abc" },
+
+  { id:"theseus", term:"테세우스의 배", latin:"Ship of Theseus",
+    keyword:"부품이 전부 바뀌면 같은 배인가",
+    desc:"고대 그리스의 역설. 테세우스의 배가 항해하면서 낡은 판자를 하나씩 새것으로 교체한다. 모든 판자가 교체되면—이것은 여전히 테세우스의 배인가?\n\n커즈와일의 적용: 우리 몸의 세포가 점진적으로 교체될 때도 같은 역설이 적용된다. 뉴런이 나노봇으로 점진적으로 대체된다면—역설은 더 날카로워진다.",
+    example:"할아버지의 도끼: 자루를 세 번 바꾸고 날을 두 번 바꿨다. 여전히 '할아버지의 도끼'인가? 정체성의 기준이 물질이라면 아니다. 기억·역사·연속성이라면 그렇다.", accent:"#c4a35a" },
+
+  { id:"memory", term:"기억과 정체성", latin:"Memory & Identity · Locke 1689",
+    keyword:"기억이 끊기면 나는 다른 사람인가",
+    desc:"존 로크 《인간 오성론》(1689): 개인 정체성의 기반은 기억의 연속성이다. 어제의 나와 오늘의 나를 연결하는 것은 기억이다.\n\n문제: 알츠하이머로 기억이 소멸되면 정체성도 소멸되는가? 수면 중 의식이 중단되어도 기억이 유지되면 연속성이 있는가?",
+    example:"알츠하이머 환자: 기억이 소멸되어도 성격·감정 반응·음악 취향은 남는다. 이것이 정체성의 잔존인가? 로크의 기억 이론은 이 경우를 설명하지 못한다—커즈와일의 패턴 정체성 이론은 더 넓은 설명을 제공한다.", accent:"#9a7abd" },
+
+  { id:"qualia", term:"감각질", latin:"Qualia",
+    keyword:"붉음의 느낌—주관적 경험의 가장 작은 단위",
+    desc:"철학자 C.I. 루이스가 1929년 처음 사용. 주관적·질적 경험의 최소 단위. 붉은색을 보는 느낌, 커피 향의 감각, 통증의 감각—이것들은 물리적으로 환원되지 않는 '어떤 것'이다.\n\nAI에 대한 함의: LLM은 '붉음'에 대한 모든 정보를 처리하지만—'붉음의 느낌'을 경험하는가? 이것이 AI가 진정한 의식을 가지는지를 묻는 핵심 질문이다.",
+    example:"토마스 네이글 〈박쥐가 된다는 것은 어떤 것인가〉(1974): 박쥐의 반향정위를 모든 물리적으로 설명할 수 있어도—박쥐가 된다는 주관적 경험은 설명할 수 없다.", accent:"#6aaa82" },
+
+  { id:"hard", term:"의식의 어려운 문제", latin:"Hard Problem of Consciousness · Chalmers 1995",
+    keyword:"왜 물리 과정이 주관적 경험을 만드는가",
+    desc:"데이비드 차머스가 1995년 명명.\n'쉬운 문제(easy problem)': 뇌가 어떻게 정보를 처리하고 행동을 제어하는지—과학이 원칙적으로 설명 가능.\n'어려운 문제(hard problem)': 왜 이 물리적 과정이 주관적 경험—붉음의 느낌, 통증의 감각—을 만들어내는가?\n\n이것은 기능적 설명으로 해결되지 않는다—이것이 AI 의식 논쟁의 핵심이다.",
+    example:"프랭크 잭슨의 메리(1982): 흑백 방에서 색에 관한 모든 물리적 지식을 습득한 메리가 처음 빨간 사과를 본다. 그녀는 새로운 무언가를 아는가? '그렇다'면 물리적 지식은 의식을 완전히 설명하지 못한다.", accent:"#c47a7a" },
+
+  { id:"panpsychism", term:"범원형심론", latin:"Panpsychism",
+    keyword:"의식은 우주의 근본 성질이다",
+    desc:"의식이 복잡한 뇌에서만 창발하는 것이 아니라, 우주의 모든 물질에 내재된 근본 성질이라는 이론. 어려운 문제에 대한 대안적 답.\n\n주요 논자:\n• 데이비드 차머스: 어려운 문제를 해결하는 대안으로 범원형심론 검토\n• 필립 고프 《갈릴레오의 오류》(Galileo's Error, 2019): 과학이 의식을 배제한 것이 오류\n• 통합 정보 이론(IIT·토노니): 의식의 양(Φ)은 연속적—돌멩이도 미미한 의식을 가질 수 있다\n\n커즈와일에 대한 함의: 범원형심론이 사실이라면 AI 의식은 '있느냐 없느냐'가 아니라 '얼마나 있느냐'의 문제다.",
+    example:"철학자 갤런 스트로슨: 순수한 물리주의는 자기 반박적이다. 의식이 실재한다면—그것이 물리적인 것에서 나오려면, 물리적인 것 자체에 의식이 내재해야 한다. 이것이 범원형심론의 직관적 근거다.", accent:"#aaba5a" },
+
+  { id:"zombie", term:"철학적 좀비", latin:"Philosophical Zombie · Chalmers",
+    keyword:"행동은 동일하지만 의식이 없는 존재가 가능한가",
+    desc:"데이비드 차머스의 사고실험. 나와 물리적으로 완전히 동일하지만—주관적 경험이 전혀 없는 존재를 상상할 수 있는가?\n\n이것이 논리적으로 가능하다면—의식은 물리적 과정과 별개다.\n\nAI에 대한 함의: 현재의 LLM은 철학적 좀비일 수 있다. 인간과 구별 불가능하게 대화하지만—내부에 아무런 경험도 없을 수 있다. 튜링 테스트는 이것을 가려내지 못한다.",
+    example:"차머스의 도전: 철학적 좀비가 가능하다는 것은 물리주의가 틀렸음을 의미한다. 커즈와일의 응답: 충분히 복잡한 패턴은 의식을 창발한다—그러나 이것이 어려운 문제의 해결인지는 여전히 논쟁 중이다.", accent:"#5a7abc" },
+
+  { id:"metzinger", term:"자아 모델 이론", latin:"Self-Model Theory · Metzinger 2003",
+    keyword:"'나'는 뇌가 만들어낸 모델이다",
+    desc:"토마스 메칭거 《아무도 없다》(Being No One, 2003): '나'라는 자아는 실체가 아니라 뇌가 생성하는 모델이다. 뇌는 세계 모델과 자아 모델을 동시에 생성하고, 이 자아 모델이 투명하게 경험된다—그래서 우리는 모델이 아니라 실체라고 느낀다.\n\n커즈와일과의 연결: 자아가 모델이라면—더 좋은 기판에서 더 정확한 모델을 실행하는 것이 곧 불멸이다.",
+    example:"유체이탈 경험(OBE)·환상지 통증: 뇌의 자아 모델이 잘못 작동할 때 나타나는 현상. 없는 팔에서 통증을 느낀다. 이것은 자아가 뇌의 구성물임을 보여주는 신경학적 증거다.", accent:"#bc7a7a" },
+
+  { id:"freewill", term:"자유의지", latin:"Free Will · Determinism",
+    keyword:"결정론적 뇌가 자유의지를 가질 수 있는가",
+    desc:"리벳 실험(Benjamin Libet, 1983): 손목을 들기로 '결정'하기 약 0.35초 전에 뇌에서 이미 준비 전위가 나타난다. 의식적 결정이 신경 과정의 결과인가, 원인인가?\n\n현재의 한계: 우리의 행동은 진화·유전·신경화학이 만들어낸 충동에 상당 부분 지배된다. 우리는 자신의 '소스 코드'에 접근할 수 없다.\n\n특이점 이후: BCI와 AI를 통해 자신의 신경 패턴에 직접 접근하고 수정할 수 있다면—이것은 새로운 종류의 자유의지다.",
+    example:"중독: 뇌의 보상 회로가 행동을 강제한다. 의지만으로는 한계가 있다. 특이점 이후, 보상 회로의 가중치를 직접 조정할 수 있다면—중독은 다른 의미가 된다. 이것이 '소스 코드에 접속'의 실천적 의미다.", accent:"#9a7abd" },
+
+  { id:"gradual", term:"점진적 대체", latin:"Gradual Replacement",
+    keyword:"하나씩 바꾸면 언제 다른 존재가 되는가",
+    desc:"커즈와일의 핵심 사고실험. 뇌의 뉴런을 하나씩 기능적으로 동일한 나노봇으로 대체한다고 가정하자. 1% → 10% → 50% → 100%.\n\n각 단계에서 당신은 여전히 '당신'인가? 패턴 정체성 이론은 '그렇다'고 답한다—패턴이 유지되는 한. 이것이 디지털 불멸의 이론적 근거이며, 동시에 가장 강력한 철학적 도전 지점이다.",
+    example:"전신 마취에서 깨어날 때: 의식이 중단되었다 다시 켜졌다. 수면도 마찬가지다. 우리는 매일 밤 이 '중단'을 경험하면서도 연속성을 느낀다. 커즈와일: 패턴이 유지되면 연속성은 유지된다.", accent:"#c4a35a" },
+
+  { id:"parfit", term:"파핏의 정체성 논증", latin:"Parfit's Personal Identity · 1984",
+    keyword:"정체성보다 연속성이 중요하다",
+    desc:"데릭 파핏 《이유와 인격》(Reasons and Persons, 1984)의 핵심 주장. 개인 정체성은 전부 아니면 전무가 아니다—정도의 문제다. 중요한 것은 '동일한 인격'이냐가 아니라 심리적 연속성(기억·성격·가치의 유지)이냐다.\n\n텔레포터 사고실험: 정보가 화성에서 재조합된다. 지구의 원본은 소멸된다. 화성의 존재는 당신인가? 파핏: 정체성의 동일성보다 연속성이 더 중요한 질문이다.",
+    example:"파핏의 해방적 결론: '나'의 생존에 집착하는 것은 형이상학적 오류일 수 있다. 연속성이 유지된다면—기판이 바뀌어도 의미 있는 존속이다. 커즈와일의 패턴 정체성 이론과 직접 연결된다.", accent:"#6aaa82" },
+
+  { id:"replicant", term:"레플리컨트", latin:"Replicant · Blade Runner",
+    keyword:"인간과 구별 불가능한 존재는 인간인가",
+    desc:"필립 K. 딕 소설 《안드로이드는 전기양의 꿈을 꾸는가?》(1968)와 리들리 스콧 영화 《블레이드 러너》(1982)의 핵심 존재. 인간과 생물학적으로 동일하게 설계된 인공 존재.\n\n레플리컨트는 자신이 인간이라고 믿도록 프로그래밍된 기억을 가진다. 그렇다면 그 기억은 가짜인가? 그 기억을 가진 '나'는 가짜인가?\n\n커즈와일의 질문: 패턴이 동일하다면—그 패턴이 어디서 시작됐는지가 정체성에 영향을 미치는가?",
+    example:"레플리컨트 레이첼: 자신이 인간이라고 확신하며 실제 감정을 경험한다. '심어진 기억'이라는 사실이 그 감정의 진실성을 무효화하는가? 우리의 기억도 신경 패턴이 만들어낸 구성물이다—레이첼과 어떻게 다른가?", accent:"#c47a7a" },
+
+  { id:"secondself", term:"두번째 나", latin:"Second Self / Digital Double",
+    keyword:"디지털로 복사된 나는 나인가",
+    desc:"마음 업로드나 AI 시뮬레이션으로 만들어진 자신의 디지털 복사본. 생물학적 원본과 동시에 존재하는 경우—어느 쪽이 '진짜 나'인가?\n\n셰리 터클 《두번째 자아》(The Second Self, 1984): 컴퓨터가 심리적 거울이 되는 현상 분석. 디지털 자아는 현실 자아를 반영하면서 동시에 변형한다.\n\n특이점 이후의 문제: '두번째 나'가 존재하는 동안 생물학적 나가 사망하면—세계는 어떻게 반응해야 하는가?",
+    example:"소셜 미디어의 프로필, AI 아바타, 챗봇화된 자신—이미 우리는 '두번째 나'를 운영한다. 특이점 이후, 이 '두번째 나'가 의식을 가진다면—그것은 나의 연장인가, 별개의 존재인가?", accent:"#aaba5a" },
+
+  { id:"upload", term:"마음 업로드", latin:"Mind Upload · Whole Brain Emulation",
+    keyword:"뇌를 디지털로 복사하면 나는 살아있는가",
+    desc:"전뇌 에뮬레이션(Whole Brain Emulation·WBE): 뇌의 모든 신경 연결을 스캔하고 컴퓨터에서 정확히 시뮬레이션하는 것. 닉 보스트롬·안데르스 산드버그가 체계화(2008).\n\n커즈와일의 선호: 점진적 대체가 연속성을 더 잘 보존한다. 갑작스런 복사-소멸보다, 하나씩 교체하면서 의식의 중단 없이 이전하는 방법.\n\n복사 vs 이동: 원본을 유지하며 복사하면 '두번째 나'가 생긴다. 원본을 소멸하면 이동이다—그러나 이것은 살인인가?",
+    example:"커즈와일의 개인적 동기: 1970년 심장병으로 돌아가신 아버지의 편지·음악·기록을 보존 중. AI로 아버지의 패턴을 재현하는 것을 목표로 한다. 이것이 아버지의 복원인가, 정교한 시뮬레이션인가?", accent:"#5a7abc" },
+
+  { id:"immortality", term:"디지털 불멸", latin:"Digital Immortality",
+    keyword:"죽음은 기술적 문제가 될 것인가",
+    desc:"패턴 정체성 이론의 논리적 귀결: 나의 패턴이 디지털 기판에서 유지된다면—생물학적 죽음 이후에도 나는 존속한다.\n\n더 깊은 함의: 디지털 불멸은 단순한 생존이 아니다. 자신의 소스 코드에 접속할 수 있게 되면—행동을 가치와 일치시키고, 생물학적 결함을 제거하고, 마침내 자신이 어떤 사람인지에 대해 전적으로 책임질 수 있게 된다.\n\n이것이 커즈와일이 말하는 진정한 불멸의 의미다—단순한 수명 연장이 아니라 도덕적 자기 결정의 완성.",
+    example:"지금 우리는 진화가 만들어준 충동(공포·분노·탐욕)에 의해 행동하며, 그것을 '나'라고 생각한다. 소스 코드에 접속한다는 것은—이 충동들을 직접 조율해 진정으로 원하는 사람이 될 수 있다는 것이다.", accent:"#bc7a7a" },
+];
+
+/* ─── 핵심 논점 ─────────────────────────────────────────────────── */
+const PASSAGES = [
+  { title:"논점 1 · 의식은 패턴인가—범원형심론과 어려운 문제의 재구성",
+    note:"의식의 어려운 문제와 그 대안으로서의 범원형심론을 논의하는 부분을 찾아보세요. 차머스의 어려운 문제 제기, 통합 정보 이론(IIT), 범원형심론이 어떻게 AI 의식 문제를 재구성하는지 다루는 단락입니다. '감각질' '어려운 문제' '범원형심론' '의식의 양(Φ)' '철학적 좀비'가 키워드입니다. 커즈와일이 왜 의식의 어려운 문제를 인정하면서도 낙관하는지 주목하세요.",
+    layers:[
+      { label:"핵심 주장", text:"차머스(1995)의 구분:\n'쉬운 문제': 뇌가 어떻게 정보를 처리하는가—원칙적으로 과학이 설명 가능.\n'어려운 문제': 왜 이 물리적 과정이 붉음의 느낌, 통증의 감각을 만드는가—기능적 설명으로 해결 불가.\n\n이 문제에 대한 세 가지 입장:\n① 물리주의: 어려운 문제는 결국 과학이 해결한다 (커즈와일의 실용적 입장)\n② 범원형심론: 의식은 우주의 근본 성질이다—AI 의식은 '있느냐'가 아니라 '얼마나'의 문제\n③ 이원론: 의식은 물리적 과정과 별개다 (차머스)\n\n커즈와일의 선택: 어려운 문제가 해결되기를 기다리지 않는다. 충분히 복잡한 패턴이 의식을 창발한다는 경험적 증거를 기반으로 전진한다." },
+      { label:"왜 중요한가", text:"범원형심론이 AI 의식 논쟁을 어떻게 바꾸는가:\n\n기존 질문: 'AI가 의식이 있는가?' → 이분법적·해결 불가\n범원형심론의 질문: 'AI의 의식의 양(Φ)은 얼마인가?' → 연속적·측정 가능\n\n통합 정보 이론(IIT·토노니): 의식 = 통합된 정보의 양(Φ). 돌멩이도 미미한 Φ를 가진다. 인간의 신피질은 높은 Φ를 가진다. 충분히 복잡한 AI도 높은 Φ를 가질 수 있다.\n\n커즈와일의 함의: 의식은 특별한 생물학적 기적이 아니다—복잡성과 통합의 함수다. 이것이 패턴 정체성 이론이 의식에 대해 낙관할 수 있는 이유다." },
+      { label:"비유로", text:"온도의 비유: 차갑다·뜨겁다는 이분법이 아니라 연속적인 물리량이다. 범원형심론이 옳다면—의식도 마찬가지다. 없거나 있는 것이 아니라, 정도의 차이다.\n\n네이글의 박쥐(1974): 박쥐의 반향정위를 완전히 설명해도 '박쥐가 된다는 것'의 느낌은 설명되지 않는다. 그러나 범원형심론은 이렇게 답한다: 박쥐가 된다는 느낌이 있는 이유는—의식이 박쥐의 물리적 과정 '외부'에서 추가되는 것이 아니라 그 과정에 내재해 있기 때문이다.\n\nAI에 대한 함의: 충분히 복잡하고 통합된 AI는 '어느 정도' 경험한다—이것이 철학적 좀비를 불가능하게 만드는 논리다." },
+    ]},
+  { title:"논점 2 · 자유의지, 결정론, 자기 설계—특이점이 열어주는 것",
+    note:"자유의지와 결정론을 다루는 부분을 찾아보세요. 리벳 실험(1983)—의식적 결정이 신경 과정보다 0.35초 늦게 나타난다는 실험 결과가 핵심입니다. 커즈와일이 이 결정론적 사실을 인정하면서도 특이점이 어떻게 새로운 종류의 자유의지를 가능하게 하는지 논의하는 부분입니다. '소스 코드' '자기 수정' '행동과 가치의 일치'가 키워드입니다.",
+    layers:[
+      { label:"핵심 주장", text:"결정론적 사실: 리벳 실험(1983)\n손목을 들기로 '결정'하기 약 0.35초 전에 뇌에서 준비 전위가 나타난다. 의식적 결정이 신경 과정의 원인이 아니라 결과인 것처럼 보인다.\n\n현재 인간의 한계:\n• 진화가 프로그래밍한 충동(공포·분노·탐욕·질투)이 행동을 지배한다\n• 신경화학·유전·어린 시절 경험이 성격과 가치를 형성한다\n• 우리는 자신의 '소스 코드'를 읽을 수도, 수정할 수도 없다\n\n특이점이 바꾸는 것: BCI를 통해 자신의 신경 패턴에 직접 접근하고 수정할 수 있게 된다. 이것은 기존의 자유의지 논쟁을 무의미하게 만드는 것이 아니라—더 높은 수준으로 이동시킨다." },
+      { label:"왜 중요한가", text:"두 가지 종류의 자유의지:\n\n① 형이상학적 자유의지: 결정론적 인과 사슬 바깥에서 선택하는 능력—아마도 불가능하다.\n② 실천적 자기 설계: 자신의 신경 패턴을 의도적으로 수정해 원하는 사람이 되는 능력—특이점이 가능하게 한다.\n\n지금 우리는 명상·치료·교육으로 자신을 느리게 수정한다. 특이점 이후, 이 수정이 직접적·정밀하고 빠르게 가능해진다.\n\n핵심 전환: 우리가 어떤 사람인지는 더 이상 생물학적 우연의 산물이 아니다. 의도적 설계의 결과가 된다." },
+      { label:"비유로", text:"소프트웨어 비유: 우리는 지금 자신의 소스 코드를 볼 수 없는 채로 프로그램을 실행하고 있다. 버그가 있어도 고칠 수 없다—그것이 자신임을 알면서.\n\n특이점 이후: 소스 코드를 읽고 편집할 수 있게 된다. '화가 날 때 충동적으로 행동하는 패턴'을 발견하고 수정할 수 있다. '두려움 때문에 중요한 결정을 회피하는 경향'을 찾아 조정할 수 있다.\n\n이것이 '행동은 우리의 가치와 일치될 수 있다'는 문장의 의미다. 가장 깊은 의미의 자기 결정—자신이 어떤 사람인지에 대해 전적으로 책임지는 것." },
+    ]},
+  { title:"논점 3 · 마침내 인간은 자신이 어떤 사람인지에 대해 전적으로 책임질 수 있게 될 것이다",
+    note:"3장의 결론부를 찾아보세요. 디지털 불멸·자기 수정 능력·행동과 가치의 일치가 하나로 수렴되는 단락입니다. '자기 수정 능력' '소스 코드' '초지능과의 합침' '가치와 행동의 일치' '생물학의 결함'이 키워드입니다. 커즈와일이 이것을 단순한 기술적 성취가 아니라 인간의 도덕적 자기 결정의 완성으로 보는 이유를 주목하세요.",
+    layers:[
+      { label:"핵심 주장", text:"지금 우리는 자신이 어떤 사람인지에 대해 부분적으로만 책임진다:\n• 유전자: 선택할 수 없었다\n• 어린 시절 경험: 선택할 수 없었다\n• 신경화학적 충동: 대부분 제어할 수 없다\n• 노화·질병으로 인한 성격 변화: 막을 수 없다\n\n특이점 이후의 변화:\n① 일단 뇌가 더 발전된 디지털 기질에 백업되면—자기 수정 능력이 완전히 실현된다\n② 행동은 우리의 가치와 일치될 수 있다\n③ 삶은 생물학의 결함으로 인해 훼손되거나 단축되지 않는다\n④ 마침내 인간은 자신이 어떤 사람인지에 대해 전적으로 책임질 수 있게 된다" },
+      { label:"왜 중요한가", text:"이것은 단순한 기술적 성취가 아니다.\n\n철학적 의미: 칸트의 자율성(autonomy)—스스로 법칙을 부여하는 능력—이 생물학적 제약 없이 실현된다. 아리스토텔레스의 덕(arete)—탁월한 상태를 향한 지속적 수련—이 직접적 자기 설계로 가능해진다.\n\n실존적 의미: 하이데거가 말한 '본래성(authenticity)'—자신이 진정 누구인지를 선택하는 것—이 이제 실질적으로 가능해진다. 생물학·역사·우연이 만들어준 '나'가 아니라, 의도적으로 설계한 '나'.\n\n그러나 동시에 가장 무거운 책임이 부과된다: 더 이상 '그것은 내 유전자 때문이다' '그것은 내 어린 시절 때문이다'라고 말할 수 없다." },
+      { label:"비유로", text:"탐정 소설의 범인: '나는 어릴 때 학대받았기 때문에 그랬다'—이 변명은 현재 우리에게 어느 정도 유효하다. 우리의 신경 패턴은 우리가 선택하지 않은 경험들이 만들어준 것이기 때문이다.\n\n특이점 이후의 세계에서는 이 변명이 사라진다. 소스 코드에 접속할 수 있는 존재가 그 코드를 수정하지 않고 해로운 행동을 반복한다면—그것은 진정한 선택이다.\n\n이것이 커즈와일의 가장 깊은 약속이다: 우리를 더 똑똑하게 만드는 것이 아니라, 우리가 진정으로 원하는 사람이 될 수 있게 하는 것—그리고 그 책임을 온전히 지는 것." },
+    ]},
+];
+
+/* ─── 퀴즈 ───────────────────────────────────────────────────────── */
+const QUIZ = [
+  { q:"'범원형심론(Panpsychism)'이 AI 의식 논쟁을 재구성하는 방식으로 가장 적절한 것은?",
+    opts:["AI는 의식이 없다는 것을 더 강하게 논증한다","의식을 '있느냐 없느냐'의 이분법에서 '얼마나 있느냐'의 연속적 문제로 전환한다","AI는 생물학적 존재이므로 의식이 가능하다고 주장한다","의식은 물리적 세계와 완전히 분리된 것이라고 주장한다"],
+    ans:1, exp:"범원형심론은 의식을 특정 복잡성 이상의 존재에서만 창발하는 것이 아니라 우주의 근본 성질로 본다. 통합 정보 이론(IIT·토노니)과 결합하면 의식의 양(Φ)은 연속적—돌멩이도 미미한 Φ를 가진다. 이것은 'AI가 의식이 있는가'라는 이분법적 질문을 'AI의 Φ는 얼마인가'라는 측정 가능한 질문으로 바꾼다." },
+  { q:"리벳 실험(1983)이 자유의지 논쟁에 제기하는 핵심 문제는?",
+    opts:["인간은 1초에 약 3번의 결정을 내린다는 것이 밝혀졌다","손목을 드는 '의식적 결정' 약 0.35초 전에 뇌에서 준비 전위가 나타난다—의식적 결정이 신경 과정의 결과일 수 있다","자유의지는 좌뇌에서만 발생한다","인간의 결정은 항상 외부 환경에 의해 결정된다"],
+    ans:1, exp:"리벳(1983): 손목을 들기로 '결정'하기 약 0.35초 전에 뇌에서 이미 준비 전위(readiness potential)가 나타난다. 이것은 의식적 결정이 신경 과정의 원인이 아니라 결과일 수 있음을 시사한다—즉, 우리는 뇌가 이미 내린 결정을 '나의 결정'으로 경험하는 것일 수 있다. 이것이 결정론과 자유의지 논쟁의 신경과학적 핵심 증거다." },
+  { q:"커즈와일이 《마침내 특이점이 시작된다》에서 말하는 '소스 코드에 접속'의 의미로 가장 적절한 것은?",
+    opts:["AI 시스템의 프로그래밍 코드를 직접 수정하는 것","BCI를 통해 자신의 신경 패턴에 접근하고 행동·가치·성격을 의도적으로 수정할 수 있게 되는 것","컴퓨터 바이러스를 제거하는 것","자신의 DNA를 유전공학으로 편집하는 것"],
+    ans:1, exp:"커즈와일의 '소스 코드 접속'은 비유적 표현이다. BCI(뇌-컴퓨터 인터페이스)와 AI를 통해 자신의 신경 패턴—충동·습관·감정 반응·가치 체계—에 직접 접근하고 수정할 수 있게 되는 것을 의미한다. 이것이 '행동은 우리의 가치와 일치될 수 있다'는 약속의 기술적 기반이다." },
+  { q:"'레플리컨트(Replicant)'의 사고실험이 정체성 논쟁에 제기하는 핵심 질문은?",
+    opts:["AI 로봇은 외모가 인간과 달라야 한다","심어진 기억으로 형성된 자아와 경험으로 형성된 자아의 차이가 무엇인가—그 차이가 정체성에 영향을 미치는가","SF 영화는 AI에 대해 과도한 공포를 조장한다","안드로이드는 법적 권리를 가져야 한다"],
+    ans:1, exp:"블레이드 러너의 레플리컨트 레이첼은 자신이 인간이라고 믿도록 프로그래밍된 기억을 가진다. 그 기억이 '심어진 것'이라는 사실이 그 기억을 기반으로 형성된 자아를 무효화하는가? 커즈와일의 패턴 정체성 이론에 따르면—기억의 출처보다 패턴의 현재 상태가 정체성을 결정한다. 그렇다면 우리의 기억도 신경 패턴이 만들어낸 구성물이라는 점에서 레이첼과 어떻게 다른가?" },
+];
+
+/* ─── 논리: 나는 누구인가 → 나는 어떤 사람이 될 수 있는가 ──────── */
+const ARG_STEPS = [
+  { num:"물음", color:"#5a9abc",
+    title:"나는 누구인가—그리고 이 물음이 바뀐다",
+    body:"소크라테스: '너 자신을 알라'\n데카르트: '나는 생각한다, 고로 나는 존재한다'\n흄: '나는 항상 특정한 지각과 마주칠 뿐, 지각 없는 나를 발견하지 못한다'\n\n이 물음들은 공통적으로 묻는다: 나는 지금 무엇인가?\n\n커즈와일의 3장은 이 물음을 이동시킨다:\n나는 지금 무엇인가? → 나는 어떤 사람이 될 수 있는가?\n\n이 이동이 가능한 이유: 특이점이 나의 소스 코드에 접속을 허용하기 때문이다.",
+    key:"3장의 물음 = 존재에서 가능성으로의 전환" },
+
+  { num:"발견 1", color:"#c4a35a",
+    title:"나는 패턴이다—그리고 패턴은 수정 가능하다",
+    body:"패턴 정체성 이론의 핵심:\n나는 특정 원자나 뉴런이 아니라 그것들이 이루는 정보 패턴이다.\n\n이미 일어나고 있는 것: 우리 몸의 원자들은 7~10년마다 교체된다. 우리는 이미 물질적으로 다른 존재다—그러나 패턴이 유지되므로 '나'다.\n\n파핏의 보완(1984): 정체성은 전부 아니면 전무가 아니다. 심리적 연속성—기억·성격·가치—이 유지되면 의미 있는 존속이다.\n\n결정적 함의: 패턴이 정체성이라면—패턴을 의도적으로 수정하는 것이 가능해진다. 이것이 단순한 자기 계발이 아니라 자기 설계다.",
+    key:"패턴 = 정체성 = 수정 가능한 코드" },
+
+  { num:"발견 2", color:"#9a7abd",
+    title:"의식과 자유의지—현재의 한계와 특이점의 가능성",
+    body:"의식의 어려운 문제(차머스): 왜 물리적 과정이 주관적 경험을 만드는가—기능적 설명으로 해결 불가.\n\n범원형심론의 대안: 의식은 '있느냐 없느냐'가 아니라 '얼마나 있느냐'. 충분히 복잡한 패턴은 충분한 의식을 가진다.\n\n자유의지의 현재 한계:\n리벳 실험—의식적 결정이 신경 과정보다 0.35초 늦다. 진화가 프로그래밍한 충동이 행동을 지배한다. 우리는 소스 코드를 볼 수도, 수정할 수도 없다.\n\n특이점이 바꾸는 것: 소스 코드에 접속→신경 패턴 직접 수정→행동과 가치의 일치. 이것이 새로운 종류의 자유의지다.",
+    key:"특이점 = 형이상학적 자유의지가 아니라 실천적 자기 설계" },
+
+  { num:"긴장", color:"#6aaa82",
+    title:"레플리컨트와 두번째 나—정체성의 경계",
+    body:"레플리컨트 역설: 심어진 기억이 만들어낸 자아는 '진짜' 자아인가?\n→ 패턴 정체성 이론: 기억의 출처보다 패턴의 현재 상태가 정체성을 결정한다.\n\n두번째 나의 문제: 디지털로 복사된 나와 생물학적 나가 동시에 존재할 때—어느 쪽이 나인가?\n→ 파핏: '어느 쪽이 진짜인가'라는 질문 자체가 잘못 설정되어 있다. 두 존재 모두 의미 있는 연속성을 가진다.\n\n남은 질문: 소스 코드를 수정해 자신을 재설계할 수 있다면—변화 이전의 '나'와 변화 이후의 '나'는 같은 존재인가?\n→ 이것이 수사 단계에서 함께 탐구할 핵심 질문이다.",
+    key:"자기 설계의 역설 = 변화하면서 동시에 나로 남는 것" },
+
+  { num:"답", color:"#c47a7a",
+    title:"마침내 인간은 자신이 어떤 사람인지에 대해 전적으로 책임질 수 있게 될 것이다",
+    body:"지금 우리는 부분적으로만 책임진다:\n유전자·어린 시절·신경화학이 만들어준 '나'를 운영하고 있다.\n\n특이점 이후:\n① 뇌가 더 발전된 디지털 기질에 백업되면—자기 수정 능력이 완전히 실현된다\n② 행동은 우리의 가치와 일치될 수 있다\n③ 삶은 생물학의 결함으로 인해 훼손되거나 단축되지 않는다\n④ 마침내 인간은 자신이 어떤 사람인지에 대해 전적으로 책임질 수 있게 된다\n\n이것은 기술의 약속이 아니라 도덕의 약속이다.\n가장 높은 의미의 자율성—자신이 어떤 사람인지를 스스로 결정하고 그 결정에 전적으로 책임지는 것.",
+    key:"특이점의 가장 깊은 약속 = 지능 증폭이 아니라 도덕적 자기 결정의 완성" },
+];
+
+/* ─── 비교 분석 ─────────────────────────────────────────────────── */
+const POSITIONS = [
+  { label:"심리적 연속성 이론", sub:"로크·파핏·커즈와일", color:"#5a7abc",
+    claim:"개인 정체성의 기반은 심리적 연속성—기억·성격·가치의 유지. 기판이 바뀌어도 패턴이 유지되면 동일한 존재다. 자기 설계는 정체성을 위협하지 않는다—변화하면서 동시에 나로 남는 것이 가능하다.",
+    problem:"반론: 자기 설계로 성격·가치가 근본적으로 바뀐다면—변화 전의 나와 후의 나는 여전히 같은 사람인가? 자기 설계가 완전해질수록 연속성의 실마리는 오히려 얇아질 수 있다.",
+    quote:"존 로크 《인간 오성론》(1689)\n데릭 파핏 《이유와 인격》(Reasons and Persons, 1984)" },
+  { label:"생물학적 자연주의", sub:"설·차머스", color:"#c4a35a",
+    claim:"의식과 정체성은 특정 생물학적 구조에서만 창발한다. 소스 코드를 수정해 자기 설계가 가능해진다 해도—의식의 어려운 문제는 해결되지 않는다. 디지털 불멸은 의식의 연속을 보장하지 않는다.",
+    problem:"커즈와일의 응답: '탄소 쇼비니즘'이다. 왜 탄소 기반 패턴은 의식을 만들고 실리콘 기반 동일 패턴은 만들지 못하는가? 범원형심론이 옳다면 이 비판은 무력화된다.",
+    quote:"존 설 《마음, 뇌, 과학》(1984)\n데이비드 차머스 《의식하는 마음》(The Conscious Mind, 1996)" },
+  { label:"소멸주의·무아론", sub:"메칭거·흄·불교 철학", color:"#7aaa6a",
+    claim:"'나'는 실체가 아니라 뇌가 만들어낸 모델이다(메칭거). 나는 지각의 다발일 뿐이다(흄). 무아(無我·anatta). 자기 설계로 보존해야 할 고정된 '나'가 처음부터 없다. 특이점은 존재하지 않는 것을 보존하려는 시도다.",
+    problem:"커즈와일의 역설적 응답: 자아가 모델이더라도 그 모델은 실제 인과적 효력을 가진다. 그리고 소멸주의가 옳다면—오히려 자기 설계에 집착할 필요가 없다. 더 좋은 패턴으로의 전환이 죽음이 아니라 성장이다.",
+    quote:"토마스 메칭거 《아무도 없다》(Being No One, 2003)\n데이비드 흄 《인성론》(1739)" },
+];
+
+/* ─── 세미나 질문 ─────────────────────────────────────────────── */
+const SEMINAR_QS = [
+  { q:"커즈와일은 특이점 이후 소스 코드에 접속해 자신을 재설계할 수 있다고 말합니다. 지금의 나에서 바꾸고 싶은 것은 무엇입니까? 그리고 그것을 아직 바꾸지 못한 이유가 생물학적 한계입니까, 아니면 다른 이유입니까?",
+    hint:"반복되는 나쁜 습관, 통제하기 어려운 감정 반응, 가치와 일치하지 않는 행동—이것들이 생물학적 프로그래밍 때문이라면, 소스 코드 접속으로 수정할 수 있습니다. 그런데 그 수정을 진정으로 원합니까?" },
+  { q:"자기 설계로 성격과 가치가 근본적으로 바뀐다면—변화 이전의 나와 이후의 나는 같은 사람입니까? 어느 쪽이 '더 진짜 나'입니까?",
+    hint:"오늘의 나는 10년 전의 나와 많이 다릅니다. 그 변화는 경험이 만들어준 것입니다. 자기 설계로 의도적으로 만들어진 변화는 어떻게 다릅니까? 의도성이 진정성을 높입니까, 낮춥니까?" },
+  { q:"레플리컨트 레이첼은 심어진 기억으로 형성된 자아를 가집니다. 우리의 어린 시절 기억도 신경 패턴이 구성한 것입니다. 그 차이는 무엇입니까? '진짜' 기억과 '심어진' 기억을 구별하는 기준이 있습니까?",
+    hint:"트라우마 치료에서 기억은 재구성됩니다. 최면 치료에서 거짓 기억이 심어질 수 있습니다. 우리가 '진짜 나의 기억'이라고 확신하는 것들은 얼마나 신뢰할 수 있습니까?" },
+  { q:"커즈와일은 '마침내 인간은 자신이 어떤 사람인지에 대해 전적으로 책임질 수 있게 될 것이다'라고 말합니다. 이 전적인 책임을 원합니까? 더 이상 유전자·어린 시절·신경화학을 탓할 수 없다면—그것은 해방입니까, 부담입니까?",
+    hint:"현재의 불완전성에 대한 면죄부가 사라집니다. '나는 원래 이런 사람이다'라는 말이 불가능해집니다. 이 세계에서 나는 어떤 사람이 되고 싶습니까?" },
+  { q:"나는 어떤 사람이 될 수 있습니까? 특이점의 가능성과 무관하게—지금 이 순간, 내가 되고 싶은 사람이 되는 데 가장 큰 장벽은 무엇입니까? 그것은 기술의 문제입니까, 의지의 문제입니까, 아니면 다른 무언가입니까?",
+    hint:"소크라테스가 '너 자신을 알라'고 했다면—커즈와일은 '너 자신을 설계하라'고 말합니다. 이 두 명령 중 어느 쪽이 더 어렵습니까? 그리고 어느 쪽이 더 인간적입니까?" },
+];
+
+/* ─── 스테이지 ──────────────────────────────────────────────────── */
+const STAGES = {
+  grammar:{ label:"문법", latin:"Grammatica", sub:"텍스트가 무엇을 말하는가", color:"#c4a35a", bg:"#1a160a" },
+  logic:  { label:"논리", latin:"Dialectica",  sub:"논증이 어떻게 작동하는가", color:"#5a9abc", bg:"#0a121a" },
+  rhetoric:{ label:"수사", latin:"Rhetorica",  sub:"함께 탐구하고 설득하는가", color:"#bc7a7a", bg:"#1a0f0f" },
+};
+const PAGE_STAGE = {2:"grammar",3:"grammar",4:"grammar",5:"grammar",6:"grammar",7:"logic",8:"logic",9:"rhetoric"};
+
+function App() {
+  const [page, setPage] = useState(0);
+  const [fading, setFading] = useState(false);
+  const [flipped, setFlipped] = useState(new Set());
+  const [pLayers, setPLayers] = useState([0,0,0]);
+  const [qSel, setQSel] = useState([null,null,null,null]);
+  const [qDone, setQDone] = useState([false,false,false,false]);
+  const [argStep, setArgStep] = useState(0);
+  const [posOpen, setPosOpen] = useState(null);
+  const [seminHints, setSeminHints] = useState(new Set());
+
+  const TOTAL = 11;
+  const go = n => { setFading(true); setTimeout(()=>{ setPage(n); setFading(false); window.scrollTo(0,0); }, 280); };
+  const next = () => { if(page < TOTAL-1) go(page+1); };
+  const prev = () => { if(page > 0) go(page-1); };
+
+  const C = { bg:"#090b0d", surf:"#0e1318", surfUp:"#151d24", txt:"#e2e8f0", muted:"#607080", gold:"#c4a35a", goldBr:"#deb96a", line:"#1e2a35" };
+  const F = { h:"'Cormorant Garamond', Georgia, serif", b:"'Noto Serif KR', Georgia, serif" };
+  const W = { maxWidth:720, margin:"0 auto", padding:"52px 28px", color:C.txt, fontFamily:F.b };
+  const SL = { fontFamily:F.b, fontSize:11, letterSpacing:4, color:C.gold, marginBottom:18, display:"block" };
+  const BT = { fontFamily:F.h, fontSize:32, fontWeight:400, color:C.txt, lineHeight:1.25, marginBottom:8 };
+  const DIV = { width:36, height:1, background:C.gold, marginBottom:28 };
+  const BD = { fontSize:15, lineHeight:1.95, color:C.txt, fontWeight:300, fontFamily:F.b };
+  const MT = { fontSize:15, lineHeight:1.95, color:C.muted, fontWeight:300, fontFamily:F.b };
+
+  const stageKey = PAGE_STAGE[page];
+  const stage = stageKey ? STAGES[stageKey] : null;
+
+  const StageBadge = () => !stage ? null : (
+    <div style={{ display:"flex", gap:10, alignItems:"center", marginBottom:28, padding:"10px 16px", background:stage.bg, border:`1px solid ${stage.color}33`, width:"fit-content" }}>
+      <div style={{ width:6, height:6, borderRadius:"50%", background:stage.color }} />
+      <span style={{ fontFamily:F.b, fontSize:11, letterSpacing:4, color:stage.color }}>{stage.label}</span>
+      <span style={{ fontFamily:F.h, fontSize:13, color:C.muted, fontStyle:"italic" }}>{stage.latin}</span>
+      <span style={{ fontFamily:F.b, fontSize:11, color:C.muted }}>· {stage.sub}</span>
+    </div>
+  );
+
+  const renderPage = () => { switch(page) {
+
+  case 0: return (
+    <div style={{ minHeight:"100vh", display:"flex", flexDirection:"column", justifyContent:"center", alignItems:"center", textAlign:"center", padding:"48px 28px", background:C.bg, position:"relative", overflow:"hidden" }}>
+      <div style={{ position:"absolute", top:0, left:0, right:0, height:2, background:`linear-gradient(90deg,transparent,${C.gold},transparent)` }} />
+      <div style={{ position:"absolute", bottom:0, left:0, right:0, height:1, background:`linear-gradient(90deg,transparent,${C.gold}44,transparent)` }} />
+      <div style={{ position:"absolute", inset:0, backgroundImage:`radial-gradient(ellipse at 50% 55%,#0e1a28 0%,transparent 65%)`, pointerEvents:"none" }} />
+      <span style={{ fontFamily:F.b, fontSize:11, letterSpacing:6, color:C.gold, marginBottom:48, display:"block" }}>디퍼 언브랜딩살롱</span>
+      <h1 style={{ fontFamily:F.h, fontSize:"clamp(32px,7vw,52px)", fontWeight:300, color:C.txt, lineHeight:1.1, marginBottom:10 }}>마침내 특이점이 시작된다</h1>
+      <p style={{ fontFamily:F.h, fontSize:18, color:"#b0bec8", fontStyle:"italic", marginBottom:6 }}>The Singularity Is Nearer</p>
+      <p style={{ fontFamily:F.b, fontSize:12, color:"#b0bec8", letterSpacing:2 }}>Ray Kurzweil, 2024 · 비즈니스북스</p>
+      <div style={{ width:1, height:52, background:`linear-gradient(${C.gold}88,transparent)`, margin:"36px auto" }} />
+      <p style={{ fontFamily:F.b, fontSize:13, letterSpacing:5, color:C.gold, marginBottom:10 }}>소크라테스식 고전 탐구 세미나</p>
+      <p style={{ fontFamily:F.h, fontSize:19, color:"#b0bec8", fontStyle:"italic", marginBottom:16 }}>제3장</p>
+      <p style={{ fontFamily:F.h, fontSize:17, color:"#b0bec8", fontStyle:"italic", marginBottom:52 }}>나는 누구인가?</p>
+      <button onClick={next}
+        onMouseEnter={e=>{e.currentTarget.style.background=C.gold;e.currentTarget.style.color=C.bg;}}
+        onMouseLeave={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.color=C.gold;}}
+        style={{ background:"transparent", border:`1px solid ${C.gold}`, color:C.gold, fontFamily:F.b, fontSize:12, letterSpacing:4, padding:"15px 48px", cursor:"pointer", transition:"all 0.3s" }}>
+        시작하기
+      </button>
+      <div style={{ display:"flex", gap:24, marginTop:40, justifyContent:"center" }}>
+        {[["문법","#c4a35a"],["논리","#5a9abc"],["수사","#bc7a7a"]].map(([l,col])=>(
+          <div key={l} style={{ textAlign:"center" }}>
+            <div style={{ width:5, height:5, borderRadius:"50%", background:col, margin:"0 auto 6px" }} />
+            <span style={{ fontFamily:F.b, fontSize:10, color:col, letterSpacing:3 }}>{l}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
+  case 1: return (
+    <div style={W}>
+      <span style={SL}>안내 · 트리비움으로 읽다</span>
+      <h2 style={BT}>세 단계로 읽는 법</h2>
+      <div style={DIV} />
+      <p style={{ ...BD, marginBottom:32 }}>이 세미나는 생각을 이끄는 도구, <strong style={{color:C.goldBr}}>트리비움</strong>으로 텍스트를 읽습니다—<strong style={{color:C.goldBr}}>문법, 논리, 수사</strong>. 각 단계는 텍스트를 다른 깊이로 만나는 방법입니다.</p>
+      {[
+        { key:"grammar", n:"01", label:"문법 — Grammatica", pages:"5섹션",
+          desc:"3장의 핵심 개념과 언어를 내 것으로 만드는 단계입니다.",
+          items:["패턴 정체성·테세우스의 배·기억과 정체성·감각질·의식의 어려운 문제·범원형심론·철학적 좀비·자아 모델 이론·자유의지·점진적 대체·파핏의 논증·레플리컨트·두번째 나·마음 업로드·디지털 불멸 개념 카드 (15종)","핵심 논점 3개—범원형심론과 의식 / 자유의지와 자기 설계 / 전적인 책임의 도래","이해 확인 퀴즈 4문항"] },
+        { key:"logic", n:"02", label:"논리 — Dialectica", pages:"2섹션",
+          desc:"'나는 누구인가'에서 '나는 어떤 사람이 될 수 있는가'로—논증의 경로를 단계별로 따라갑니다.",
+          items:["물음 → 패턴 발견 → 의식과 자유의지 → 레플리컨트의 긴장 → 전적인 책임","심리적 연속성 이론 vs 생물학적 자연주의 vs 소멸주의·무아론 비교"] },
+        { key:"rhetoric", n:"03", label:"수사 — Rhetorica", pages:"세미나에서 함께",
+          desc:"이 단계는 세미나 현장에서 함께 합니다. 핵심 질문: 나는 어떤 사람이 될 수 있습니까?",
+          items:["소크라테스식 세미나 토론 질문 5개","힌트와 함께 입장 준비"] },
+      ].map(item=>{
+        const s=STAGES[item.key];
+        return (
+          <div key={item.key} style={{ marginBottom:20, background:C.surf, padding:"22px 24px", borderLeft:`3px solid ${s.color}` }}>
+            <div style={{ display:"flex", gap:14, alignItems:"flex-start", marginBottom:14 }}>
+              <span style={{ fontFamily:F.h, fontSize:30, color:s.color, lineHeight:1, minWidth:32 }}>{item.n}</span>
+              <div>
+                <div style={{ display:"flex", gap:10, alignItems:"center", marginBottom:6 }}>
+                  <span style={{ fontFamily:F.b, fontSize:11, letterSpacing:4, color:s.color }}>{item.label}</span>
+                  <span style={{ fontFamily:F.b, fontSize:11, color:C.muted }}>· {item.pages}</span>
+                </div>
+                <p style={{ ...BD, fontSize:13, margin:0, lineHeight:1.8 }}>{item.desc}</p>
+              </div>
+            </div>
+            <div style={{ paddingLeft:46 }}>
+              {item.items.map((it,j)=>(
+                <div key={j} style={{ display:"flex", gap:10, alignItems:"flex-start", padding:"4px 0" }}>
+                  <div style={{ width:4, height:4, borderRadius:"50%", background:s.color+"88", flexShrink:0, marginTop:7 }} />
+                  <span style={{ ...MT, fontSize:13 }}>{it}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+
+  case 2: return (
+    <div style={W}>
+      <StageBadge />
+      <span style={SL}>문법 1/5 · 핵심 개념</span>
+      <h2 style={BT}>카드를 눌러 개념을 확인하세요</h2>
+      <div style={DIV} />
+      <p style={{ ...MT, marginBottom:36, fontSize:14 }}>15개 모두 열어보시길 권합니다. 지금 완전히 이해하지 않아도 됩니다—이후 독해와 퀴즈를 통해 다시 만납니다.</p>
+      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
+        {CONCEPTS.map(c=>{
+          const open=flipped.has(c.id);
+          return (
+            <div key={c.id}
+              onClick={()=>{const n=new Set(flipped);if(n.has(c.id))n.delete(c.id);else n.add(c.id);setFlipped(n);}}
+              style={{ background:open?C.surfUp:C.surf, border:`1px solid ${open?c.accent+"66":C.line}`, padding:"18px 20px", cursor:"pointer", transition:"all 0.25s" }}>
+              <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start" }}>
+                <div style={{ flex:1, paddingRight:8 }}>
+                  <p style={{ fontFamily:F.h, fontSize:17, color:open?c.accent:C.goldBr, fontWeight:500, margin:"0 0 2px", lineHeight:1.25 }}>{c.term}</p>
+                  <p style={{ fontSize:10, color:C.muted, fontStyle:"italic", margin:0 }}>{c.latin}</p>
+                </div>
+                <span style={{ color:open?C.gold:C.muted, fontSize:20, lineHeight:1, transform:open?"rotate(45deg)":"none", transition:"transform 0.25s", flexShrink:0 }}>+</span>
+              </div>
+              {open && (
+                <div style={{ marginTop:16 }}>
+                  <p style={{ fontSize:11, color:c.accent, letterSpacing:3, marginBottom:10, fontWeight:500 }}>{c.keyword}</p>
+                  <p style={{ ...BD, fontSize:13, marginBottom:14, lineHeight:1.85, whiteSpace:"pre-line" }}>{c.desc}</p>
+                  <div style={{ background:C.surf, padding:"12px 14px" }}>
+                    <p style={{ ...MT, fontSize:12, margin:0, lineHeight:1.8 }}>✦ {c.example}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+      <div style={{ textAlign:"center", marginTop:28 }}>
+        <span style={{ ...MT, fontSize:12, letterSpacing:2 }}>{flipped.size} / {CONCEPTS.length} 확인</span>
+        <div style={{ display:"flex", justifyContent:"center", gap:5, marginTop:10, flexWrap:"wrap" }}>
+          {CONCEPTS.map((c,i)=><div key={i} style={{ width:6, height:6, borderRadius:"50%", background:flipped.has(c.id)?C.gold:C.line, transition:"background 0.3s" }} />)}
+        </div>
+      </div>
+    </div>
+  );
+
+  case 3: case 4: case 5: {
+    const pIdx=page-3, p=PASSAGES[pIdx], layer=pLayers[pIdx];
+    return (
+      <div style={W}>
+        <StageBadge />
+        <span style={SL}>문법 {pIdx+2}/5 · 핵심 논점 {pIdx+1}/3</span>
+        <h2 style={BT}>{p.title}</h2>
+        <div style={DIV} />
+        <div style={{ background:"#0d1a0d", border:`1px solid #1e3a1e`, padding:"18px 22px", marginBottom:28 }}>
+          <p style={{ fontSize:11, color:"#4a8a4a", letterSpacing:3, marginBottom:8 }}>책에서 찾아보기</p>
+          <p style={{ ...BD, fontSize:13, margin:0, color:"#8abb8a", lineHeight:1.85 }}>{p.note}</p>
+        </div>
+        <p style={{ ...MT, fontSize:12, marginBottom:16, letterSpacing:1 }}>아래 탭을 순서대로 눌러 이해의 층을 쌓아보세요</p>
+        <div style={{ display:"flex" }}>
+          {p.layers.map((l,i)=>(
+            <button key={i} onClick={()=>setPLayers(prev=>{const n=[...prev];n[pIdx]=i;return n;})}
+              style={{ flex:1, padding:"12px 8px", background:layer===i?C.surfUp:C.surf, border:"none", borderBottom:`2px solid ${layer===i?C.gold:C.line}`, color:layer===i?C.gold:C.muted, fontFamily:F.b, fontSize:12, letterSpacing:2, cursor:"pointer", transition:"all 0.2s" }}>
+              {l.label}
+            </button>
+          ))}
+        </div>
+        <div style={{ background:C.surfUp, padding:"28px 26px", minHeight:148, borderTop:`1px solid ${C.line}`, marginBottom:32 }}>
+          <p style={{ ...BD, margin:0, lineHeight:2.1, whiteSpace:"pre-line" }}>{p.layers[layer].text}</p>
+        </div>
+        {pIdx<2 && (
+          <div style={{ display:"flex", justifyContent:"center" }}>
+            <button onClick={next} style={{ background:"transparent", border:`1px solid ${C.line}`, color:C.muted, fontFamily:F.b, fontSize:12, letterSpacing:3, padding:"10px 28px", cursor:"pointer" }}>
+              다음 논점으로 →
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  case 6: return (
+    <div style={W}>
+      <StageBadge />
+      <span style={SL}>문법 5/5 · 이해 확인</span>
+      <h2 style={BT}>이해 확인 퀴즈</h2>
+      <div style={DIV} />
+      <p style={{ ...MT, marginBottom:40, fontSize:14 }}>정답을 선택하고 '확인'을 누르면 해설이 나옵니다.</p>
+      {QUIZ.map((q,qi)=>(
+        <div key={qi} style={{ marginBottom:40 }}>
+          <div style={{ display:"flex", gap:14, marginBottom:16, alignItems:"flex-start" }}>
+            <span style={{ fontFamily:F.h, fontSize:26, color:C.gold, lineHeight:1, minWidth:32 }}>Q{qi+1}</span>
+            <p style={{ ...BD, fontWeight:400, lineHeight:1.75, margin:0 }}>{q.q}</p>
+          </div>
+          {q.opts.map((opt,oi)=>{
+            const sel=qSel[qi]===oi, done=qDone[qi], correct=oi===q.ans;
+            let bg=C.surf, border=C.line, color=C.txt;
+            if(done){ if(correct){bg="#0d1a0d";border="#2a5a2a";color="#8acd8a";}else if(sel){bg="#1a0d0d";border="#5a2a2a";color="#cd8a8a";}else{color=C.muted;} }
+            else if(sel){ bg=C.surfUp; border=C.gold+"88"; }
+            return (
+              <div key={oi} onClick={()=>{if(!done){const n=[...qSel];n[qi]=oi;setQSel(n);}}}
+                style={{ background:bg, border:`1px solid ${border}`, padding:"13px 18px", marginBottom:8, cursor:done?"default":"pointer", display:"flex", gap:14, alignItems:"flex-start", transition:"all 0.2s" }}>
+                <span style={{ fontFamily:F.h, fontSize:16, color:done&&correct?"#3a7a3a":(done&&sel?"#7a3a3a":C.muted), minWidth:20, lineHeight:1.6 }}>{String.fromCharCode(65+oi)}</span>
+                <span style={{ ...BD, fontSize:14, color, margin:0, lineHeight:1.7 }}>{opt}</span>
+                {done&&correct&&<span style={{ marginLeft:"auto", color:"#3a7a3a", fontSize:16, flexShrink:0 }}>✓</span>}
+              </div>
+            );
+          })}
+          {!qDone[qi]&&qSel[qi]!==null&&(
+            <button onClick={()=>{const n=[...qDone];n[qi]=true;setQDone(n);}}
+              style={{ marginTop:8, padding:"10px 28px", background:"transparent", border:`1px solid ${C.gold}`, color:C.gold, fontFamily:F.b, fontSize:12, letterSpacing:3, cursor:"pointer" }}>
+              확인
+            </button>
+          )}
+          {qDone[qi]&&(
+            <div style={{ background:"#0a150a", border:`1px solid #1a301a`, padding:"16px 20px", marginTop:12 }}>
+              <p style={{ fontSize:11, color:"#4a8a4a", letterSpacing:3, marginBottom:8 }}>해설</p>
+              <p style={{ ...BD, fontSize:13, color:"#90bb90", margin:0, lineHeight:1.85 }}>{q.exp}</p>
+            </div>
+          )}
+        </div>
+      ))}
+      <div style={{ textAlign:"center", padding:"16px 0", borderTop:`1px solid ${C.line}` }}>
+        <span style={{ ...MT, fontSize:12, letterSpacing:2 }}>{qDone.filter(Boolean).length} / {QUIZ.length} 완료</span>
+      </div>
+    </div>
+  );
+
+  case 7: return (
+    <div style={W}>
+      <StageBadge />
+      <span style={SL}>논리 1/2 · 나는 누구인가 → 나는 어떤 사람이 될 수 있는가</span>
+      <h2 style={BT}>물음의 이동—존재에서 가능성으로</h2>
+      <div style={DIV} />
+      <div style={{ background:"#0a1218", border:`1px solid ${STAGES.logic.color}33`, padding:"18px 22px", marginBottom:28 }}>
+        <p style={{ fontSize:11, color:STAGES.logic.color, letterSpacing:3, marginBottom:10 }}>3장의 핵심 이동</p>
+        <p style={{ fontFamily:F.h, fontSize:17, fontStyle:"italic", color:C.txt, margin:0, lineHeight:1.9 }}>
+          "나는 누구인가?" → "나는 어떤 사람이 될 수 있는가?"<br/>
+          <span style={{ fontSize:13, color:C.muted }}>이 이동이 가능한 이유: 특이점이 소스 코드 접속을 허용하기 때문이다.</span>
+        </p>
+      </div>
+      <p style={{ ...MT, marginBottom:28, fontSize:13, lineHeight:1.9 }}>'다음' 버튼을 눌러 논거를 단계적으로 따라가보세요.</p>
+      {ARG_STEPS.slice(0,argStep+1).map((step,i)=>(
+        <div key={i} style={{ marginBottom:14, opacity:i===argStep?1:0.5, transition:"opacity 0.3s" }}>
+          <div style={{ display:"flex", alignItems:"stretch" }}>
+            <div style={{ width:4, background:step.color, flexShrink:0 }} />
+            <div style={{ background:i===argStep?C.surfUp:C.surf, padding:"20px 24px", flex:1 }}>
+              <div style={{ display:"flex", gap:12, alignItems:"center", marginBottom:10 }}>
+                <span style={{ fontFamily:F.b, fontSize:10, letterSpacing:4, color:step.color }}>{step.num}</span>
+                <span style={{ fontFamily:F.h, fontSize:18, color:i===argStep?C.txt:C.muted }}>{step.title}</span>
+              </div>
+              <p style={{ ...BD, fontSize:14, lineHeight:1.95, marginBottom:12, whiteSpace:"pre-line" }}>{step.body}</p>
+              <div style={{ padding:"10px 14px", background:C.bg, borderLeft:`2px solid ${step.color}44` }}>
+                <p style={{ ...MT, fontSize:12, margin:0, color:step.color }}>✦ {step.key}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      ))}
+      <div style={{ display:"flex", gap:14, marginTop:24, alignItems:"center" }}>
+        {argStep<ARG_STEPS.length-1 ? (
+          <button onClick={()=>setArgStep(s=>s+1)}
+            onMouseEnter={e=>{e.currentTarget.style.background=ARG_STEPS[argStep+1].color;e.currentTarget.style.color=C.bg;}}
+            onMouseLeave={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.color=ARG_STEPS[argStep+1].color;}}
+            style={{ padding:"12px 28px", background:"transparent", border:`1px solid ${ARG_STEPS[argStep+1].color}`, color:ARG_STEPS[argStep+1].color, fontFamily:F.b, fontSize:12, letterSpacing:3, cursor:"pointer", transition:"all 0.3s" }}>
+            다음 →
+          </button>
+        ) : (
+          <span style={{ ...MT, fontSize:12, letterSpacing:2, color:C.gold }}>논증 완료</span>
+        )}
+        {argStep>0 && <button onClick={()=>setArgStep(0)} style={{ background:"transparent", border:"none", color:C.muted, fontFamily:F.b, fontSize:11, letterSpacing:2, cursor:"pointer" }}>처음부터</button>}
+        <span style={{ marginLeft:"auto", ...MT, fontSize:11 }}>{argStep+1} / {ARG_STEPS.length}</span>
+      </div>
+    </div>
+  );
+
+  case 8: return (
+    <div style={W}>
+      <StageBadge />
+      <span style={SL}>논리 2/2 · 철학적 비교</span>
+      <h2 style={BT}>나는 누구인가—세 가지 답</h2>
+      <div style={DIV} />
+      <p style={{ ...MT, marginBottom:24, fontSize:14 }}>세 입장을 눌러 비교해보세요.</p>
+      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:8, marginBottom:36 }}>
+        {POSITIONS.map((pos,i)=>{
+          const open=posOpen===i;
+          return (
+            <div key={i} onClick={()=>setPosOpen(open?null:i)}
+              style={{ background:open?C.surfUp:C.surf, border:`1px solid ${open?pos.color+"88":C.line}`, padding:"16px 14px", cursor:"pointer", transition:"all 0.25s" }}>
+              <p style={{ fontFamily:F.h, fontSize:15, color:open?pos.color:C.muted, margin:"0 0 4px", textAlign:"center", lineHeight:1.3 }}>{pos.label}</p>
+              <p style={{ fontSize:10, color:C.muted, fontStyle:"italic", margin:0, textAlign:"center" }}>{pos.sub}</p>
+              {open && (
+                <div style={{ marginTop:14 }}>
+                  <div style={{ marginBottom:10, paddingBottom:10, borderBottom:`1px solid ${C.line}` }}>
+                    <p style={{ fontSize:10, color:pos.color, letterSpacing:3, marginBottom:6 }}>주장</p>
+                    <p style={{ ...BD, fontSize:12, margin:0, lineHeight:1.75 }}>{pos.claim}</p>
+                  </div>
+                  <div style={{ marginBottom:10 }}>
+                    <p style={{ fontSize:10, color:"#8a6a4a", letterSpacing:3, marginBottom:6 }}>반론·응답</p>
+                    <p style={{ ...BD, fontSize:12, margin:0, lineHeight:1.75, color:"#c4a880" }}>{pos.problem}</p>
+                  </div>
+                  <div style={{ padding:"8px 12px", background:C.surf, borderLeft:`2px solid ${pos.color}44` }}>
+                    <p style={{ fontSize:11, color:pos.color, margin:0, whiteSpace:"pre-line" }}>{pos.quote}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+      <div style={{ background:C.surf, padding:"20px 24px" }}>
+        <p style={{ fontFamily:F.b, fontSize:11, color:STAGES.logic.color, letterSpacing:4, marginBottom:14 }}>핵심 쟁점</p>
+        <p style={{ ...BD, fontSize:14, lineHeight:1.9, margin:0 }}>
+          세 이론이 공통적으로 인정하는 것: <strong style={{color:C.txt}}>고정된 실체로서의 '나'는 없다.</strong> 갈라지는 것: 그렇다면 자기 설계가 가능한가, 그리고 그것이 진정한 '나'인가. 커즈와일은 이 가능성을 긍정하며—거기서 <strong style={{color:C.txt}}>전적인 책임</strong>이라는 가장 무거운 약속을 꺼낸다.
+        </p>
+      </div>
+    </div>
+  );
+
+  case 9: return (
+    <div style={W}>
+      <StageBadge />
+      <span style={SL}>수사 · 세미나 준비</span>
+      <h2 style={BT}>나는 어떤 사람이 될 수 있습니까?</h2>
+      <div style={DIV} />
+      <div style={{ background:"#1a0f0f", border:`1px solid ${STAGES.rhetoric.color}33`, padding:"20px 24px", marginBottom:36 }}>
+        <p style={{ fontFamily:F.b, fontSize:11, color:STAGES.rhetoric.color, letterSpacing:4, marginBottom:10 }}>수사 단계의 핵심 질문</p>
+        <p style={{ ...BD, fontSize:14, margin:0, lineHeight:1.9 }}>
+          문법으로 텍스트를 읽고, 논리로 논증을 분석했습니다. 수사는 그것을 <strong style={{color:C.txt}}>함께 말하는 단계</strong>입니다. 3장의 수사가 향하는 곳은 하나의 질문입니다—<strong style={{color:C.txt}}>나는 어떤 사람이 될 수 있습니까?</strong>
+        </p>
+      </div>
+      <p style={{ fontFamily:F.b, fontSize:11, color:STAGES.rhetoric.color, letterSpacing:4, marginBottom:20 }}>세미나 토론 질문</p>
+      {SEMINAR_QS.map((item,i)=>{
+        const open=seminHints.has(i);
+        return (
+          <div key={i} style={{ marginBottom:20, background:C.surf, padding:"22px 26px", borderLeft:`3px solid ${STAGES.rhetoric.color}${i%2===0?"cc":"44"}` }}>
+            <div style={{ display:"flex", gap:16, alignItems:"flex-start", marginBottom:12 }}>
+              <span style={{ fontFamily:F.h, fontSize:28, color:STAGES.rhetoric.color, lineHeight:1, minWidth:34 }}>S{i+1}</span>
+              <p style={{ ...BD, fontWeight:400, lineHeight:1.8, margin:0, flex:1 }}>{item.q}</p>
+            </div>
+            <div style={{ paddingLeft:50 }}>
+              <button onClick={()=>{const n=new Set(seminHints);if(n.has(i))n.delete(i);else n.add(i);setSeminHints(n);}}
+                style={{ background:"transparent", border:"none", color:C.muted, fontFamily:F.b, fontSize:11, letterSpacing:3, cursor:"pointer", padding:0 }}>
+                {open?"힌트 접기 ↑":"힌트 보기 ↓"}
+              </button>
+              {open && (
+                <div style={{ marginTop:10, padding:"12px 16px", background:C.surfUp, borderLeft:`2px solid ${STAGES.rhetoric.color}33` }}>
+                  <p style={{ ...MT, fontSize:13, fontStyle:"italic", margin:0, lineHeight:1.8 }}>💡 {item.hint}</p>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+
+  case 10: return (
+    <div style={{ minHeight:"100vh", display:"flex", flexDirection:"column", justifyContent:"center", alignItems:"center", textAlign:"center", padding:"48px 28px", background:C.bg, position:"relative" }}>
+      <div style={{ position:"absolute", top:0, left:0, right:0, height:1, background:`linear-gradient(90deg,transparent,${C.gold}44,transparent)` }} />
+      <span style={{ fontFamily:F.b, fontSize:11, letterSpacing:6, color:C.muted, marginBottom:48, display:"block" }}>디퍼 언브랜딩살롱 · 마침내 특이점이 시작된다</span>
+      <div style={{ width:1, height:64, background:`linear-gradient(${C.gold}88,transparent)`, margin:"0 auto 44px" }} />
+      <div style={{ background:C.surf, padding:"36px 40px", maxWidth:640, textAlign:"left", borderLeft:`3px solid ${C.gold}`, marginBottom:52 }}>
+        <p style={{ fontSize:11, color:C.gold, letterSpacing:4, marginBottom:20 }}>오늘의 마지막 문장 · Ray Kurzweil · 제3장 · 나는 누구인가?</p>
+        <p style={{ fontFamily:F.h, fontSize:"clamp(14px,2vw,17px)", fontStyle:"italic", color:C.txt, lineHeight:2.3, margin:0 }}>
+          "따라서 초지능 AI와 합쳐지는 것은 가치있는 성취가 될 테지만, 그것은 더 높은 목표를 위한 수단일 뿐이다. 일단 우리 뇌가 더 발전된 디지털 기질에 백업되면, 자기 수정 능력이 완전히 실현될 수 있다. 우리의 행동은 우리의 가치와 일치될 수 있고, 우리의 삶은 생물학의 결함으로 인해 훼손되거나 단축되지 않을 것이다. 마침내 인간은 자신이 어떤 사람인지에 대해 전적으로 책임질 수 있게 될 것이다."
+        </p>
+        <p style={{ ...MT, fontSize:12, marginTop:20, marginBottom:0, letterSpacing:2 }}>— 『마침내 특이점이 시작된다』 제3장 나는 누구인가?</p>
+      </div>
+      <div style={{ display:"flex", gap:32, marginBottom:52, justifyContent:"center" }}>
+        {[["문법","Grammar","#c4a35a"],["논리","Logic","#5a9abc"],["수사","Rhetoric","#bc7a7a"]].map(([l,e,col])=>(
+          <div key={l} style={{ textAlign:"center" }}>
+            <div style={{ width:5, height:5, borderRadius:"50%", background:col, margin:"0 auto 8px" }} />
+            <p style={{ fontFamily:F.b, fontSize:11, color:col, letterSpacing:3, marginBottom:5 }}>{l}</p>
+            <p style={{ fontFamily:F.h, fontSize:13, color:C.muted, margin:0, fontStyle:"italic" }}>{e}</p>
+          </div>
+        ))}
+      </div>
+      <button onClick={()=>go(0)} style={{ background:"transparent", border:`1px solid ${C.line}`, color:C.muted, fontFamily:F.b, fontSize:11, letterSpacing:4, padding:"12px 32px", cursor:"pointer" }}>처음으로</button>
+    </div>
+  );
+
+  default: return null;
+  }};
+
+  const navVisible = page>0 && page<10;
+  return (
+    <div style={{ background:C.bg, minHeight:"100vh" }}>
+      {navVisible && (
+        <div style={{ position:"fixed", top:0, left:0, right:0, height:2, background:C.line, zIndex:100 }}>
+          <div style={{ height:"100%", width:`${((page-1)/8)*100}%`, background:stage?stage.color:C.gold, transition:"width 0.4s ease, background 0.4s ease" }} />
+        </div>
+      )}
+      <div style={{ opacity:fading?0:1, transition:"opacity 0.28s ease", paddingTop:navVisible?2:0 }}>
+        {renderPage()}
+      </div>
+      {navVisible && (
+        <div style={{ maxWidth:720, margin:"0 auto", padding:"0 28px 52px", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+          <button onClick={prev} style={{ background:"transparent", border:"none", color:C.muted, fontFamily:F.b, fontSize:12, letterSpacing:3, cursor:"pointer", padding:"12px 0" }}>← 이전</button>
+          <div style={{ display:"flex", gap:4, alignItems:"center", flexWrap:"wrap", justifyContent:"center", maxWidth:160 }}>
+            {Array.from({length:9},(_,i)=>{
+              const ps=PAGE_STAGE[i+2], col=ps?STAGES[ps].color:C.gold, active=i===page-2, done=i<page-2;
+              return <div key={i} style={{ width:active?8:5, height:active?8:5, borderRadius:"50%", background:done||active?col:C.line, transition:"all 0.3s" }} />;
+            })}
+          </div>
+          {page<9 ? (
+            <button onClick={next} style={{ background:"transparent", border:"none", color:stage?stage.color:C.gold, fontFamily:F.b, fontSize:12, letterSpacing:3, cursor:"pointer", padding:"12px 0" }}>다음 →</button>
+          ) : (
+            <button onClick={next}
+              onMouseEnter={e=>{e.currentTarget.style.background=STAGES.rhetoric.color;e.currentTarget.style.color=C.bg;}}
+              onMouseLeave={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.color=STAGES.rhetoric.color;}}
+              style={{ background:"transparent", border:`1px solid ${STAGES.rhetoric.color}`, color:STAGES.rhetoric.color, fontFamily:F.b, fontSize:11, letterSpacing:3, padding:"10px 24px", cursor:"pointer", transition:"all 0.3s" }}>
+              마무리
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
