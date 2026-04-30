@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>마침내 특이점이 시작된다 · 제4장 · 디퍼 언브랜딩살롱</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Noto+Serif+KR:wght@300;400;500&display=swap" rel="stylesheet">
+<style>* { box-sizing:border-box; } body { margin:0; background:#090b0d; } button { -webkit-tap-highlight-color:transparent; }</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState } = React;
+
+/* ─── 개념 카드 16종 ────────────────────────────────────────────── */
+const CONCEPTS = [
+  { id:"loar", term:"수확 가속의 법칙", latin:"Law of Accelerating Returns",
+    keyword:"진화와 기술 발전 자체가 기하급수적으로 가속한다",
+    desc:"커즈와일의 핵심 원리. 정보 기술의 발전 속도는 시간이 지날수록 가속한다. 각 세대의 기술이 다음 세대를 만드는 데 활용되는 양의 피드백 루프 때문이다.\n\n4장의 적용: 이 법칙이 컴퓨터 칩에만 적용되는 것이 아니라, 빈곤·질병·에너지·식량이라는 인류의 가장 오래된 문제들에도 적용되고 있다는 것이 4장의 핵심 주장이다.\n\n선순환 구조: 기술 발전 → 더 많은 자원 → 더 빠른 기술 발전 → 인류의 삶 개선 → 더 많은 연구자 → 더 빠른 발전.",
+    example:"1달러로 살 수 있는 컴퓨팅 성능은 1958년 이후 매 16개월마다 두 배씩 증가했다. 같은 법칙이 유전체 분석 비용(매년 절반씩 감소), 태양광 비용(매년 감소), AI 성능(매년 향상)에 동시에 적용된다.", accent:"#5a9abc" },
+
+  { id:"expinfo", term:"기하급수적 정보 기술", latin:"Exponential Information Technology",
+    keyword:"비정보 기술이 정보 기술로 전환되는 순간 가속이 시작된다",
+    desc:"커즈와일 4장의 핵심 개념. AI와 결합하면서 기존에 선형적으로 발전하던 기술 분야들이 기하급수적 정보 기술로 전환된다.\n\n전환 사례:\n• 농업: AI 병해충 예측·드론 정밀 살포 → 수확량 최적화\n• 의학: 유전체 분석·AI 진단·AI 신약 설계 → 기하급수적 의료 혁신\n• 제조: 로봇·AI 설계·3D 프린팅 → 디지털 제조\n• 에너지: AI 전력망 최적화·신소재 발견 → 에너지 전환 가속\n\n이것이 4장의 핵심 논거다: AI가 농업·의학·제조·에너지라는 선형 기술들을 기하급수적 정보 기술로 전환시키고 있다.",
+    example:"AlphaFold2(2020)가 단백질 구조 예측 50년 난제를 해결한 것: 생물학(비정보 과학)이 AI(정보 기술)와 결합해 기하급수적 전환이 일어난 가장 극적인 사례. 이후 신약 후보 물질 발굴 속도가 수십 배 빨라졌다.", accent:"#c4a35a" },
+
+  { id:"knee", term:"가파른 구간", latin:"The Knee of the Curve",
+    keyword:"기하급수 곡선이 솟아오르기 시작하는 변곡점",
+    desc:"기하급수 성장 곡선에서 '가파른 구간'은 성장이 극적으로 가속되기 시작하는 변곡점이다.\n\n특성:\n• 그 전까지: 성장이 느려 보인다—실제로는 기하급수적으로 진행 중이었지만\n• 변곡점 이후: 성장이 수직에 가깝게 솟아오른다\n\n커즈와일의 주장: 인류의 삶을 개선하는 정보 기술은 지금 이 가파른 구간에 진입하고 있다.\n\n수련 연못: 매일 두 배로 자라 30일째 가득 찬다. 25일까지 연못의 3%만 채워진다. 26일째부터 급속히 솟아오른다—우리는 지금 이 전환점에 있다.",
+    example:"2022년 ChatGPT 등장 이전 대부분의 AI 전문가들은 범용 언어 이해 AI를 수십 년 후로 예측했다. 2023년 GPT-4, AlphaFold2, AlphaGeometry가 연달아 등장했다. 이것이 가파른 구간 진입의 신호다.", accent:"#9a7abd" },
+
+  { id:"progress", term:"인류 진보 지표", latin:"Human Progress Metrics",
+    keyword:"데이터로 보면 거의 모든 삶의 지표가 개선되고 있다",
+    desc:"커즈와일이 4장에서 제시하는 핵심 근거. 감정과 직관이 아니라 측정 가능한 지표로 볼 때—거의 모든 영역에서 인류의 삶은 기하급수적으로 개선되고 있다.\n\n핵심 지표:\n• 극빈층 비율: 1820년 약 89% → 2023년 약 9%\n• 5세 미만 아동 사망률: 1900년 약 43% → 현재 약 4%\n• 전 세계 문해율: 1820년 약 12% → 현재 약 87%\n• 전쟁으로 인한 사망: 20세기 중반 이후 지속 감소\n• 태양광 발전 비용: 2010년 대비 90% 이상 감소\n\n출처: Our World in Data(맥스 로저), 세계은행, IHME",
+    example:"맥스 로저(Our World in Data): '1990년 이후 매일 약 17만 명이 극빈층을 탈출했다. 매일 약 17,000명의 아동 사망이 줄었다. 이것은 매일 일어나는 기적—그러나 뉴스에 나오지 않는다.'", accent:"#6aaa82" },
+
+  { id:"negbias", term:"부정성 편향", latin:"Negativity Bias",
+    keyword:"왜 우리는 세상의 개선을 인식하지 못하는가",
+    desc:"진화심리학적 사실. 인간의 뇌는 위협(부정적 정보)을 기회(긍정적 정보)보다 더 강하게, 더 오래 처리한다. 생존에 유리했기 때문이다.\n\n현대적 결과:\n• 나쁜 뉴스가 좋은 뉴스보다 클릭률이 높다\n• 미디어는 부정적 사건을 과잉 보도한다\n• 기하급수적 개선은 매일 조금씩 일어나 눈에 띄지 않는다\n• 실패는 갑자기 발생해 뉴스를 채운다\n\n다니엘 카너먼: 손실 회피(loss aversion)—같은 크기의 손실이 이득보다 약 2배 더 강하게 느껴진다.\n\n커즈와일의 처방: 직관이 아니라 데이터와 법칙으로 판단하라.",
+    example:"비행기 추락 사고는 뉴스 1면을 차지하지만, 오늘 안전하게 착륙한 수천 편의 비행기는 보도되지 않는다. 항공 여행은 역사상 가장 안전해졌지만—공포는 줄지 않는다. 기하급수적 안전 개선도 같은 방식으로 가려진다.", accent:"#c47a7a" },
+
+  { id:"poverty", term:"극빈층 감소", latin:"Extreme Poverty Reduction",
+    keyword:"인류 역사상 가장 빠른 빈곤 감소",
+    desc:"세계은행 기준 극빈층: 하루 $2.15(2023년 기준) 미만.\n\n• 1990년: 약 36% (약 19억 명)\n• 2023년: 약 9% (약 7억 명)\n\n가장 빠른 감소 사례: 중국—30년 만에 8억 명 이상 빈곤 탈출. 방글라데시·인도·베트남이 뒤따름.\n\n기하급수적 정보 기술의 역할: 스마트폰 기반 디지털 금융(M-Pesa)·원격 의료·AI 기반 교육 플랫폼이 개발도상국의 발전 경로를 단축시킨다. 선형적 제도 발전 단계를 건너뛰는 '개구리 뛰기(leapfrogging)' 발전이 가능해진다.",
+    example:"케냐 M-Pesa(2007): 은행 계좌 없이 스마트폰으로 금융 서비스 접근. 케냐 GDP의 약 50%가 M-Pesa를 통해 처리된다. 기술이 수십 년의 제도적 발전을 단숨에 건너뛴 사례—커즈와일이 4장에서 제시하는 정보 기술의 빈곤 해소 메커니즘이다.", accent:"#aaba5a" },
+
+  { id:"violence", term:"폭력의 역사적 감소", latin:"Decline of Violence · Pinker",
+    keyword:"우리는 역사상 가장 평화로운 시대에 살고 있다",
+    desc:"스티븐 핑커 《우리 본성의 선한 천사》(Better Angels of Our Nature, 2011)·《지금 다시 계몽》(Enlightenment Now, 2018)의 핵심 주장. 커즈와일이 4장에서 인류 진보의 증거로 직접 인용.\n\n핑커의 데이터:\n• 전쟁으로 인한 1인당 사망률: 20세기 초 대비 지속 감소\n• 살인율: 중세 유럽의 약 1/10~1/30 수준\n• 인종 차별·성차별·동성애 혐오: 수십 년 만에 극적으로 감소\n• 아동 체벌·가정 폭력·동물 학대: 용납 수준이 급격히 하락\n\n핑커의 설명: 이성·교육·공감 능력의 확산과 제도적 발전이 폭력을 구조적으로 감소시켰다.",
+    example:"유럽: 1000년간 끊임없이 전쟁했던 국가들이 2차 세계대전 이후 80년간 서로 전쟁하지 않았다. 핑커: 이것은 우연이 아니라 민주주의·무역·국제기구라는 제도가 만든 구조적 평화다. 커즈와일: 여기에 정보 기술의 역할이 더해진다.", accent:"#5a7abc" },
+
+  { id:"childmort", term:"아동 사망률", latin:"Child Mortality",
+    keyword:"5세 미만 사망률—가장 극적인 인류 진보의 증거",
+    desc:"5세 미만 아동 사망률:\n• 1900년: 약 43%\n• 1950년: 약 22%\n• 2000년: 약 7%\n• 2023년: 약 4%\n\n주요 기여:\n• 경구 수분 보충 요법(ORS): 설사로 인한 영아 사망을 극적으로 감소\n• 백신 접종 확대: 홍역·소아마비·천연두\n• 산모 교육과 출산 의료 접근성\n• 영양 개선\n\n기하급수적 전환: AI 진단이 오지에서도 폐렴·말라리아를 정확히 진단. mRNA 기술로 새로운 백신 개발 기간이 수개월로 단축.",
+    example:"홍역 백신: 2000~2017년 사이 홍역으로 인한 사망이 약 80% 감소했다. 세계 백신 면역 연합(GAVI)이 저소득국가에 백신을 보급한 결과다. 정보 기술(물류 최적화·콜드체인 관리)이 이 전달 체계를 가능하게 했다.", accent:"#bc7a7a" },
+
+  { id:"longevity", term:"수명 연장", latin:"Longevity Extension · LEV",
+    keyword:"기하급수적 의료 기술이 노화의 패러다임을 바꾼다",
+    desc:"커즈와일 4장의 핵심 주제 중 하나. 기하급수적 정보 기술이 의료에 적용되면서 수명 연장이 기하급수적 궤도에 오르고 있다.\n\n수명 탈출 속도(Longevity Escape Velocity·LEV·오브리 드 그레이): 과학이 매년 남은 기대 수명을 1년 이상 연장시키는 시점—이 시점이 되면 수명이 계속 연장된다.\n\n커즈와일의 예측: 2030년대 LEV 달성 가능.\n\n진행 중인 연구:\n• 세노리틱스(Senolytics): 노화 세포 제거\n• CRISPR 유전자 편집: 노화 관련 유전자 수정\n• 야마나카 인자 세포 재프로그래밍: 노화 세포를 젊은 상태로 역전\n• Calico(Google 자회사)·Altos Labs·Unity Biotechnology: 노화 역전 집중 연구",
+    example:"2023년: Altos Labs 창립 멤버인 야마나카 신야(2012년 노벨상)의 역분화 기술이 인간 세포 노화 역전 연구에 적용되고 있다. 커즈와일은 이 기술들이 수확 가속의 법칙을 따라 기하급수적으로 발전할 것이라고 본다.", accent:"#c4a35a" },
+
+  { id:"energy", term:"에너지 전환", latin:"Energy Transition · Swanson's Law",
+    keyword:"수확 가속의 법칙이 에너지에 적용된 결과",
+    desc:"스완슨의 법칙: 태양광 모듈 출하량이 두 배가 될 때마다 비용이 약 20% 감소한다. 무어의 법칙과 같은 메커니즘이 에너지에 적용된 것.\n\n태양광 발전 비용:\n• 2010년: 약 $378/MWh\n• 2023년: 약 $29/MWh (90% 이상 감소)\n\n2023년: 신규 전력 용량의 약 90%가 재생에너지.\n\nAI의 역할: 전력망 최적화·신소재 발견·핵융합 플라즈마 제어를 가속. 에너지가 정보 기술과 결합하면서 기하급수적 전환이 시작됐다.",
+    example:"인도: 2010년대 초 전력 불안정이 심각했다. 2020년대 태양광 가격 급락으로 수억 명이 안정적 전력에 접근하게 됐다. 기술의 기하급수적 비용 감소가 에너지 접근성을 민주화한 사례—커즈와일이 4장에서 제시하는 에너지 진보의 구체적 예시다.", accent:"#9a7abd" },
+
+  { id:"printing3d", term:"3D 프린팅", latin:"3D Printing · Additive Manufacturing",
+    keyword:"제조가 정보 기술이 되는 순간",
+    desc:"3D 프린팅(적층 제조): 디지털 설계 파일을 물리적 객체로 직접 변환하는 기술. 커즈와일이 4장에서 제조 분야의 기하급수적 전환 사례로 제시.\n\n핵심 의미: 제조를 '파일 전송'으로 전환한다. 어디서든 설계 파일을 받아 물리적 객체를 만들 수 있다.\n\n현재 적용:\n• 의료: 맞춤형 뼈 임플란트, 보조기구, 의약품 전달 시스템\n• 건설: 콘크리트 3D 프린팅으로 저비용 주택 공급\n• 항공우주: 로켓 엔진 부품 최적화\n\n3D 프린터 비용도 수확 가속의 법칙을 따른다—매년 하락 중.",
+    example:"코로나19 팬데믹 초기: 인공호흡기 밸브 설계 파일이 공개 공유되어 전 세계 3D 프린터 사용자들이 72시간 안에 부품을 생산했다. 이것이 제조의 정보 기술화가 가져오는 분산형 회복력이다.", accent:"#6aaa82" },
+
+  { id:"food", term:"식량 혁명", latin:"Food Revolution · Green Revolution",
+    keyword:"기술이 기근을 역사로 만들어가고 있다",
+    desc:"녹색혁명(1960~70년대): 노먼 볼로그(Norman Borlaug)의 고수확 밀·쌀 품종 개발. 아시아·라틴아메리카 대규모 기근 예방. 약 10억 명의 생명을 구한 것으로 추정.\n\n현재 기하급수적 전환:\n• 기아 인구 비율: 1970년 약 35% → 현재 약 9%\n• AI 정밀 농업: 수확량·물 사용·비료 효율 최적화\n• AlphaFold2의 단백질 예측이 작물 병해 저항성 연구를 가속\n• 대체 단백질(배양육·식물성): 식량 시스템 재구성 중\n\nGNR 혁명의 교차점: AI(R)가 유전공학(G)을 통해 식량 안보를 개선한다.",
+    example:"수직 농업(Vertical Farming): 도시 안에서 LED·AI 제어로 일반 농업 대비 100배 적은 토지와 95% 적은 물로 식품 생산. 이것이 선형 농업이 기하급수적 정보 농업으로 전환되는 방향이다.", accent:"#c47a7a" },
+
+  { id:"health", term:"의료 혁명", latin:"Health Revolution",
+    keyword:"AI가 의료를 기하급수적 정보 기술로 전환하고 있다",
+    desc:"20세기 선형 의료 혁명:\n• 천연두: 1980년 완전 박멸\n• 소아마비: 1988년 대비 99% 감소\n• HIV: 사망 선고 → 만성 질환 관리 가능\n\n21세기 기하급수적 전환:\n• AlphaFold2: 단백질 구조 예측 50년 난제 해결\n• Insilico Medicine: AI 설계 신약 임상 시험 진입(2023)\n• mRNA 기술: 코로나19 백신 12개월 만에 개발(기존 최단 4년)\n• AI 병리학: 피부암·안저 질환 진단에서 전문의 수준 달성\n• 유전체 분석 비용: 2001년 약 $3억 → 2023년 약 $200 이하",
+    example:"구글 딥마인드의 AI 시스템: 망막 스캔 하나로 당뇨병성 망막병증·나이 관련 황반변성을 진단하는 것 외에, 심장병 위험도와 환자 나이까지 예측했다. 안과 진단이 기하급수적 정보 기술로 전환된 사례다.", accent:"#5a9abc" },
+
+  { id:"info", term:"정보 민주화", latin:"Democratization of Information",
+    keyword:"생각을 공유하고 새로운 생각을 만드는 능력의 기하급수적 향상",
+    desc:"커즈와일의 핵심 통찰: 정보 기술은 생각에 관한 것이다. 생각을 공유하고 새로운 생각을 만드는 능력의 기하급수적 향상이—개인에게 인류 잠재력 전체를 활용할 힘을 준다.\n\n• 인터넷 접속률: 1995년 1% → 2023년 약 65%\n• 스마트폰: 2007년 등장 → 2023년 약 67억 대\n• Khan Academy·Coursera·YouTube: 세계 최고 수준 교육의 무료 접근\n• LLM: 의료·법률·교육·재정 조언을 무료로 민주화\n\n이것이 수확 가속의 법칙이 삶의 질에서 가장 넓게 작동하는 방식이다: 생각 자체를 만들고 공유하는 도구가 기하급수적으로 향상되면—인류의 집단적 문제 해결 역량도 기하급수적으로 증가한다.",
+    example:"아프리카의 스마트폰 사용자는 20년 전 미국 대통령이 접근할 수 없었던 정보에 즉각 접근할 수 있다. 커즈와일이 4장에서 직접 언급하는 정보 민주화의 상징적 사례다.", accent:"#c4a35a" },
+
+  { id:"inequality", term:"불평등의 역설", latin:"Paradox of Inequality",
+    keyword:"절대적 빈곤은 줄지만 상대적 격차는 벌어진다",
+    desc:"인류 진보의 가장 큰 이면. 절대적 빈곤은 감소했지만—상대적 불평등은 많은 국가에서 증가했다.\n\n• 국가 간 불평등: 감소 추세 (개발도상국의 빠른 성장)\n• 국가 내 불평등: 증가 추세 (특히 선진국)\n• 기술 가속의 구조: 수확 가속의 법칙이 '가진 자'에게 먼저, 더 많이 작용한다\n• 토마 피케티 《21세기 자본》(2013): 자본 수익률이 경제 성장률보다 높을 때 불평등은 구조적으로 확대된다\n\n커즈와일의 답: 기술은 결국 민주화된다. 전화기·컴퓨터·스마트폰·인터넷이 그랬다. 그러나 민주화까지의 시간이 문제다—그 시간에 발생하는 피해는 정책의 몫이다.",
+    example:"코로나19: AI 기반 신약 개발의 혜택은 먼저 선진국에 집중됐다. 저소득국가의 백신 접종률은 오랫동안 낮았다. 기술 가속이 불평등을 일시적으로 심화할 수 있다는 구조적 예시다.", accent:"#aaba5a" },
+
+  { id:"climate", term:"기후 위기와 기술적 해법", latin:"Climate Crisis & Technology",
+    keyword:"기하급수적 문제인가, 기하급수적 해법인가",
+    desc:"기후 위기는 커즈와일의 4장 낙관론에 대한 가장 강력한 반론이다.\n\n현황:\n• 산업화 이후 지구 평균 온도 약 1.2°C 상승\n• 극단 기상 현상 빈도·강도 증가\n\n커즈와일의 기술적 해법:\n• 태양광 비용의 기하급수적 감소 (2010년 대비 90% 이상)\n• AI 기후 모델링·탄소 포집 소재 발견\n• 핵융합(Commonwealth Fusion·ITER): 2030년대 상용화 가능성\n• 기후 문제도 정보 기술로 전환되면 기하급수적 해결이 가능하다\n\n핵심 질문: 기하급수적 해결책이 기후 돌이킬 수 없는 임계점(티핑 포인트) 이전에 작동할 수 있는가.",
+    example:"2023년: 전 세계 신규 전력 설비의 약 90%가 재생에너지, 동시에 기록상 가장 더운 해. 기술적 해법과 기후 위기가 동시에 가속되는 역설—수확 가속의 법칙이 문제와 해법을 함께 가속한다.", accent:"#bc7a7a" },
+];
+
+/* ─── 핵심 논점 ─────────────────────────────────────────────────── */
+const PASSAGES = [
+  { title:"논점 1 · 스티븐 핑커의 증거—번영과 평화의 확산은 데이터로 입증된다",
+    note:"커즈와일이 4장에서 스티븐 핑커의 《우리 본성의 선한 천사》(2011)와 《지금 다시 계몽》(2018)을 인용하는 부분을 찾아보세요. 폭력의 역사적 감소, 극빈층 감소, 민주주의 확산, 문해율 향상 등 구체적 수치가 제시되는 단락입니다. '핑커' '데이터' '번영' '폭력 감소' '부정성 편향'이 키워드입니다.",
+    layers:[
+      { label:"핵심 주장", text:"핑커의 테제: 우리는 역사상 가장 평화롭고 번영한 시대에 살고 있다. 그러나 대부분의 사람들은 이것을 믿지 않는다.\n\n핑커의 데이터:\n• 전쟁으로 인한 1인당 사망률: 20세기 중반 이후 지속 하락\n• 살인율: 중세 유럽의 약 1/10~1/30 수준으로 감소\n• 극빈층: 1820년 89% → 2023년 9%\n• 문해율: 1820년 12% → 현재 87%\n• 아동 사망률: 1900년 43% → 현재 4%\n• 민주주의: 20세기 초 소수 → 현재 과반수 국가\n\n커즈와일의 연결: 이 개선들이 단순한 정치·사회적 진보가 아니라, 정보 기술의 기하급수적 발전이 만들어낸 기반 위에 있다는 것이 4장의 핵심 논거다." },
+      { label:"왜 중요한가", text:"역설: 이토록 명확한 진보가 있는데—왜 사람들은 세상이 나빠지고 있다고 느끼는가?\n\n부정성 편향의 구조:\n① 나쁜 뉴스가 좋은 뉴스보다 클릭률이 높다\n② 기하급수적 개선은 매일 조금씩 일어나 눈에 띄지 않는다\n③ 재난·범죄·전쟁은 갑자기 발생해 뉴스를 독점한다\n④ 소셜 미디어 알고리즘이 분노·공포 콘텐츠를 증폭한다\n\n한스 로슬링의 실험(《팩트풀니스》, 2018): 세계 전문가들에게 빈곤·아동 사망률을 물었을 때—침팬지의 무작위 선택보다 낮은 정답률. 전문가들조차 부정성 편향에서 자유롭지 않다.\n\n결론: 데이터를 보는 것이 이 시대를 이해하는 첫 번째 과제다." },
+      { label:"비유로", text:"스티븐 핑커의 표현: 나쁜 것들은 사건이고, 좋은 것들은 과정이다. 살인은 하룻밤 사이에 일어난다—범죄율 감소는 수십 년에 걸쳐 일어난다. 전쟁은 하루 만에 시작된다—평화는 수십 년에 걸쳐 구축된다.\n\n미디어는 사건을 보도한다. 과정은 보도되지 않는다. 그래서 우리는 사건의 세계에 살고 있다고 착각한다—실제로는 과정의 세계에 살고 있으면서.\n\n커즈와일의 처방: 수십 년·수백 년의 스케일에서 데이터를 보라. 그때 기하급수적 개선이 보인다." },
+    ]},
+  { title:"논점 2 · 기하급수적 정보 기술—선형 기술이 전환되는 순간",
+    note:"AI가 농업·의학·제조·에너지라는 선형 기술 분야를 기하급수적 정보 기술로 전환시키는 메커니즘을 설명하는 단락을 찾아보세요. AlphaFold2·mRNA 백신·태양광 비용·3D 프린팅 등 구체적 사례들이 제시됩니다. '기하급수적 전환' 'AI' '선형에서 기하급수로'가 키워드입니다.",
+    layers:[
+      { label:"핵심 주장", text:"커즈와일 4장의 핵심 메커니즘:\n\n선형 기술(농업·의학·제조·에너지) + AI = 기하급수적 정보 기술\n\n① 의학: AlphaFold2가 단백질 구조 예측 50년 난제를 해결했다. Insilico Medicine이 AI로 설계한 신약이 임상 시험에 진입했다(2023). mRNA 기술로 백신 개발 기간이 수십 년에서 수개월로 단축됐다. 유전체 분석 비용이 2001년 약 $3억에서 2023년 약 $200 이하로 감소했다.\n\n② 에너지: 스완슨의 법칙으로 태양광 비용이 2010년 대비 90% 이상 감소했다. 수확 가속의 법칙이 에너지에 적용된 것.\n\n③ 제조: 3D 프린팅이 제조를 '파일 전송'으로 전환한다. 어디서든 설계 파일을 받아 물리적 객체를 만들 수 있다.\n\n이 전환들이 동시에, 기하급수적으로 일어나고 있다는 것이 4장의 핵심이다." },
+      { label:"왜 중요한가", text:"이것이 특이점의 구체적 메커니즘이다. 세상의 모든 영역이 정보 문제로 전환되고—정보 기술이 그것을 기하급수적으로 해결한다.\n\n수확 가속의 법칙이 적용되는 새로운 영역들:\n• 유전체 분석: 2001년 $3억 → 2023년 $200 이하 (백만 배 이상 감소)\n• mRNA 백신 개발: 12개월 (기존 최단 4~10년)\n• 태양광: 2010년 대비 90% 비용 감소\n• AI 언어 모델: 18개월마다 성능 두 배\n\n커즈와일의 핵심 주장: 이 전환은 더 빨라지고 있다. 가파른 구간에 들어섰기 때문이다." },
+      { label:"비유로", text:"디지털 카메라와 필름 카메라: 필름 카메라 시장은 선형적으로 성장했다. 디지털 카메라가 등장한 순간—사진술이 정보 기술이 됐다. 이후 스마트폰이 등장하자 디지털 카메라 시장까지 붕괴했다.\n\n의료도 같은 전환 중이다. X선·MRI·병리 슬라이드는 이미 디지털 이미지다. AI가 이것을 분석하기 시작하면—의료가 정보 기술이 된다.\n\n이 전환이 일어나는 순간: 그 분야에도 수확 가속의 법칙이 적용되기 시작한다." },
+    ]},
+  { title:"논점 3 · 수명 연장—정보 기술이 노화의 패러다임을 바꾼다",
+    note:"커즈와일이 4장에서 수명 연장과 노화 연구를 논의하는 부분을 찾아보세요. 수명 탈출 속도(LEV), 세노리틱스, 야마나카 인자, Calico·Altos Labs 등의 연구 방향이 등장하는 단락입니다. '수명 연장' 'LEV' '노화 역전' '기하급수적 의료'가 키워드입니다. 이것이 3장의 디지털 불멸 논의와 어떻게 연결되는지도 확인하세요.",
+    layers:[
+      { label:"핵심 주장", text:"수명 탈출 속도(Longevity Escape Velocity·LEV):\n오브리 드 그레이가 제안한 개념. 과학이 매년 남은 기대 수명을 1년 이상 연장하는 시점—이 시점이 되면 수명은 계속 연장된다.\n\n커즈와일의 예측: 2030년대 LEV 달성 가능.\n\n진행 중인 기하급수적 연구:\n• 세노리틱스: 노화 세포(senescent cells)를 제거하는 약물. 생쥐 실험에서 수명 25~30% 연장 확인.\n• 야마나카 인자 재프로그래밍: 2012년 노벨상. 성체 세포를 줄기세포 수준으로 역분화. 노화 역전 연구의 핵심.\n• CRISPR 유전자 편집: 노화 관련 유전자 직접 수정\n• Calico(Google)·Altos Labs: 노화 역전에 수십억 달러 투자 중\n\n커즈와일 자신의 실천: 하루 약 100가지 보충제와 정기적 의료 검진으로 자신의 수명을 특이점까지 연장하려는 개인 프로젝트." },
+      { label:"왜 중요한가", text:"수명 연장이 기하급수적 정보 기술의 전형적 사례인 이유:\n\n유전체 분석 비용: 2001년 $3억 → 2023년 $200 이하. 이 속도로 계속되면 개인 유전체 분석이 일상 건강검진이 된다.\n\n이것이 노화 연구를 변화시키는 방식:\n• 수십만 명의 노화 유전체 데이터를 AI가 분석\n• 개인별 노화 패턴을 정확히 파악\n• 개인 맞춤 노화 억제 전략 수립 가능\n\n3장의 연결: 수명 연장은 디지털 불멸의 생물학적 경로다. 생물학적 수명을 특이점까지 연장하면—BCI를 통한 마음 업로드가 가능해지는 시점까지 살아있을 수 있다.\n\n사회적 함의: LEV가 실현되면 은퇴·교육·세대 구조 등 사회 제도 전체가 재설계돼야 한다." },
+      { label:"비유로", text:"노화를 질병으로 보는 시각의 전환: 과거에는 노화가 피할 수 없는 자연 현상이었다. 커즈와일은 노화를 해결 가능한 정보 처리 문제로 본다.\n\n컴퓨터 소프트웨어 버그와 유사: 버그(노화 세포·유전자 오류·단백질 응집)를 찾아 수정하면 시스템(몸)이 정상 작동한다. 우리는 지금 몸이라는 소프트웨어의 버그 목록을 정확히 파악하기 시작했다.\n\n가파른 구간의 적용: 세노리틱스·유전자 편집·세포 재프로그래밍이 동시에 발전하면서—노화 연구도 가파른 구간에 진입하고 있다." },
+    ]},
+];
+
+/* ─── 퀴즈 ───────────────────────────────────────────────────────── */
+const QUIZ = [
+  { q:"스티븐 핑커가 커즈와일 4장의 논거로 사용되는 방식으로 가장 적절한 것은?",
+    opts:["핑커의 연구는 AI 기술 발전 속도를 측정했다","핑커는 폭력 감소·극빈층 감소·문해율 향상 등의 데이터로 인류 삶이 역사적으로 개선됐다는 것을 실증했으며, 커즈와일은 이것이 기하급수적 정보 기술의 발전과 함께 더 빠르게 진행될 것이라고 주장한다","핑커는 AI가 폭력을 줄일 것이라고 예측했다","핑커의 연구는 커즈와일 4장의 논지와 반대된다"],
+    ans:1, exp:"스티븐 핑커 《우리 본성의 선한 천사》(2011)와 《지금 다시 계몽》(2018)은 전쟁 사망률 감소·살인율 하락·극빈층 감소·문해율 향상·민주주의 확산을 데이터로 실증했다. 커즈와일은 4장에서 이 데이터들을 인류 삶의 기하급수적 개선 증거로 직접 인용하며, 기하급수적 정보 기술이 이 개선을 더욱 가속할 것이라는 주장의 근거로 삼는다." },
+  { q:"커즈와일이 말하는 '기하급수적 정보 기술로의 전환'을 가장 잘 보여주는 사례는?",
+    opts:["인터넷 사용자 수가 증가하고 있다","AlphaFold2가 AI를 활용해 단백질 구조 예측의 50년 난제를 해결했고, 유전체 분석 비용이 2001년 약 $3억에서 2023년 약 $200 이하로 감소했다—생물학이 기하급수적 정보 기술이 된 사례","스마트폰 판매량이 증가했다","전 세계 데이터 저장량이 증가하고 있다"],
+    ans:1, exp:"AlphaFold2는 생물학(비정보 과학)이 AI(기하급수적 정보 기술)와 결합해 50년 난제를 해결한 사례다. 동시에 유전체 분석 비용의 극적 감소(2001년 $3억 → 현재 $200 이하)는 수확 가속의 법칙이 의료에 직접 적용된 증거다. 이것이 커즈와일이 말하는 '선형 기술의 기하급수적 정보 기술로의 전환'의 실증적 사례다." },
+  { q:"수명 탈출 속도(Longevity Escape Velocity·LEV)의 개념으로 가장 적절한 것은?",
+    opts:["100세 이상 사는 것을 목표로 하는 개인 건강 관리 전략","과학이 매년 남은 기대 수명을 1년 이상 연장하는 시점—이 시점이 되면 수명이 지속적으로 연장될 수 있다","우주 여행이 인간의 수명을 연장하는 효과","장기 이식 기술이 완성되는 시점"],
+    ans:1, exp:"수명 탈출 속도(LEV)는 오브리 드 그레이가 제안하고 커즈와일이 4장에서 언급하는 개념이다. 과학이 매년 남은 기대 수명을 1년 이상 연장하는 속도에 도달하면—죽음이 계속 후퇴한다. 커즈와일은 세노리틱스·야마나카 인자 재프로그래밍·CRISPR 유전자 편집 등의 기하급수적 발전이 2030년대에 LEV를 달성 가능하게 할 것이라고 예측한다." },
+  { q:"부정성 편향이 기하급수적 개선 인식을 방해하는 구조적 이유로 가장 적절한 것은?",
+    opts:["사람들이 교육을 충분히 받지 못했기 때문에","기하급수적 개선은 매일 조금씩 일어나 눈에 띄지 않지만, 재난·범죄·전쟁은 갑자기 발생해 미디어를 독점한다—진화적으로 인간의 뇌는 위협을 기회보다 강하게 처리하도록 설계되어 있다","미디어가 의도적으로 진실을 숨긴다","기하급수적 개선이 실제로는 일어나지 않기 때문에"],
+    ans:1, exp:"부정성 편향은 진화심리학적 사실이다. 수백만 년의 진화 동안 위협을 과대평가하는 개체가 생존에 유리했다. 현대에 이 편향이 기하급수적 개선 인식을 방해하는 이유: 개선은 매일 조금씩 일어나 뉴스에 나오지 않지만, 재난은 갑자기 발생해 미디어를 독점한다. 핑커의 표현처럼 '나쁜 것들은 사건이고, 좋은 것들은 과정이다.'" },
+];
+
+/* ─── 논리: 데이터에서 특이점의 실감까지 ────────────────────────── */
+const ARG_STEPS = [
+  { num:"물음", color:"#5a9abc",
+    title:"세상은 더 나빠지고 있는가—당신의 답과 데이터의 답",
+    body:"스티븐 핑커의 도발적 질문(《지금 다시 계몽》, 2018):\n'당신은 세상이 더 나빠지고 있다고 생각하는가?'\n\n대부분의 사람이 '그렇다'고 답한다.\n\n그러나 핑커의 데이터:\n• 극빈층: 1820년 89% → 2023년 9%\n• 아동 사망률: 1900년 43% → 현재 4%\n• 전쟁 사망률: 20세기 중반 이후 지속 하락\n• 문해율: 1820년 12% → 현재 87%\n\n커즈와일은 이 간극에서 4장을 시작한다: 왜 세상이 실제로는 나아지고 있는데—우리는 나빠지고 있다고 느끼는가?",
+    key:"핑커의 물음 = 데이터와 인식의 간극에서 시작한다" },
+
+  { num:"발견 1", color:"#c4a35a",
+    title:"부정성 편향이 진보를 가린다",
+    body:"부정성 편향의 구조:\n• 나쁜 것은 사건이고 좋은 것은 과정이다 (핑커)\n• 기하급수적 개선은 매일 조금씩 일어나 눈에 띄지 않는다\n• 재난·범죄·전쟁은 갑자기 발생해 뉴스를 독점한다\n\n결과: 침팬지보다 세계 현황을 부정확하게 아는 전문가들 (로슬링)\n\n맥스 로저(Our World in Data):\n'매일 17만 명이 극빈층을 탈출하고, 매일 17,000명의 아동 사망이 줄어든다. 그러나 이것은 뉴스가 아니다.'\n\n커즈와일의 처방: 직관이 아니라 데이터와 수확 가속의 법칙으로 판단하라.",
+    key:"부정성 편향 = 진보를 가리는 인지적 왜곡" },
+
+  { num:"발견 2", color:"#9a7abd",
+    title:"기하급수적 정보 기술이 모든 분야에서 전환을 만들고 있다",
+    body:"AI가 선형 기술을 기하급수적으로 전환하는 사례들:\n\n의학:\n• AlphaFold2: 단백질 구조 예측 50년 난제 해결\n• 유전체 분석 비용: $3억(2001) → $200 이하(2023)\n• mRNA 백신: 12개월 개발 (기존 4~10년)\n\n에너지:\n• 태양광 비용: 2010년 대비 90% 이상 감소 (스완슨의 법칙)\n• 2023년 신규 전력 용량의 약 90%가 재생에너지\n\n제조:\n• 3D 프린팅: 제조를 디지털 파일 공유로 전환\n\n이 전환들이 동시에, 기하급수적으로 일어나고 있다.",
+    key:"기하급수적 전환 = 삶의 개선이 가속되는 구체적 메커니즘" },
+
+  { num:"핵심", color:"#6aaa82",
+    title:"수명 연장—정보 기술이 죽음의 지평을 밀어낸다",
+    body:"수명 연장이 기하급수적 정보 기술의 가장 극적인 적용이다.\n\n수명 탈출 속도(LEV): 과학이 매년 기대 수명을 1년 이상 연장하면—죽음은 계속 후퇴한다.\n\n현재 진행 중:\n• 세노리틱스: 노화 세포 제거—생쥐 실험에서 수명 25~30% 연장\n• 야마나카 인자 재프로그래밍: 세포 노화 역전 (2012년 노벨상)\n• CRISPR: 노화 관련 유전자 직접 수정\n• Calico(Google)·Altos Labs: 수십억 달러 투자\n\n커즈와일의 예측: 2030년대 LEV 달성.\n\n3장과의 연결: 생물학적 수명을 특이점까지 연장하면—BCI를 통한 마음 업로드가 가능한 시점까지 살아있을 수 있다.",
+    key:"수명 연장 = 3장의 디지털 불멸과 4장의 의료 혁신이 만나는 지점" },
+
+  { num:"결론", color:"#c47a7a",
+    title:"정보 기술은 생각에 관한 것이다—선순환이 특이점을 향해 수렴한다",
+    body:"커즈와일의 핵심 통찰:\n정보 기술은 생각에 관한 것이다.\n\n인류 역사의 전환점들은 모두 '생각을 공유하는 능력'의 도약이었다:\n언어 → 문자 → 인쇄기 → 인터넷 → AI\n\nAI가 이 능력을 기하급수적으로 증폭한다:\n• 생각을 만들고, 공유하고, 연결하는 역량이 기하급수적으로 향상된다\n• 인류의 집단 문제 해결 역량이 기하급수적으로 증가한다\n• 기후·빈곤·질병·에너지 등 인류의 가장 어려운 문제들이 동시에 기하급수적 해결 경로에 들어선다\n\n이것이 기하급수적 개선이 특이점으로 수렴하는 방식이다.",
+    key:"정보 기술 = 생각 도구 = 선순환 = 특이점으로의 수렴" },
+];
+
+/* ─── 비교 분석 ─────────────────────────────────────────────────── */
+const POSITIONS = [
+  { label:"기술 낙관론", sub:"커즈와일·핑커·디아만디스", color:"#5a7abc",
+    claim:"데이터가 보여주는 것처럼 삶은 기하급수적으로 개선되고 있다. AI와 기하급수적 정보 기술이 이 개선을 더욱 가속할 것이다. 인류는 과거 어느 시대보다 더 많은 문제를 해결할 역량을 보유하고 있다.",
+    problem:"비판: 데이터 기반 낙관론이 현재의 고통(불평등·기후 위기·AI 위험)을 과소평가한다. '결국 나아진다'는 약속이 지금 고통받는 사람들에게 어떤 의미인가? 낙관론이 긴급한 정치적 행동을 늦추는 데 활용될 수 있다.",
+    quote:"피터 디아만디스 《어번던스》(Abundance, 2012)\n맷 리들리 《이성적 낙관주의자》(The Rational Optimist, 2010)" },
+  { label:"비판적 현실주의", sub:"피케티·클라인·히크먼", color:"#c4a35a",
+    claim:"진보는 실재하지만 불균등하다. 기술 가속이 오히려 불평등을 심화하고 있다. 기후 위기는 낙관론으로 대응할 수 있는 수준이 아니다. 구조적 변화 없이 기술 발전만으로는 충분하지 않다.",
+    problem:"커즈와일의 응답: 기술 민주화의 역사가 이 비판을 반박한다. 전화기·컴퓨터·스마트폰·인터넷이 결국 모든 사람에게 닿았다. 기술 발전과 구조적 변화는 배타적이지 않다—함께 필요하다.",
+    quote:"토마 피케티 《21세기 자본》(2013)\n나오미 클라인 《이것이 모든 것을 바꾼다》(2014)" },
+  { label:"효과적 이타주의", sub:"싱어·매케스킬·오드", color:"#7aaa6a",
+    claim:"기술이 강력하고 진보는 실재한다. 그러나 AI 안전·글로벌 건강·실존위험 감소가 현재 가장 중요한 문제다. 기하급수적 가속이 만들 수 있는 위험(AI 정렬 실패·생물 무기)도 동시에 가속된다. 전략적 우선순위가 필요하다.",
+    problem:"커즈와일과의 공통점: 기술을 적극적으로 활용해 인류의 삶을 개선한다. 차이점: 가속의 위험을 더 강조하며, 현재의 자원을 가장 효과적인 문제 해결에 집중해야 한다고 주장한다.",
+    quote:"피터 싱어 《효율적 이타주의》(2015)\n윌리엄 매케스킬 《냉정한 이타주의자》(2015)" },
+];
+
+/* ─── 세미나 질문 ─────────────────────────────────────────────── */
+const SEMINAR_QS = [
+  { q:"스티븐 핑커는 '나쁜 것은 사건이고 좋은 것은 과정이다'라고 말합니다. 당신이 '세상이 나빠지고 있다'고 느끼게 만드는 정보의 출처는 어디입니까? 그 출처가 세계 전체를 얼마나 대표합니까?",
+    hint:"어제 본 뉴스 중 '기아 인구가 또 줄었다' '아동 사망률이 또 하락했다'는 뉴스가 있었습니까? 없었다면—당신이 보는 세계는 어떤 필터를 통과한 세계입니까?" },
+  { q:"커즈와일은 AI가 농업·의학·제조·에너지라는 선형 기술을 기하급수적 정보 기술로 전환하고 있다고 말합니다. 당신의 분야에서 이 전환이 일어나고 있습니까? 어떤 징후를 봤습니까?",
+    hint:"출판·교육·의료·법률·금융·제조 등 각 분야에서 AI 도입이 어떤 변화를 만들고 있는지 생각해보세요. 아직 전환이 일어나지 않은 분야가 있다면—그 이유는 무엇입니까?" },
+  { q:"수명 탈출 속도(LEV)가 2030년대에 달성된다면—'삶을 어떻게 살 것인가'라는 질문은 근본적으로 달라집니다. 수명이 무한히 연장되는 세계에서 당신은 무엇을 하겠습니까? 무엇이 달라질 것 같습니까?",
+    hint:"지금 당신이 미루고 있는 것들—'언젠가 하리라' 했던 것들—수명이 연장된다면 그것들의 우선순위는 어떻게 달라집니까? 아니면, 무한한 시간이 오히려 지금의 절박함을 없애는 것은 아닙니까?" },
+  { q:"기하급수적 정보 기술이 선형 기술을 전환하는 과정에서 구조적으로 '먼저 혜택을 받는 집단'과 '나중에 혜택을 받는 집단'이 생깁니다. 이 격차를 줄이기 위해 지금 가장 필요한 것은 무엇입니까?",
+    hint:"mRNA 백신이 개발됐을 때, 저소득국가의 접종률은 오랫동안 낮았습니다. 기술의 민주화는 '자동으로' 일어납니까, 아니면 의도적 노력이 필요합니까?" },
+  { q:"커즈와일은 '정보 기술은 생각에 관한 것이다—생각을 공유하고 새로운 생각을 만드는 능력의 기하급수적 향상이 인류의 잠재력을 활짝 펼친다'고 말합니다. 지금 당신은 AI를 어떤 방식으로 생각 도구로 사용하고 있습니까? 그리고 어떻게 더 잘 사용할 수 있습니까?",
+    hint:"계산기가 나온 후 수학자들은 더 큰 문제를 풀었습니다. 검색 엔진이 나온 후 연구자들은 더 깊은 분석을 했습니다. AI가 생각 도구가 된다면—나는 무엇을 더 잘 생각할 수 있습니까?" },
+];
+
+/* ─── 스테이지 ──────────────────────────────────────────────────── */
+const STAGES = {
+  grammar:{ label:"문법", latin:"Grammatica", sub:"텍스트가 무엇을 말하는가", color:"#c4a35a", bg:"#1a160a" },
+  logic:  { label:"논리", latin:"Dialectica",  sub:"논증이 어떻게 작동하는가", color:"#5a9abc", bg:"#0a121a" },
+  rhetoric:{ label:"수사", latin:"Rhetorica",  sub:"함께 탐구하고 설득하는가", color:"#bc7a7a", bg:"#1a0f0f" },
+};
+const PAGE_STAGE = {2:"grammar",3:"grammar",4:"grammar",5:"grammar",6:"grammar",7:"logic",8:"logic",9:"rhetoric"};
+
+function App() {
+  const [page, setPage] = useState(0);
+  const [fading, setFading] = useState(false);
+  const [flipped, setFlipped] = useState(new Set());
+  const [pLayers, setPLayers] = useState([0,0,0]);
+  const [qSel, setQSel] = useState([null,null,null,null]);
+  const [qDone, setQDone] = useState([false,false,false,false]);
+  const [argStep, setArgStep] = useState(0);
+  const [posOpen, setPosOpen] = useState(null);
+  const [seminHints, setSeminHints] = useState(new Set());
+
+  const TOTAL = 11;
+  const go = n => { setFading(true); setTimeout(()=>{ setPage(n); setFading(false); window.scrollTo(0,0); }, 280); };
+  const next = () => { if(page < TOTAL-1) go(page+1); };
+  const prev = () => { if(page > 0) go(page-1); };
+
+  const C = { bg:"#090b0d", surf:"#0e1318", surfUp:"#151d24", txt:"#e2e8f0", muted:"#607080", gold:"#c4a35a", goldBr:"#deb96a", line:"#1e2a35" };
+  const F = { h:"'Cormorant Garamond', Georgia, serif", b:"'Noto Serif KR', Georgia, serif" };
+  const W = { maxWidth:720, margin:"0 auto", padding:"52px 28px", color:C.txt, fontFamily:F.b };
+  const SL = { fontFamily:F.b, fontSize:11, letterSpacing:4, color:C.gold, marginBottom:18, display:"block" };
+  const BT = { fontFamily:F.h, fontSize:32, fontWeight:400, color:C.txt, lineHeight:1.25, marginBottom:8 };
+  const DIV = { width:36, height:1, background:C.gold, marginBottom:28 };
+  const BD = { fontSize:15, lineHeight:1.95, color:C.txt, fontWeight:300, fontFamily:F.b };
+  const MT = { fontSize:15, lineHeight:1.95, color:C.muted, fontWeight:300, fontFamily:F.b };
+
+  const stageKey = PAGE_STAGE[page];
+  const stage = stageKey ? STAGES[stageKey] : null;
+
+  const StageBadge = () => !stage ? null : (
+    <div style={{ display:"flex", gap:10, alignItems:"center", marginBottom:28, padding:"10px 16px", background:stage.bg, border:`1px solid ${stage.color}33`, width:"fit-content" }}>
+      <div style={{ width:6, height:6, borderRadius:"50%", background:stage.color }} />
+      <span style={{ fontFamily:F.b, fontSize:11, letterSpacing:4, color:stage.color }}>{stage.label}</span>
+      <span style={{ fontFamily:F.h, fontSize:13, color:C.muted, fontStyle:"italic" }}>{stage.latin}</span>
+      <span style={{ fontFamily:F.b, fontSize:11, color:C.muted }}>· {stage.sub}</span>
+    </div>
+  );
+
+  const renderPage = () => { switch(page) {
+
+  case 0: return (
+    <div style={{ minHeight:"100vh", display:"flex", flexDirection:"column", justifyContent:"center", alignItems:"center", textAlign:"center", padding:"48px 28px", background:C.bg, position:"relative", overflow:"hidden" }}>
+      <div style={{ position:"absolute", top:0, left:0, right:0, height:2, background:`linear-gradient(90deg,transparent,${C.gold},transparent)` }} />
+      <div style={{ position:"absolute", bottom:0, left:0, right:0, height:1, background:`linear-gradient(90deg,transparent,${C.gold}44,transparent)` }} />
+      <div style={{ position:"absolute", inset:0, backgroundImage:`radial-gradient(ellipse at 50% 55%,#0a1a0a 0%,transparent 65%)`, pointerEvents:"none" }} />
+      <span style={{ fontFamily:F.b, fontSize:11, letterSpacing:6, color:C.gold, marginBottom:48, display:"block" }}>디퍼 언브랜딩살롱</span>
+      <h1 style={{ fontFamily:F.h, fontSize:"clamp(32px,7vw,52px)", fontWeight:300, color:C.txt, lineHeight:1.1, marginBottom:10 }}>마침내 특이점이 시작된다</h1>
+      <p style={{ fontFamily:F.h, fontSize:18, color:"#b0bec8", fontStyle:"italic", marginBottom:6 }}>The Singularity Is Nearer</p>
+      <p style={{ fontFamily:F.b, fontSize:12, color:"#b0bec8", letterSpacing:2 }}>Ray Kurzweil, 2024 · 비즈니스북스</p>
+      <div style={{ width:1, height:52, background:`linear-gradient(${C.gold}88,transparent)`, margin:"36px auto" }} />
+      <p style={{ fontFamily:F.b, fontSize:13, letterSpacing:5, color:C.gold, marginBottom:10 }}>소크라테스식 고전 탐구 세미나</p>
+      <p style={{ fontFamily:F.h, fontSize:19, color:"#b0bec8", fontStyle:"italic", marginBottom:16 }}>제4장</p>
+      <p style={{ fontFamily:F.h, fontSize:17, color:"#b0bec8", fontStyle:"italic", marginBottom:52 }}>삶은 기하급수적으로 개선되고 있다</p>
+      <button onClick={next}
+        onMouseEnter={e=>{e.currentTarget.style.background=C.gold;e.currentTarget.style.color=C.bg;}}
+        onMouseLeave={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.color=C.gold;}}
+        style={{ background:"transparent", border:`1px solid ${C.gold}`, color:C.gold, fontFamily:F.b, fontSize:12, letterSpacing:4, padding:"15px 48px", cursor:"pointer", transition:"all 0.3s" }}>
+        시작하기
+      </button>
+      <div style={{ display:"flex", gap:24, marginTop:40, justifyContent:"center" }}>
+        {[["문법","#c4a35a"],["논리","#5a9abc"],["수사","#bc7a7a"]].map(([l,col])=>(
+          <div key={l} style={{ textAlign:"center" }}>
+            <div style={{ width:5, height:5, borderRadius:"50%", background:col, margin:"0 auto 6px" }} />
+            <span style={{ fontFamily:F.b, fontSize:10, color:col, letterSpacing:3 }}>{l}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
+  case 1: return (
+    <div style={W}>
+      <span style={SL}>안내 · 트리비움으로 읽다</span>
+      <h2 style={BT}>세 단계로 읽는 법</h2>
+      <div style={DIV} />
+      <p style={{ ...BD, marginBottom:32 }}>이 세미나는 생각을 이끄는 도구, <strong style={{color:C.goldBr}}>트리비움</strong>으로 텍스트를 읽습니다—<strong style={{color:C.goldBr}}>문법, 논리, 수사</strong>. 각 단계는 텍스트를 다른 깊이로 만나는 방법입니다.</p>
+      {[
+        { key:"grammar", n:"01", label:"문법 — Grammatica", pages:"5섹션",
+          desc:"4장의 핵심 개념과 언어를 내 것으로 만드는 단계입니다.",
+          items:["수확 가속의 법칙·기하급수적 정보 기술·가파른 구간·인류 진보 지표·부정성 편향·극빈층 감소·폭력의 역사적 감소·아동 사망률·수명 연장·에너지 전환·3D 프린팅·식량 혁명·의료 혁명·정보 민주화·불평등의 역설·기후 위기 개념 카드 (16종)","핵심 논점 3개—핑커의 증거와 부정성 편향 / 기하급수적 정보 기술의 전환 / 수명 연장과 특이점의 실감","이해 확인 퀴즈 4문항"] },
+        { key:"logic", n:"02", label:"논리 — Dialectica", pages:"2섹션",
+          desc:"핑커의 질문에서 출발해 특이점으로의 수렴까지—5단계로 논증을 따라갑니다.",
+          items:["데이터와 인식의 간극 → 부정성 편향 → 기하급수적 전환 → 수명 연장 → 특이점으로의 수렴","기술 낙관론 vs 비판적 현실주의 vs 효과적 이타주의 비교"] },
+        { key:"rhetoric", n:"03", label:"수사 — Rhetorica", pages:"세미나에서 함께",
+          desc:"이 단계는 세미나 현장에서 함께 합니다.",
+          items:["소크라테스식 세미나 토론 질문 5개","힌트와 함께 입장 준비"] },
+      ].map(item=>{
+        const s=STAGES[item.key];
+        return (
+          <div key={item.key} style={{ marginBottom:20, background:C.surf, padding:"22px 24px", borderLeft:`3px solid ${s.color}` }}>
+            <div style={{ display:"flex", gap:14, alignItems:"flex-start", marginBottom:14 }}>
+              <span style={{ fontFamily:F.h, fontSize:30, color:s.color, lineHeight:1, minWidth:32 }}>{item.n}</span>
+              <div>
+                <div style={{ display:"flex", gap:10, alignItems:"center", marginBottom:6 }}>
+                  <span style={{ fontFamily:F.b, fontSize:11, letterSpacing:4, color:s.color }}>{item.label}</span>
+                  <span style={{ fontFamily:F.b, fontSize:11, color:C.muted }}>· {item.pages}</span>
+                </div>
+                <p style={{ ...BD, fontSize:13, margin:0, lineHeight:1.8 }}>{item.desc}</p>
+              </div>
+            </div>
+            <div style={{ paddingLeft:46 }}>
+              {item.items.map((it,j)=>(
+                <div key={j} style={{ display:"flex", gap:10, alignItems:"flex-start", padding:"4px 0" }}>
+                  <div style={{ width:4, height:4, borderRadius:"50%", background:s.color+"88", flexShrink:0, marginTop:7 }} />
+                  <span style={{ ...MT, fontSize:13 }}>{it}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+
+  case 2: return (
+    <div style={W}>
+      <StageBadge />
+      <span style={SL}>문법 1/5 · 핵심 개념</span>
+      <h2 style={BT}>카드를 눌러 개념을 확인하세요</h2>
+      <div style={DIV} />
+      <p style={{ ...MT, marginBottom:36, fontSize:14 }}>16개 모두 열어보시길 권합니다. 지금 완전히 이해하지 않아도 됩니다—이후 독해와 퀴즈를 통해 다시 만납니다.</p>
+      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
+        {CONCEPTS.map(c=>{
+          const open=flipped.has(c.id);
+          return (
+            <div key={c.id}
+              onClick={()=>{const n=new Set(flipped);if(n.has(c.id))n.delete(c.id);else n.add(c.id);setFlipped(n);}}
+              style={{ background:open?C.surfUp:C.surf, border:`1px solid ${open?c.accent+"66":C.line}`, padding:"18px 20px", cursor:"pointer", transition:"all 0.25s" }}>
+              <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start" }}>
+                <div style={{ flex:1, paddingRight:8 }}>
+                  <p style={{ fontFamily:F.h, fontSize:17, color:open?c.accent:C.goldBr, fontWeight:500, margin:"0 0 2px", lineHeight:1.25 }}>{c.term}</p>
+                  <p style={{ fontSize:10, color:C.muted, fontStyle:"italic", margin:0 }}>{c.latin}</p>
+                </div>
+                <span style={{ color:open?C.gold:C.muted, fontSize:20, lineHeight:1, transform:open?"rotate(45deg)":"none", transition:"transform 0.25s", flexShrink:0 }}>+</span>
+              </div>
+              {open && (
+                <div style={{ marginTop:16 }}>
+                  <p style={{ fontSize:11, color:c.accent, letterSpacing:3, marginBottom:10, fontWeight:500 }}>{c.keyword}</p>
+                  <p style={{ ...BD, fontSize:13, marginBottom:14, lineHeight:1.85, whiteSpace:"pre-line" }}>{c.desc}</p>
+                  <div style={{ background:C.surf, padding:"12px 14px" }}>
+                    <p style={{ ...MT, fontSize:12, margin:0, lineHeight:1.8 }}>✦ {c.example}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+      <div style={{ textAlign:"center", marginTop:28 }}>
+        <span style={{ ...MT, fontSize:12, letterSpacing:2 }}>{flipped.size} / {CONCEPTS.length} 확인</span>
+        <div style={{ display:"flex", justifyContent:"center", gap:5, marginTop:10, flexWrap:"wrap" }}>
+          {CONCEPTS.map((c,i)=><div key={i} style={{ width:6, height:6, borderRadius:"50%", background:flipped.has(c.id)?C.gold:C.line, transition:"background 0.3s" }} />)}
+        </div>
+      </div>
+    </div>
+  );
+
+  case 3: case 4: case 5: {
+    const pIdx=page-3, p=PASSAGES[pIdx], layer=pLayers[pIdx];
+    return (
+      <div style={W}>
+        <StageBadge />
+        <span style={SL}>문법 {pIdx+2}/5 · 핵심 논점 {pIdx+1}/3</span>
+        <h2 style={BT}>{p.title}</h2>
+        <div style={DIV} />
+        <div style={{ background:"#0d1a0d", border:`1px solid #1e3a1e`, padding:"18px 22px", marginBottom:28 }}>
+          <p style={{ fontSize:11, color:"#4a8a4a", letterSpacing:3, marginBottom:8 }}>책에서 찾아보기</p>
+          <p style={{ ...BD, fontSize:13, margin:0, color:"#8abb8a", lineHeight:1.85 }}>{p.note}</p>
+        </div>
+        <p style={{ ...MT, fontSize:12, marginBottom:16, letterSpacing:1 }}>아래 탭을 순서대로 눌러 이해의 층을 쌓아보세요</p>
+        <div style={{ display:"flex" }}>
+          {p.layers.map((l,i)=>(
+            <button key={i} onClick={()=>setPLayers(prev=>{const n=[...prev];n[pIdx]=i;return n;})}
+              style={{ flex:1, padding:"12px 8px", background:layer===i?C.surfUp:C.surf, border:"none", borderBottom:`2px solid ${layer===i?C.gold:C.line}`, color:layer===i?C.gold:C.muted, fontFamily:F.b, fontSize:12, letterSpacing:2, cursor:"pointer", transition:"all 0.2s" }}>
+              {l.label}
+            </button>
+          ))}
+        </div>
+        <div style={{ background:C.surfUp, padding:"28px 26px", minHeight:148, borderTop:`1px solid ${C.line}`, marginBottom:32 }}>
+          <p style={{ ...BD, margin:0, lineHeight:2.1, whiteSpace:"pre-line" }}>{p.layers[layer].text}</p>
+        </div>
+        {pIdx<2 && (
+          <div style={{ display:"flex", justifyContent:"center" }}>
+            <button onClick={next} style={{ background:"transparent", border:`1px solid ${C.line}`, color:C.muted, fontFamily:F.b, fontSize:12, letterSpacing:3, padding:"10px 28px", cursor:"pointer" }}>
+              다음 논점으로 →
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  case 6: return (
+    <div style={W}>
+      <StageBadge />
+      <span style={SL}>문법 5/5 · 이해 확인</span>
+      <h2 style={BT}>이해 확인 퀴즈</h2>
+      <div style={DIV} />
+      <p style={{ ...MT, marginBottom:40, fontSize:14 }}>정답을 선택하고 '확인'을 누르면 해설이 나옵니다.</p>
+      {QUIZ.map((q,qi)=>(
+        <div key={qi} style={{ marginBottom:40 }}>
+          <div style={{ display:"flex", gap:14, marginBottom:16, alignItems:"flex-start" }}>
+            <span style={{ fontFamily:F.h, fontSize:26, color:C.gold, lineHeight:1, minWidth:32 }}>Q{qi+1}</span>
+            <p style={{ ...BD, fontWeight:400, lineHeight:1.75, margin:0 }}>{q.q}</p>
+          </div>
+          {q.opts.map((opt,oi)=>{
+            const sel=qSel[qi]===oi, done=qDone[qi], correct=oi===q.ans;
+            let bg=C.surf, border=C.line, color=C.txt;
+            if(done){ if(correct){bg="#0d1a0d";border="#2a5a2a";color="#8acd8a";}else if(sel){bg="#1a0d0d";border="#5a2a2a";color="#cd8a8a";}else{color=C.muted;} }
+            else if(sel){ bg=C.surfUp; border=C.gold+"88"; }
+            return (
+              <div key={oi} onClick={()=>{if(!done){const n=[...qSel];n[qi]=oi;setQSel(n);}}}
+                style={{ background:bg, border:`1px solid ${border}`, padding:"13px 18px", marginBottom:8, cursor:done?"default":"pointer", display:"flex", gap:14, alignItems:"flex-start", transition:"all 0.2s" }}>
+                <span style={{ fontFamily:F.h, fontSize:16, color:done&&correct?"#3a7a3a":(done&&sel?"#7a3a3a":C.muted), minWidth:20, lineHeight:1.6 }}>{String.fromCharCode(65+oi)}</span>
+                <span style={{ ...BD, fontSize:14, color, margin:0, lineHeight:1.7 }}>{opt}</span>
+                {done&&correct&&<span style={{ marginLeft:"auto", color:"#3a7a3a", fontSize:16, flexShrink:0 }}>✓</span>}
+              </div>
+            );
+          })}
+          {!qDone[qi]&&qSel[qi]!==null&&(
+            <button onClick={()=>{const n=[...qDone];n[qi]=true;setQDone(n);}}
+              style={{ marginTop:8, padding:"10px 28px", background:"transparent", border:`1px solid ${C.gold}`, color:C.gold, fontFamily:F.b, fontSize:12, letterSpacing:3, cursor:"pointer" }}>
+              확인
+            </button>
+          )}
+          {qDone[qi]&&(
+            <div style={{ background:"#0a150a", border:`1px solid #1a301a`, padding:"16px 20px", marginTop:12 }}>
+              <p style={{ fontSize:11, color:"#4a8a4a", letterSpacing:3, marginBottom:8 }}>해설</p>
+              <p style={{ ...BD, fontSize:13, color:"#90bb90", margin:0, lineHeight:1.85 }}>{q.exp}</p>
+            </div>
+          )}
+        </div>
+      ))}
+      <div style={{ textAlign:"center", padding:"16px 0", borderTop:`1px solid ${C.line}` }}>
+        <span style={{ ...MT, fontSize:12, letterSpacing:2 }}>{qDone.filter(Boolean).length} / {QUIZ.length} 완료</span>
+      </div>
+    </div>
+  );
+
+  case 7: return (
+    <div style={W}>
+      <StageBadge />
+      <span style={SL}>논리 1/2 · 데이터에서 특이점의 실감까지</span>
+      <h2 style={BT}>세상은 더 나빠지고 있는가</h2>
+      <div style={DIV} />
+      <div style={{ background:"#0a1218", border:`1px solid ${STAGES.logic.color}33`, padding:"18px 22px", marginBottom:28 }}>
+        <p style={{ fontSize:11, color:STAGES.logic.color, letterSpacing:3, marginBottom:10 }}>스티븐 핑커 · 《지금 다시 계몽》 · 2018</p>
+        <p style={{ fontFamily:F.h, fontSize:17, fontStyle:"italic", color:C.txt, margin:0, lineHeight:1.9 }}>
+          "나쁜 것들은 사건이고, 좋은 것들은 과정이다. 사건은 보도되고, 과정은 보도되지 않는다."
+        </p>
+      </div>
+      <p style={{ ...MT, marginBottom:28, fontSize:13, lineHeight:1.9 }}>핑커의 질문에서 출발해 커즈와일의 논증이 어떻게 특이점으로 수렴하는지 단계별로 따라가보세요.</p>
+      {ARG_STEPS.slice(0,argStep+1).map((step,i)=>(
+        <div key={i} style={{ marginBottom:14, opacity:i===argStep?1:0.5, transition:"opacity 0.3s" }}>
+          <div style={{ display:"flex", alignItems:"stretch" }}>
+            <div style={{ width:4, background:step.color, flexShrink:0 }} />
+            <div style={{ background:i===argStep?C.surfUp:C.surf, padding:"20px 24px", flex:1 }}>
+              <div style={{ display:"flex", gap:12, alignItems:"center", marginBottom:10 }}>
+                <span style={{ fontFamily:F.b, fontSize:10, letterSpacing:4, color:step.color }}>{step.num}</span>
+                <span style={{ fontFamily:F.h, fontSize:18, color:i===argStep?C.txt:C.muted }}>{step.title}</span>
+              </div>
+              <p style={{ ...BD, fontSize:14, lineHeight:1.95, marginBottom:12, whiteSpace:"pre-line" }}>{step.body}</p>
+              <div style={{ padding:"10px 14px", background:C.bg, borderLeft:`2px solid ${step.color}44` }}>
+                <p style={{ ...MT, fontSize:12, margin:0, color:step.color }}>✦ {step.key}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      ))}
+      <div style={{ display:"flex", gap:14, marginTop:24, alignItems:"center" }}>
+        {argStep<ARG_STEPS.length-1 ? (
+          <button onClick={()=>setArgStep(s=>s+1)}
+            onMouseEnter={e=>{e.currentTarget.style.background=ARG_STEPS[argStep+1].color;e.currentTarget.style.color=C.bg;}}
+            onMouseLeave={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.color=ARG_STEPS[argStep+1].color;}}
+            style={{ padding:"12px 28px", background:"transparent", border:`1px solid ${ARG_STEPS[argStep+1].color}`, color:ARG_STEPS[argStep+1].color, fontFamily:F.b, fontSize:12, letterSpacing:3, cursor:"pointer", transition:"all 0.3s" }}>
+            다음 →
+          </button>
+        ) : (
+          <span style={{ ...MT, fontSize:12, letterSpacing:2, color:C.gold }}>논증 완료</span>
+        )}
+        {argStep>0 && <button onClick={()=>setArgStep(0)} style={{ background:"transparent", border:"none", color:C.muted, fontFamily:F.b, fontSize:11, letterSpacing:2, cursor:"pointer" }}>처음부터</button>}
+        <span style={{ marginLeft:"auto", ...MT, fontSize:11 }}>{argStep+1} / {ARG_STEPS.length}</span>
+      </div>
+    </div>
+  );
+
+  case 8: return (
+    <div style={W}>
+      <StageBadge />
+      <span style={SL}>논리 2/2 · 철학적 비교</span>
+      <h2 style={BT}>기술은 세상을 구할 수 있는가—세 가지 답</h2>
+      <div style={DIV} />
+      <p style={{ ...MT, marginBottom:24, fontSize:14 }}>세 입장을 눌러 비교해보세요. 어디서 갈라지는가.</p>
+      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:8, marginBottom:36 }}>
+        {POSITIONS.map((pos,i)=>{
+          const open=posOpen===i;
+          return (
+            <div key={i} onClick={()=>setPosOpen(open?null:i)}
+              style={{ background:open?C.surfUp:C.surf, border:`1px solid ${open?pos.color+"88":C.line}`, padding:"16px 14px", cursor:"pointer", transition:"all 0.25s" }}>
+              <p style={{ fontFamily:F.h, fontSize:15, color:open?pos.color:C.muted, margin:"0 0 4px", textAlign:"center", lineHeight:1.3 }}>{pos.label}</p>
+              <p style={{ fontSize:10, color:C.muted, fontStyle:"italic", margin:0, textAlign:"center" }}>{pos.sub}</p>
+              {open && (
+                <div style={{ marginTop:14 }}>
+                  <div style={{ marginBottom:10, paddingBottom:10, borderBottom:`1px solid ${C.line}` }}>
+                    <p style={{ fontSize:10, color:pos.color, letterSpacing:3, marginBottom:6 }}>주장</p>
+                    <p style={{ ...BD, fontSize:12, margin:0, lineHeight:1.75 }}>{pos.claim}</p>
+                  </div>
+                  <div style={{ marginBottom:10 }}>
+                    <p style={{ fontSize:10, color:"#8a6a4a", letterSpacing:3, marginBottom:6 }}>반론·응답</p>
+                    <p style={{ ...BD, fontSize:12, margin:0, lineHeight:1.75, color:"#c4a880" }}>{pos.problem}</p>
+                  </div>
+                  <div style={{ padding:"8px 12px", background:C.surf, borderLeft:`2px solid ${pos.color}44` }}>
+                    <p style={{ fontSize:11, color:pos.color, margin:0, whiteSpace:"pre-line" }}>{pos.quote}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+      <div style={{ background:C.surf, padding:"20px 24px" }}>
+        <p style={{ fontFamily:F.b, fontSize:11, color:STAGES.logic.color, letterSpacing:4, marginBottom:14 }}>핵심 쟁점</p>
+        <p style={{ ...BD, fontSize:14, lineHeight:1.9, margin:0 }}>
+          세 입장 모두: <strong style={{color:C.txt}}>기술이 인류의 삶을 개선할 수 있다.</strong> 갈라지는 것: <strong style={{color:C.txt}}>그 개선이 충분히 빠르게, 충분히 균등하게, 충분히 안전하게 일어날 것인가.</strong> 커즈와일은 수확 가속의 법칙을 신뢰하고, 피케티는 구조를 경고하고, 효과적 이타주의는 우선순위를 묻는다. 세 관점 모두 이 시대를 이해하는 데 필요하다.
+        </p>
+      </div>
+    </div>
+  );
+
+  case 9: return (
+    <div style={W}>
+      <StageBadge />
+      <span style={SL}>수사 · 세미나 준비</span>
+      <h2 style={BT}>이제 함께 탐구합니다</h2>
+      <div style={DIV} />
+      <div style={{ background:"#1a0f0f", border:`1px solid ${STAGES.rhetoric.color}33`, padding:"20px 24px", marginBottom:36 }}>
+        <p style={{ fontFamily:F.b, fontSize:11, color:STAGES.rhetoric.color, letterSpacing:4, marginBottom:10 }}>수사 단계에 대하여</p>
+        <p style={{ ...BD, fontSize:14, margin:0, lineHeight:1.9 }}>
+          문법으로 텍스트를 읽고, 논리로 논증을 분석했습니다. 수사는 그것을 <strong style={{color:C.txt}}>함께 말하는 단계</strong>입니다. 정보 기술은 생각에 관한 것이고—생각을 공유하고 새로운 생각을 만드는 능력의 기하급수적 향상이 우리 각자에게 <strong style={{color:C.txt}}>인류의 잠재력을 활짝 펼치고 사회가 직면한 문제를 집단적으로 해결할 수 있는 힘</strong>을 제공합니다.
+        </p>
+      </div>
+      <p style={{ fontFamily:F.b, fontSize:11, color:STAGES.rhetoric.color, letterSpacing:4, marginBottom:20 }}>세미나 토론 질문</p>
+      {SEMINAR_QS.map((item,i)=>{
+        const open=seminHints.has(i);
+        return (
+          <div key={i} style={{ marginBottom:20, background:C.surf, padding:"22px 26px", borderLeft:`3px solid ${STAGES.rhetoric.color}${i%2===0?"cc":"44"}` }}>
+            <div style={{ display:"flex", gap:16, alignItems:"flex-start", marginBottom:12 }}>
+              <span style={{ fontFamily:F.h, fontSize:28, color:STAGES.rhetoric.color, lineHeight:1, minWidth:34 }}>S{i+1}</span>
+              <p style={{ ...BD, fontWeight:400, lineHeight:1.8, margin:0, flex:1 }}>{item.q}</p>
+            </div>
+            <div style={{ paddingLeft:50 }}>
+              <button onClick={()=>{const n=new Set(seminHints);if(n.has(i))n.delete(i);else n.add(i);setSeminHints(n);}}
+                style={{ background:"transparent", border:"none", color:C.muted, fontFamily:F.b, fontSize:11, letterSpacing:3, cursor:"pointer", padding:0 }}>
+                {open?"힌트 접기 ↑":"힌트 보기 ↓"}
+              </button>
+              {open && (
+                <div style={{ marginTop:10, padding:"12px 16px", background:C.surfUp, borderLeft:`2px solid ${STAGES.rhetoric.color}33` }}>
+                  <p style={{ ...MT, fontSize:13, fontStyle:"italic", margin:0, lineHeight:1.8 }}>💡 {item.hint}</p>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+
+  case 10: return (
+    <div style={{ minHeight:"100vh", display:"flex", flexDirection:"column", justifyContent:"center", alignItems:"center", textAlign:"center", padding:"48px 28px", background:C.bg, position:"relative" }}>
+      <div style={{ position:"absolute", top:0, left:0, right:0, height:1, background:`linear-gradient(90deg,transparent,${C.gold}44,transparent)` }} />
+      <span style={{ fontFamily:F.b, fontSize:11, letterSpacing:6, color:C.muted, marginBottom:48, display:"block" }}>디퍼 언브랜딩살롱 · 마침내 특이점이 시작된다</span>
+      <div style={{ width:1, height:64, background:`linear-gradient(${C.gold}88,transparent)`, margin:"0 auto 44px" }} />
+      <div style={{ background:C.surf, padding:"36px 40px", maxWidth:640, textAlign:"left", borderLeft:`3px solid ${C.gold}`, marginBottom:52 }}>
+        <p style={{ fontSize:11, color:C.gold, letterSpacing:4, marginBottom:20 }}>오늘의 마지막 문장 · Ray Kurzweil · 제4장 · 삶은 기하급수적으로 개선되고 있다</p>
+        <p style={{ fontFamily:F.h, fontSize:"clamp(14px,2vw,17px)", fontStyle:"italic", color:C.txt, lineHeight:2.3, margin:0 }}>
+          "기하급수적으로 발전하는 정보 기술은 인간의 조건이라는 모든 배를 띄워 올리는 밀물이다. 이제 우리는 이 밀물이 이전에 한 번도 올라가지 않은 높이까지 솟아오르는 시기에 막 들어서려 하고 있다. 이 과정을 이끄는 핵심 기술은 인공 지능인데, 인공 지능은 농업과 의학에서부터 제조와 토지 사용에 이르기까지 선형적으로 발전하는 많은 종류의 기술을 기하급수적 정보 기술로 전환시키고 있다. 앞으로 우리의 삶 자체를 기하급수적으로 개선할 원동력은 바로 이 힘이다."
+        </p>
+        <p style={{ ...MT, fontSize:12, marginTop:20, marginBottom:0, letterSpacing:2 }}>— 『마침내 특이점이 시작된다』 제4장 삶은 기하급수적으로 개선되고 있다</p>
+      </div>
+      <div style={{ display:"flex", gap:32, marginBottom:52, justifyContent:"center" }}>
+        {[["문법","Grammar","#c4a35a"],["논리","Logic","#5a9abc"],["수사","Rhetoric","#bc7a7a"]].map(([l,e,col])=>(
+          <div key={l} style={{ textAlign:"center" }}>
+            <div style={{ width:5, height:5, borderRadius:"50%", background:col, margin:"0 auto 8px" }} />
+            <p style={{ fontFamily:F.b, fontSize:11, color:col, letterSpacing:3, marginBottom:5 }}>{l}</p>
+            <p style={{ fontFamily:F.h, fontSize:13, color:C.muted, margin:0, fontStyle:"italic" }}>{e}</p>
+          </div>
+        ))}
+      </div>
+      <button onClick={()=>go(0)} style={{ background:"transparent", border:`1px solid ${C.line}`, color:C.muted, fontFamily:F.b, fontSize:11, letterSpacing:4, padding:"12px 32px", cursor:"pointer" }}>처음으로</button>
+    </div>
+  );
+
+  default: return null;
+  }};
+
+  const navVisible = page>0 && page<10;
+  return (
+    <div style={{ background:C.bg, minHeight:"100vh" }}>
+      {navVisible && (
+        <div style={{ position:"fixed", top:0, left:0, right:0, height:2, background:C.line, zIndex:100 }}>
+          <div style={{ height:"100%", width:`${((page-1)/8)*100}%`, background:stage?stage.color:C.gold, transition:"width 0.4s ease, background 0.4s ease" }} />
+        </div>
+      )}
+      <div style={{ opacity:fading?0:1, transition:"opacity 0.28s ease", paddingTop:navVisible?2:0 }}>
+        {renderPage()}
+      </div>
+      {navVisible && (
+        <div style={{ maxWidth:720, margin:"0 auto", padding:"0 28px 52px", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+          <button onClick={prev} style={{ background:"transparent", border:"none", color:C.muted, fontFamily:F.b, fontSize:12, letterSpacing:3, cursor:"pointer", padding:"12px 0" }}>← 이전</button>
+          <div style={{ display:"flex", gap:4, alignItems:"center", flexWrap:"wrap", justifyContent:"center", maxWidth:160 }}>
+            {Array.from({length:9},(_,i)=>{
+              const ps=PAGE_STAGE[i+2], col=ps?STAGES[ps].color:C.gold, active=i===page-2, done=i<page-2;
+              return <div key={i} style={{ width:active?8:5, height:active?8:5, borderRadius:"50%", background:done||active?col:C.line, transition:"all 0.3s" }} />;
+            })}
+          </div>
+          {page<9 ? (
+            <button onClick={next} style={{ background:"transparent", border:"none", color:stage?stage.color:C.gold, fontFamily:F.b, fontSize:12, letterSpacing:3, cursor:"pointer", padding:"12px 0" }}>다음 →</button>
+          ) : (
+            <button onClick={next}
+              onMouseEnter={e=>{e.currentTarget.style.background=STAGES.rhetoric.color;e.currentTarget.style.color=C.bg;}}
+              onMouseLeave={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.color=STAGES.rhetoric.color;}}
+              style={{ background:"transparent", border:`1px solid ${STAGES.rhetoric.color}`, color:STAGES.rhetoric.color, fontFamily:F.b, fontSize:11, letterSpacing:3, padding:"10px 24px", cursor:"pointer", transition:"all 0.3s" }}>
+              마무리
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
