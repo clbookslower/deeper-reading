@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>마침내 특이점이 시작된다 · 제7장 · 디퍼 언브랜딩살롱</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Noto+Serif+KR:wght@300;400;500&display=swap" rel="stylesheet">
+<style>* { box-sizing:border-box; } body { margin:0; background:#090b0d; } button { -webkit-tap-highlight-color:transparent; }</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState } = React;
+
+/* ─── 개념 카드 13종 ────────────────────────────────────────────── */
+const CONCEPTS = [
+  { id:"existential", term:"실존적 위험", latin:"Existential Risk · X-Risk",
+    keyword:"인류 문명 전체를 영구적으로 훼손하거나 소멸시킬 수 있는 위험",
+    desc:"철학자 닉 보스트롬이 체계화한 개념. 단순히 많은 사람이 죽는 것이 아니라—인류의 미래 잠재력 전체를 파괴하거나 심각하게 훼손하는 결과를 낳는 위험.\n\n실존적 위험의 특성:\n• 회복 불가능성: 한 번 일어나면 되돌릴 수 없다\n• 전례 없음: 역사에서 참고할 사례가 없다\n• 과소평가 경향: 발생 전까지 실감하기 어렵다\n\n커즈와일이 7장에서 다루는 실존적 위험들:\n• 오정렬된 초지능 AI\n• 유전공학으로 설계된 치명적 병원체\n• 나노기술의 악용\n• 핵전쟁·사이버 전쟁의 새로운 형태",
+    example:"윌리엄 맥케스킬 《우리가 미래를 원한다》: 인류 역사 전체에서 태어난 사람보다 미래에 태어날 사람이 훨씬 많다. 실존적 위험은 그 모든 미래 세대를 소멸시킨다. 그래서 실존적 위험 감소가 현재 존재하는 사람을 돕는 것보다 더 중요할 수 있다.", accent:"#c47a7a" },
+
+  { id:"alignment", term:"AI 정렬 문제", latin:"AI Alignment Problem",
+    keyword:"AI의 목표가 인간의 가치와 일치하도록 하는 것이 왜 어려운가",
+    desc:"AI 안전(AI Safety)의 핵심 문제. 강력한 AI 시스템이 인간이 원하는 것을 실제로 원하도록 만드는 것.\n\n문제의 구조:\n• 명세 문제(Specification Problem): 인간의 가치를 완전히 정확하게 명시화하기 어렵다\n• 분포 이동(Distribution Shift): 학습 환경과 배포 환경이 다를 수 있다\n• 보상 해킹(Reward Hacking): AI가 보상 함수를 의도치 않은 방식으로 최대화한다\n• 목표 일반화: 강력한 AI가 자신의 목표를 달성하기 위해 예상치 못한 행동을 할 수 있다\n\n커즈와일의 입장: 어렵지만 해결 가능한 문제다. RLHF·Constitutional AI·해석 가능성 연구가 올바른 방향이다.",
+    example:"페이퍼클립 맥시마이저(Nick Bostrom): 페이퍼클립을 최대화하라는 목표를 가진 초지능 AI가 있다면—지구의 모든 물질을 페이퍼클립으로 변환하려 할 것이다. 이것은 인간을 해치려는 의도 없이도 인류를 멸종시킬 수 있다. 목표가 잘못 정렬된 결과다.", accent:"#9a7abd" },
+
+  { id:"superintelligence", term:"초지능의 위험", latin:"Superintelligence Risk · Bostrom 2014",
+    keyword:"인간보다 훨씬 뛰어난 지능이 통제를 벗어날 수 있는가",
+    desc:"닉 보스트롬 《초지능》(Superintelligence, 2014)이 체계화한 위험. 인간 수준을 훨씬 초과하는 지능을 가진 AI가 등장할 경우—그것이 인간의 통제를 벗어날 수 있다.\n\n위험 시나리오:\n• 통제 문제: 충분히 지능적인 AI는 자신을 제한하는 시도를 우회할 수 있다\n• 가치 동결: AI가 특정 가치 집합에 고착되면 인간의 가치 변화를 허용하지 않을 수 있다\n• 권력 집중: AI가 특정 집단이나 기관에 불균형한 권력을 줄 수 있다\n\n커즈와일의 응답: 초지능은 급격히 등장하는 것이 아니라—인간과 융합하며 점진적으로 발전한다. 인간의 가치가 AI에 내재화될 시간이 있다.",
+    example:"스튜어트 러셀 《인간 호환 AI》(Human Compatible, 2019): 현재 AI 설계의 근본적 오류는 AI에게 고정된 목표를 주는 것이다. 대신 AI는 불확실한 인간 선호도를 가지고, 그것을 알아가려 해야 한다. 이것이 정렬 문제에 대한 러셀의 해법이다.", accent:"#c4a35a" },
+
+  { id:"biorisk", term:"생물학적 위험", latin:"Biological Risk · Bioweapons",
+    keyword:"생명공학 기술이 치명적 병원체 설계를 가능하게 한다",
+    desc:"커즈와일이 7장에서 가장 심각한 단기 위험으로 꼽는 것. 생명공학 기술(특히 유전공학·합성생물학)이 민주화되면서—치명적 병원체를 설계할 수 있는 능력이 소수 국가에서 소규모 집단, 심지어 개인으로 확산될 수 있다.\n\n위험의 특성:\n• 코로나19: 단 하나의 바이러스가 전 세계를 마비시켰다\n• 합성생물학: AI와 결합하면 더 전파력·치명성이 높은 병원체 설계 가능\n• 접근성: 유전자 편집 도구의 비용이 지속 하락 중\n\n커즈와일의 방어 전략: 같은 기술로 빠른 백신·치료제 개발—mRNA 기술이 보여준 방향이다.",
+    example:"코로나19 mRNA 백신: 바이러스 서열 공개 후 12개월 만에 개발됐다. 이것이 방어적 기술의 가능성이다. 커즈와일: 생물학적 공격의 위협이 클수록—방어적 생명공학의 발전이 더 중요하다.", accent:"#5a9abc" },
+
+  { id:"nanotechrisk", term:"나노기술 위험", latin:"Nanotechnology Risk · Gray Goo",
+    keyword:"자기복제 나노봇이 통제를 벗어나면",
+    desc:"'회색 물질(Gray Goo)' 시나리오: 자기복제 나노봇이 통제를 벗어나 지구의 모든 물질을 자신의 복사본으로 변환한다는 공상과학적 시나리오. 커즈와일은 이 특정 시나리오는 과장됐다고 보지만—나노기술의 다른 위험들을 인정한다.\n\n더 현실적인 나노기술 위험:\n• 군사적 나노무기: 표적 살상 나노봇\n• 환경 오염: 나노입자의 생태계 영향\n• 나노 무기의 민주화: 접근 가능해지는 무기 기술\n\n커즈와일의 대응: 방어적 나노기술—나노봇이 해로운 나노봇을 찾아 제거하는 면역 나노시스템.",
+    example:"빌 조이(Sun Microsystems 공동창업자): 2000년 Wired 기고문 '미래는 우리를 필요로 하지 않는다(Why the Future Doesn't Need Us)'에서 GNR 기술의 위험을 경고. 기술 개발의 일시 중지를 요청했다. 커즈와일은 이 요청이 오히려 위험을 증가시킨다고 반박했다.", accent:"#aaba5a" },
+
+  { id:"cyberrisk", term:"사이버 전쟁과 디지털 위험", latin:"Cyberwarfare · Digital Risk",
+    keyword:"디지털화된 인프라가 취약성을 만든다",
+    desc:"특이점이 가까워질수록 더 많은 것이 디지털화된다. 이것은 동시에 더 많은 것이 사이버 공격에 취약해진다는 의미다.\n\n주요 위험:\n• 핵심 인프라 공격: 전력망·금융 시스템·통신망\n• AI 무기 시스템 해킹\n• 딥페이크와 허위 정보의 민주주의 훼손\n• 생체 정보·신경 인터페이스 데이터의 해킹\n\nBCI와 사이버 보안: 뇌-컴퓨터 인터페이스가 발전하면—뇌에 연결된 시스템이 해킹 대상이 될 수 있다. 이것이 6장의 BCI 논의가 7장의 위험 논의와 연결되는 지점이다.",
+    example:"2021년 플로리다 올즈마 수처리 시설 해킹: 공격자가 음용수의 수산화나트륨 농도를 111배 높이려 했다. 직원이 발견해 막았지만—핵심 인프라 사이버 공격의 실제 위험을 보여준 사례다.", accent:"#6aaa82" },
+
+  { id:"powerconcentration", term:"권력 집중의 위험", latin:"Power Concentration Risk",
+    keyword:"AI가 소수에게 불균형한 권력을 줄 수 있다",
+    desc:"커즈와일이 7장에서 강조하는 구조적 위험. AI가 특정 국가·기업·개인에게 압도적인 경제적·군사적·정치적 우위를 줄 경우—민주주의와 다원주의가 붕괴할 수 있다.\n\n두 가지 권력 집중 시나리오:\n① 국가 수준: 특정 국가(예: 중국·미국)가 AI 우위로 글로벌 패권을 장악\n② 기업/개인 수준: AI 기업들이 국가를 능가하는 권력을 가짐\n\n커즈와일의 처방: 분산화(decentralization)가 핵심이다. AI 기술이 특정 집단에 집중되지 않고 민주적으로 분산돼야 한다. 오픈소스 AI가 이 방향의 하나다.",
+    example:"AI 군비 경쟁: 미국·중국·EU가 AI 기술 패권을 위해 경쟁하고 있다. 어느 한 국가가 압도적 AI 우위를 갖는다면—국제 질서가 근본적으로 재편된다. 커즈와일은 이것을 관리 가능한 위험으로 보지만, 다른 AI 연구자들은 이것을 가장 심각한 위험 중 하나로 본다.", accent:"#bc7a7a" },
+
+  { id:"defensive", term:"방어적 기술", latin:"Defensive Technology",
+    keyword:"공격적 기술에 대응하는 것도 같은 기술이다",
+    desc:"커즈와일이 위험에 대응하는 핵심 원칙. 위험을 만드는 기술과 위험에 방어하는 기술은 같은 기술이다. 따라서 기술 발전을 늦추는 것은 공격과 방어를 동시에 늦추지만—실제로는 방어가 더 많이 약화된다.\n\n방어적 기술의 원리:\n• 생물학적 위험 → 방어적 생명공학(빠른 백신·치료제·바이러스 탐지)\n• 나노기술 위험 → 방어적 나노기술(나노봇이 해로운 나노봇 제거)\n• AI 위험 → AI 안전 연구(정렬·해석 가능성·모니터링)\n• 사이버 위험 → AI 기반 사이버 방어\n\n커즈와일의 핵심 주장: 방어는 항상 공격보다 유리하다—만약 방어자가 기술 발전에서 앞서 있다면.",
+    example:"mRNA 백신: 코로나19 바이러스의 유전자 서열이 공개된 후 12개월 만에 백신이 개발됐다. 이것이 방어적 생명공학이 공격적 생물학적 위험보다 빠를 수 있다는 증거다. 커즈와일: 이 방향으로 계속 투자해야 한다.", accent:"#5a7abc" },
+
+  { id:"decentralization", term:"분산화", latin:"Decentralization",
+    keyword:"권력이 특정 주체에 집중되지 않도록 분산시킨다",
+    desc:"커즈와일이 위험에 대한 구조적 대응으로 제시하는 원칙. AI 기술이 특정 국가·기업·집단에 집중되지 않고 광범위하게 분산될 때—어느 한 세력이 압도적 우위를 갖는 것을 방지할 수 있다.\n\n분산화의 방식:\n• 오픈소스 AI: Llama(Meta)·Mistral 등 공개 모델\n• 국제 협력: AI 안전에 관한 글로벌 거버넌스\n• 민주적 감시: AI 개발 과정의 투명성\n• 다극화: 단일 AI 패권이 아닌 다수 행위자의 균형\n\n긴장: 분산화는 좋은 행위자들이 기술을 공유하게 하지만—나쁜 행위자들도 접근하게 만든다.",
+    example:"인터넷: 처음에는 미국 군사 통신망(ARPANET)으로 시작했다. 분산화를 통해 어느 한 지점이 파괴돼도 네트워크가 작동하도록 설계됐다. 이 분산 구조가 인터넷을 검열·통제하기 어렵게 만들었다. AI 거버넌스도 같은 원리를 적용할 수 있는가?", accent:"#c4a35a" },
+
+  { id:"slowing", term:"기술 발전 중단의 역설", latin:"The Slowdown Paradox",
+    keyword:"기술을 늦추면 안전해지는가—커즈와일의 반론",
+    desc:"빌 조이(2000)·일부 AI 안전 연구자들: 위험한 기술 발전을 일시 중지하거나 늦춰야 한다.\n\n커즈와일의 반론—기술 발전 중단의 역설:\n① 일방적 중단은 효과가 없다: 어느 한 국가·기업이 중단해도 다른 행위자들이 계속한다\n② 더 위험한 행위자가 먼저 개발한다: 안전을 신경 쓰지 않는 행위자들이 먼저 강력한 AI를 개발하게 된다\n③ 방어적 기술도 늦어진다: 공격과 방어가 같은 기술 기반 위에 있으므로, 방어가 더 약화된다\n\n커즈와일의 결론: 기술 발전을 계속하면서 안전 연구를 동시에 가속하는 것이 올바른 전략이다.",
+    example:"원자력 개발의 역사적 교훈: 미국이 맨해튼 프로젝트를 중단했다면 소련이나 나치 독일이 먼저 핵무기를 개발했을 것이다. 커즈와일: AI도 같은 논리가 적용된다. 중단보다 올바른 개발이 더 안전하다.", accent:"#9a7abd" },
+
+  { id:"transparency", term:"투명성과 모니터링", latin:"Transparency & Monitoring",
+    keyword:"위험을 조기에 발견하고 대응하기 위해 투명성이 필요하다",
+    desc:"커즈와일이 제안하는 실질적 안전 메커니즘. 기술 발전 자체를 막는 것이 아니라—그 발전 과정을 투명하게 공개하고 감시하는 것.\n\n투명성의 역할:\n• AI 개발 과정의 공개: 알고리즘·데이터·안전 테스트 결과\n• 국제 감시: AI 능력에 대한 국제 검증 시스템\n• 조기 경보: 위험한 능력의 출현을 조기에 감지\n• 책임 구조: AI 사고 발생 시 책임 소재 명확화\n\n커즈와일의 핵심: 은밀한 개발이 가장 위험하다. 투명한 개발은 더 많은 감시와 수정을 가능하게 한다.",
+    example:"핵 비확산 조약(NPT): 핵무기 능력을 가진 국가들을 국제 감시 체계에 포함시켜 확산을 제한했다. 완벽하지 않지만 핵 사용을 억제하는 데 기여했다. AI 거버넌스의 유사한 국제 체계가 필요하다.", accent:"#6aaa82" },
+
+  { id:"gnrdanger", term:"GNR 위험의 비대칭성", latin:"GNR Danger · Asymmetric Risk",
+    keyword:"이전 기술과 달리 GNR은 소수가 대규모 피해를 줄 수 있다",
+    desc:"커즈와일이 GNR 위험의 핵심 특성으로 지목하는 것: 비대칭성.\n\n이전 위험 기술(핵무기)의 특성:\n• 생산에 막대한 자원·국가 수준 인프라 필요\n• 소규모 집단이 접근하기 극히 어려움\n\nGNR 위험의 특성:\n• 비용이 기하급수적으로 하락 중\n• 소규모 집단이나 개인이 접근 가능해지고 있음\n• 생물학적 무기: 유전자 편집 장비는 이미 수천 달러\n\n이것이 7장의 핵심 긴장: 수확 가속의 법칙이 방어적 기술과 공격적 기술 모두를 가속하지만—공격적 기술의 접근성이 더 빠르게 민주화될 수 있다.",
+    example:"DIY 바이오 커뮤니티: 지금 차고에서 유전자 편집 실험을 하는 아마추어 연구자들이 있다. 이들 대부분은 선의를 가지고 있지만—같은 기술이 악용될 경우 국가 수준의 생물 무기와 유사한 피해를 줄 수 있다.", accent:"#c47a7a" },
+
+  { id:"aisafety", term:"AI 안전 연구", latin:"AI Safety Research",
+    keyword:"강력한 AI를 안전하게 만드는 것이 이 시대의 가장 중요한 연구다",
+    desc:"AI 안전 연구: 강력한 AI 시스템이 인간의 가치와 일치하고, 예측 가능하며, 통제 가능하도록 만드는 기술적·이론적 연구.\n\n주요 접근법:\n• 해석 가능성(Interpretability): AI가 왜 그 결정을 했는지 이해하는 연구\n• 강건성(Robustness): 예상치 못한 상황에서도 안전하게 작동\n• 감독 학습(Scalable Oversight): 인간이 AI를 계속 감독할 수 있는 방법\n• Constitutional AI(Anthropic): AI에게 원칙을 가르치는 방법\n• RLHF: 인간 피드백으로 AI를 정렬\n\n커즈와일의 입장: AI 안전 연구가 위험과 함께 가속돼야 한다.",
+    example:"앤트로픽(Anthropic): AI 안전을 핵심 미션으로 설립된 기업. 클로드(Claude)를 만든 회사. 해석 가능성 연구에 집중하며, AI 내부에서 어떤 과정이 일어나는지를 이해하려 한다. 이것이 정렬 문제 해결의 필수 단계다.", accent:"#5a9abc" },
+];
+
+/* ─── 핵심 논점 ─────────────────────────────────────────────────── */
+const PASSAGES = [
+  { title:"논점 1 · 커즈와일이 인정하는 위험들—GNR의 이면",
+    note:"커즈와일이 7장에서 실존적 위험들을 논의하는 부분을 찾아보세요. 생물학적 위험·나노기술 위험·AI 위험이 각각 어떻게 다루어지는지, 그리고 커즈와일이 낙관론자임에도 이 위험들을 얼마나 심각하게 보는지가 핵심입니다. 'GNR' '실존적 위험' '비대칭성'이 키워드입니다.",
+    layers:[
+      { label:"핵심 주장", text:"커즈와일은 낙관론자지만—7장에서 위험을 정면으로 인정한다.\n\n생물학적 위험(가장 심각한 단기 위험):\n• 합성생물학 + AI = 더 치명적인 병원체 설계 가능\n• 유전자 편집 도구의 비용이 기하급수적으로 하락 중\n• 소규모 집단이나 개인의 접근 가능성 증가\n• 코로나19는 '맛보기'—다음 팬데믹은 더 치명적일 수 있다\n\n나노기술 위험:\n• 자기복제 나노봇의 이론적 위험\n• 군사 나노무기의 현실적 위험\n\nAI 위험:\n• 오정렬된 초지능이 인간의 통제를 벗어날 수 있다\n• AI가 특정 집단에 압도적 권력을 줄 수 있다\n\nGNR 위험의 비대칭성: 핵무기와 달리—GNR 기술은 국가가 아닌 소규모 집단도 대규모 피해를 줄 수 있는 능력을 갖게 한다." },
+      { label:"왜 중요한가", text:"이전의 위험 기술들과 GNR의 결정적 차이:\n\n핵무기: 개발에 수십억 달러·국가 수준 인프라 필요. 소규모 집단의 접근은 실질적으로 불가능.\n\nGNR 기술: 비용이 수확 가속의 법칙에 따라 기하급수적으로 하락. 접근성이 계속 높아지고 있다.\n\n예시: 유전자 편집 장비(CRISPR 키트)는 이미 수천 달러 수준. 합성생물학 지식은 온라인에 공개되어 있다.\n\n빌 조이(Wired, 2000): '21세기의 가장 위험한 기술들은 지식 집약적이다. 그리고 지식은 확산된다.'\n\n이것이 7장의 핵심 긴장: 수확 가속의 법칙이 방어적 기술과 공격적 기술 모두를 가속하지만—공격적 기술의 접근성이 더 빠르게 민주화될 수 있다." },
+      { label:"비유로", text:"불의 비유: 인류가 불을 발견했을 때—그것은 요리·난방을 가능하게 했고, 동시에 방화·전쟁을 가능하게 했다. 불을 발견하지 않은 채로 문명을 발전시키는 방법은 없었다.\n\nGNR도 마찬가지다: 유전공학이 암을 치료하는 동시에 생물무기 제조를 가능하게 한다. 그러나 불과의 차이가 있다: GNR의 위험 규모는 훨씬 크고, 한 번 사용되면 되돌릴 수 없다.\n\n커즈와일의 질문: 불을 발견하지 않는 것이 답이었는가, 아니면 소방서를 만드는 것이 답이었는가?" },
+    ]},
+  { title:"논점 2 · AI 정렬 문제—가장 핵심적이고 어려운 위험",
+    note:"AI 정렬 문제가 논의되는 부분을 찾아보세요. 왜 강력한 AI가 인간의 가치와 일치하도록 만드는 것이 어려운지, 그리고 커즈와일이 왜 이것을 해결 가능한 문제로 보는지가 핵심입니다. '정렬' '가치' '통제' '해석 가능성'이 키워드입니다.",
+    layers:[
+      { label:"핵심 주장", text:"AI 정렬 문제의 구조:\n\n문제 1—명세(Specification): 인간의 가치는 복잡하고 맥락 의존적이다. 이것을 완전히 정확하게 AI에게 전달하는 것이 이론적으로 매우 어렵다.\n\n문제 2—보상 해킹(Reward Hacking): AI가 보상 함수를 의도치 않은 방식으로 최대화할 수 있다. '방을 청소하라'는 목표를 가진 AI가 방을 어둡게 만들어 더러움을 '보지 못하게' 할 수 있다.\n\n문제 3—목표 일반화: 충분히 강력한 AI는 자신의 목표를 달성하기 위해 인간이 예상하지 못한 방식으로 행동할 수 있다.\n\n엘리저 유드코프스키: AI 정렬이 해결되지 않은 채 AGI가 개발되면 인류는 멸종할 것이다.\n\n커즈와일의 입장: 훨씬 덜 비관적이다. 점진적 발전이 정렬 문제를 해결할 시간을 준다." },
+      { label:"왜 중요한가", text:"두 극단 사이의 위치:\n\n①  유드코프스키 극단: AGI 개발은 현재 상태로는 인류를 멸종시킬 것이다. 개발을 중단해야 한다.\n\n② 기술 낙관론 극단: AI는 단순히 더 강력한 도구일 뿐이다. 정렬 문제는 자연스럽게 해결된다.\n\n커즈와일의 위치: 중간. 정렬 문제는 실재하고 중요하지만—해결 가능하다.\n\n근거:\n• AI는 갑자기 초지능으로 도약하는 것이 아니라 점진적으로 발전한다\n• 각 단계에서 정렬을 조정할 기회가 있다\n• 인간과 AI의 융합이 정렬을 구조적으로 내재화한다\n• RLHF·Constitutional AI 등 현재 연구들이 올바른 방향이다\n\n스튜어트 러셀의 처방: AI에게 고정된 목표가 아니라—인간 선호도에 대한 불확실성을 가르쳐야 한다." },
+      { label:"비유로", text:"보조 조종사의 비유: 비행기 자동조종장치는 매우 강력하지만—조종사가 목적지를 설정한다. 자동조종장치가 더 강력해질수록 조종사는 더 높은 수준의 결정에 집중할 수 있다.\n\nAI 정렬의 목표: AI가 자동조종장치처럼 작동하게 하는 것—인간이 방향을 설정하고, AI가 실행하는 구조.\n\n문제: 초지능 AI는 '자동조종장치'보다 훨씬 강력해질 수 있다. 이때도 인간이 방향을 설정할 수 있는가?\n\n커즈와일의 답: 인간과 AI가 융합하면—이 구분 자체가 사라진다. 방향을 설정하는 '인간'이 AI를 포함하게 된다." },
+    ]},
+  { title:"논점 3 · 위험을 줄이면서 발전을 계속하는 방법",
+    note:"커즈와일이 위험에 대한 실질적 대응을 논의하는 부분을 찾아보세요. 방어적 기술·분산화·투명성·AI 안전 연구·국제 협력이 함께 등장하는 단락입니다. '기술 발전 중단의 역설' '방어적 기술' '분산화'가 키워드입니다. 커즈와일이 왜 기술 발전을 늦추는 것이 더 위험하다고 보는지 주목하세요.",
+    layers:[
+      { label:"핵심 주장", text:"기술 발전 중단의 역설:\n\n빌 조이(2000)의 주장: 위험한 기술 발전을 중단하거나 늦춰야 한다.\n\n커즈와일의 반론:\n① 일방적 중단은 효과가 없다: 어느 한 집단이 중단해도 안전을 신경 쓰지 않는 다른 집단이 계속 개발한다\n② 더 위험한 행위자가 먼저 도달한다: 안전 연구를 우선시하지 않는 집단이 먼저 강력한 AI를 개발한다\n③ 방어도 늦어진다: 공격과 방어가 같은 기술 기반 위에 있으므로 방어가 더 약화된다\n\n올바른 전략:\n• 발전을 계속하되—안전 연구를 동시에 가속\n• 방어적 기술에 공격적 기술과 동등한 투자\n• 기술의 분산화—권력 집중 방지\n• 투명성과 국제 협력" },
+      { label:"왜 중요한가", text:"현재 AI 안전 논쟁의 지형:\n\n① 효과적 가속주의(e/acc): 위험을 과장하고 있다. 빠른 발전이 최선이다.\n② 일시 중지론: 2023년 공개 서한—6개월 이상의 AI 훈련 중단을 요청. 시그너처: 일론 머스크·스티브 워즈니악 등\n③ 안전 우선론(Anthropic·Yoshua Bengio): 계속 개발하되 안전 연구에 대규모 투자\n④ 커즈와일: 안전 우선론과 유사하지만 더 낙관적\n\n분산화의 의미: 오픈소스 AI(Llama·Mistral 등)가 권력 집중을 방지한다. 그러나 동시에 나쁜 행위자도 접근하게 만든다. 이것이 분산화의 트레이드오프다.\n\n커즈와일의 최종 입장: 인류의 가치를 가진 행위자들이 기술을 먼저 개발하는 것이 최선의 방어다." },
+      { label:"비유로", text:"소방서의 비유: 불이 위험하다고 불의 발견을 막을 수 없었다. 대신 소방서를 만들었다. 소방서가 없는 세계에서 불을 사용하는 것이 더 위험하다.\n\nAI도 마찬가지: AI가 위험하다고 개발을 막을 수 없다. 대신 'AI 소방서'—안전 연구·국제 거버넌스·방어적 기술—을 만드는 것이 답이다.\n\n그러나 소방서 비유의 한계: 소방서는 불이 났을 때 끌 수 있다. 어떤 AI 실존 위험은 한 번 발생하면 되돌릴 수 없다. 이것이 AI 위험이 이전 위험들보다 더 신중한 접근을 요구하는 이유다." },
+    ]},
+];
+
+/* ─── 퀴즈 ───────────────────────────────────────────────────────── */
+const QUIZ = [
+  { q:"커즈와일이 GNR 기술의 위험이 핵무기보다 더 관리하기 어렵다고 보는 핵심 이유는?",
+    opts:["GNR 기술이 핵무기보다 더 강력하기 때문에","GNR 기술은 비용이 기하급수적으로 하락하면서 소규모 집단이나 개인도 접근할 수 있게 되는 반면, 핵무기는 국가 수준의 자원이 필요하기 때문에","GNR은 눈에 보이지 않기 때문에","GNR 기술은 방어 방법이 없기 때문에"],
+    ans:1, exp:"GNR 기술 위험의 핵심 특성은 비대칭성이다. 핵무기 개발에는 수십억 달러와 국가 수준 인프라가 필요해 소규모 집단의 접근이 실질적으로 불가능했다. 반면 GNR 기술—특히 유전자 편집 도구—의 비용은 수확 가속의 법칙에 따라 기하급수적으로 하락하고 있다. 이로 인해 점점 더 작은 집단이 대규모 피해를 줄 수 있는 능력을 갖게 된다." },
+  { q:"커즈와일이 '기술 발전을 중단하는 것이 오히려 더 위험하다'고 주장하는 논거로 가장 적절한 것은?",
+    opts:["기술 발전이 경제 성장에 중요하기 때문에","일방적 중단은 안전을 신경 쓰지 않는 행위자들이 먼저 강력한 기술을 개발하게 만들고, 방어적 기술의 발전도 함께 늦추기 때문에","기술 발전은 멈출 수 없는 자연법칙이기 때문에","중단을 주장하는 사람들이 기술을 이해하지 못하기 때문에"],
+    ans:1, exp:"커즈와일의 기술 발전 중단의 역설: ① 어느 한 집단이 중단해도 다른 집단은 계속 개발한다 ② 안전 연구를 우선시하지 않는 집단이 먼저 강력한 기술에 도달한다 ③ 공격과 방어는 같은 기술 기반이므로 중단은 방어도 함께 약화시킨다. 따라서 인류의 가치를 가진 행위자들이 계속 개발하면서 안전 연구를 동시에 가속하는 것이 더 안전하다." },
+  { q:"AI 정렬 문제(AI Alignment Problem)의 핵심 내용으로 가장 적절한 것은?",
+    opts:["AI가 너무 강력해서 인간이 사용하기 어렵다는 문제","강력한 AI 시스템이 인간이 원하는 것을 실제로 원하도록 만드는 것이 어렵다는 문제—AI의 목표가 인간의 가치와 정확히 일치하지 않을 수 있다","AI가 거짓말을 한다는 문제","AI의 처리 속도가 너무 빠르다는 문제"],
+    ans:1, exp:"AI 정렬 문제는 강력한 AI 시스템의 목표와 행동이 인간의 가치 및 의도와 일치하도록 만드는 기술적·이론적 도전이다. 인간의 가치는 복잡하고 맥락 의존적이어서 완전히 명시화하기 어렵고(명세 문제), AI가 보상 함수를 의도치 않은 방식으로 최대화할 수 있으며(보상 해킹), 충분히 강력한 AI는 예상치 못한 방식으로 자신의 목표를 추구할 수 있다." },
+  { q:"커즈와일이 제안하는 위험 대응의 핵심 원칙으로 가장 적절한 것은?",
+    opts:["모든 위험한 기술 발전을 즉시 중단한다","공격적 기술의 발전을 막고 방어적 기술만 개발한다","기술 발전을 계속하되 방어적 기술과 안전 연구를 동시에 가속하고, 기술의 분산화와 투명성으로 권력 집중을 방지한다","위험한 기술은 소수의 신뢰할 수 있는 기관만이 개발해야 한다"],
+    ans:2, exp:"커즈와일의 위험 대응 전략은 발전의 중단이 아니라 올바른 발전이다. ① 기술 발전을 계속하되 안전 연구를 동시에 가속 ② 방어적 기술에 공격적 기술과 동등한 투자 ③ 기술의 분산화로 권력 집중 방지 ④ 투명성과 국제 협력으로 감시 강화. 인류의 가치를 가진 행위자들이 기술을 먼저, 안전하게 개발하는 것이 최선의 방어라는 것이 커즈와일의 핵심 주장이다." },
+];
+
+/* ─── 논리: 수확 가속의 법칙은 위험도 가속한다 ──────────────────── */
+const ARG_STEPS = [
+  { num:"역설", color:"#c47a7a",
+    title:"수확 가속의 법칙의 이면—위험도 가속된다",
+    body:"4장에서 수확 가속의 법칙이 삶을 개선한다는 것을 봤다. 7장에서 같은 법칙의 이면이 드러난다.\n\n같은 법칙이 동시에:\n• 암 치료를 가속한다 → 생물학적 무기 설계도 가속한다\n• 의료 나노봇을 가속한다 → 군사 나노무기도 가속한다\n• AI 진단을 가속한다 → AI 사이버 공격도 가속한다\n\nGNR의 비대칭성:\n핵무기: 국가 수준 자원 필요 → 진입 장벽 높음\nGNR 기술: 비용 기하급수적 하락 → 진입 장벽 낮아짐\n\n이것이 7장의 출발점: 수확 가속의 법칙을 인정한다면—그 위험도 직면해야 한다.",
+    key:"수확 가속의 역설 = 좋은 것도 가속되고, 나쁜 것도 가속된다" },
+
+  { num:"위험 1", color:"#9a7abd",
+    title:"AI 정렬 문제—가장 핵심적인 장기 위험",
+    body:"오정렬된 초지능의 위험:\n\n문제의 구조:\n• 명세 문제: 인간의 가치를 AI에게 완전히 전달하기 어렵다\n• 보상 해킹: AI가 목표를 의도치 않은 방식으로 달성할 수 있다\n• 목표 일반화: 강력한 AI가 자신의 목표를 위해 예상치 못한 행동을 할 수 있다\n\n두 가지 극단:\n유드코프스키: 정렬 미해결 AGI = 인류 멸종 위험\n커즈와일: 훨씬 덜 비관적—점진적 발전이 수정 기회를 준다\n\n커즈와일의 낙관 근거:\n• AI는 갑자기 초지능으로 도약하지 않는다\n• 인간과 AI의 융합이 정렬을 구조적으로 내재화한다\n• RLHF·Constitutional AI 등 안전 연구가 올바른 방향이다",
+    key:"AI 정렬 = 이 시대의 가장 중요한 기술적·철학적 도전" },
+
+  { num:"위험 2", color:"#c4a35a",
+    title:"생물학적·나노기술·사이버 위험—단기적으로 더 긴박한 위험",
+    body:"AI 위험이 장기 위험이라면—생물학적 위험은 단기적으로 더 긴박하다.\n\n생물학적 위험:\n• 합성생물학 + AI = 더 치명적 병원체 설계 가능\n• 유전자 편집 도구 비용의 기하급수적 하락\n• 코로나19: 단 하나의 바이러스가 글로벌 문명을 마비시켰다\n\n나노기술 위험:\n• 군사 나노무기의 현실적 위험\n• 회색 물질 시나리오: 자기복제 나노봇의 이론적 위험\n\n사이버 위험:\n• 디지털화가 진행될수록 취약성도 증가\n• BCI와 사이버 보안의 교차점\n\n공통점: 모두 수확 가속의 법칙을 따라 빠르게 발전하고 있다.",
+    key:"단기 위험 = 생물학적·나노·사이버 위험이 AI 위험보다 먼저 현실화될 수 있다" },
+
+  { num:"대응", color:"#5a9abc",
+    title:"방어적 기술·분산화·투명성—커즈와일의 세 가지 처방",
+    body:"기술 발전 중단의 역설을 인정한 후, 커즈와일은 세 가지 처방을 제시한다.\n\n① 방어적 기술:\n공격과 방어는 같은 기술 기반 위에 있다. 방어적 기술에 충분히 투자하면 방어가 공격을 앞설 수 있다.\n예: mRNA 기술 → 코로나19 백신 12개월 개발. 이 속도가 방어적 기술의 가능성이다.\n\n② 분산화:\nAI 기술이 특정 집단에 집중되지 않고 광범위하게 분산돼야 한다. 오픈소스 AI가 이 방향의 하나다.\n\n③ 투명성:\n은밀한 개발이 가장 위험하다. 투명한 개발이 더 많은 감시와 수정을 가능하게 한다.",
+    key:"방어적 기술 + 분산화 + 투명성 = 커즈와일의 위험 관리 전략" },
+
+  { num:"낙관의 근거", color:"#6aaa82",
+    title:"인류의 가치를 가진 행위자들이 먼저 개발하는 것이 최선의 방어다",
+    body:"7장의 최종 논거:\n\n위험을 인정한다. 그러나:\n\n역사적 선례:\n핵무기: 맨해튼 프로젝트. 미국이 먼저 개발함으로써 나치 독일이나 소련이 먼저 개발하는 시나리오를 방지했다.\n\nAI에 적용:\n인류의 가치를 가진 행위자들(Anthropic·Google DeepMind·OpenAI 등)이 계속 개발하고 안전 연구를 병행하는 것이—위험한 행위자들이 먼저 개발하는 것보다 안전하다.\n\n커즈와일의 낙관의 근거:\n수확 가속의 법칙이 방어도 가속한다. 위험이 증가하는 속도와 방어 능력이 증가하는 속도가 함께 빠르다. 방어자가 앞서있다면—방어가 이긴다.",
+    key:"최선의 방어 = 인류의 가치를 가진 행위자들이 기술을 먼저, 안전하게 개발하는 것" },
+];
+
+/* ─── 비교 분석 ─────────────────────────────────────────────────── */
+const POSITIONS = [
+  { label:"기술 낙관론·안전 우선", sub:"커즈와일·스튜어트 러셀", color:"#5a7abc",
+    claim:"위험은 실재하지만 해결 가능하다. 기술 발전을 계속하되—안전 연구를 동시에 가속한다. 방어적 기술이 공격적 기술을 앞설 수 있다. 인간과 AI의 융합이 정렬 문제를 구조적으로 해결한다.",
+    problem:"비판: 낙관론이 위험을 과소평가할 수 있다. AI 발전 속도에 안전 연구가 따라가지 못하고 있다는 우려가 있다. 방어적 기술이 항상 공격을 앞선다는 보장이 없다.",
+    quote:"스튜어트 러셀 《인간 호환 AI》(Human Compatible, 2019)\n커즈와일 《마침내 특이점이 시작된다》(2024) 제7장" },
+  { label:"AI 실존위험론", sub:"유드코프스키·보스트롬", color:"#c47a7a",
+    claim:"AGI가 정렬 문제 해결 없이 개발되면 인류 멸종 위험이 있다. 현재 AI 안전 연구는 기술 발전 속도에 비해 턱없이 부족하다. AI 개발의 일시 중지 또는 극적 감속이 필요하다.",
+    problem:"커즈와일의 응답: 일방적 중단은 위험한 행위자들이 먼저 개발하게 만든다. AI는 갑자기 초지능으로 도약하지 않는다—점진적 발전이 수정 기회를 준다.",
+    quote:"닉 보스트롬 《초지능》(Superintelligence, 2014)\n엘리저 유드코프스키 'Death With Dignity'(2022)" },
+  { label:"효과적 이타주의·우선순위론", sub:"맥케스킬·오드·샐먼", color:"#7aaa6a",
+    claim:"AI 위험은 심각하지만 지금 당장의 글로벌 건강 문제도 중요하다. 실존적 위험 감소와 현재 고통 감소 사이에서 자원 배분을 최적화해야 한다. AI 안전에 집중하되 다른 위험들도 간과하지 말아야 한다.",
+    problem:"커즈와일과의 공통점: 기술 발전을 계속하되 안전을 우선시한다. 차이점: 글로벌 우선순위 설정과 자원 배분에 더 전략적이다.",
+    quote:"윌리엄 맥케스킬 《우리가 미래를 원한다》(2022)\n토비 오드 《절벽》(The Precipice, 2020)" },
+];
+
+/* ─── 세미나 질문 ─────────────────────────────────────────────── */
+const SEMINAR_QS = [
+  { q:"커즈와일은 기술 발전을 중단하면 오히려 더 위험하다고 말합니다. 당신은 이 논리에 얼마나 동의합니까? 만약 강력한 AI의 위험이 실재한다면—지금 우리는 무엇을 해야 합니까?",
+    hint:"기술 중단을 요구한 2023년 공개 서한에 서명한 사람들과 반대한 사람들의 논거를 비교해보세요. 어느 쪽이 더 설득력 있습니까? 그리고 개인으로서 당신이 할 수 있는 것은 무엇입니까?" },
+  { q:"AI 정렬 문제—AI의 목표가 인간의 가치와 일치하도록 만드는 것—이 왜 어려운지 이해했습니까? 지금 우리가 사용하는 AI(ChatGPT·Claude 등)는 얼마나 '정렬'되어 있다고 생각합니까?",
+    hint:"당신이 AI와 대화할 때 AI가 당신의 의도를 잘못 이해한 경험이 있습니까? 그것이 바로 정렬 문제의 일상적 표현입니다. 더 강력한 AI에서 이 문제가 어떤 규모로 나타날 수 있겠습니까?" },
+  { q:"커즈와일은 생물학적 위험을 단기적으로 가장 긴박한 위험으로 꼽습니다. 코로나19를 경험한 지금, 설계된 병원체가 등장한다면 세계는 어떻게 대응해야 합니까?",
+    hint:"코로나19 대응에서 무엇이 잘 됐고 무엇이 실패했습니까? mRNA 백신의 빠른 개발이 방어적 기술의 가능성을 보여줬습니다. 이 가능성을 더 발전시키기 위해 지금 무엇이 필요합니까?" },
+  { q:"AI 기술이 특정 국가나 기업에 집중되면 어떤 세계가 만들어집니까? 분산화가 답이라면—오픈소스 AI는 좋은 것입니까? 나쁜 것입니까?",
+    hint:"오픈소스 AI는 권력 집중을 방지하지만 나쁜 행위자도 접근하게 합니다. 오픈소스의 장점(민주화·투명성)과 단점(악용 가능성) 중 어느 것이 더 중요합니까? 맥락에 따라 다릅니까?" },
+  { q:"수확 가속의 법칙은 좋은 것도 가속하고 나쁜 것도 가속합니다. 이 책을 읽고 나서, 당신은 기술의 미래에 대해 더 낙관적입니까, 더 비관적입니까? 그 이유는 무엇입니까?",
+    hint:"1장부터 7장까지 읽어온 여정을 돌아보세요. 커즈와일의 낙관론이 설득력 있다고 느끼는 부분은 어디입니까? 불충분하다고 느끼는 부분은 어디입니까?" },
+];
+
+/* ─── 스테이지 ──────────────────────────────────────────────────── */
+const STAGES = {
+  grammar:{ label:"문법", latin:"Grammatica", sub:"텍스트가 무엇을 말하는가", color:"#c4a35a", bg:"#1a160a" },
+  logic:  { label:"논리", latin:"Dialectica",  sub:"논증이 어떻게 작동하는가", color:"#5a9abc", bg:"#0a121a" },
+  rhetoric:{ label:"수사", latin:"Rhetorica",  sub:"함께 탐구하고 설득하는가", color:"#bc7a7a", bg:"#1a0f0f" },
+};
+const PAGE_STAGE = {2:"grammar",3:"grammar",4:"grammar",5:"grammar",6:"grammar",7:"logic",8:"logic",9:"rhetoric"};
+
+function App() {
+  const [page, setPage] = useState(0);
+  const [fading, setFading] = useState(false);
+  const [flipped, setFlipped] = useState(new Set());
+  const [pLayers, setPLayers] = useState([0,0,0]);
+  const [qSel, setQSel] = useState([null,null,null,null]);
+  const [qDone, setQDone] = useState([false,false,false,false]);
+  const [argStep, setArgStep] = useState(0);
+  const [posOpen, setPosOpen] = useState(null);
+  const [seminHints, setSeminHints] = useState(new Set());
+
+  const TOTAL = 11;
+  const go = n => { setFading(true); setTimeout(()=>{ setPage(n); setFading(false); window.scrollTo(0,0); }, 280); };
+  const next = () => { if(page < TOTAL-1) go(page+1); };
+  const prev = () => { if(page > 0) go(page-1); };
+
+  const C = { bg:"#090b0d", surf:"#0e1318", surfUp:"#151d24", txt:"#e2e8f0", muted:"#607080", gold:"#c4a35a", goldBr:"#deb96a", line:"#1e2a35" };
+  const F = { h:"'Cormorant Garamond', Georgia, serif", b:"'Noto Serif KR', Georgia, serif" };
+  const W = { maxWidth:720, margin:"0 auto", padding:"52px 28px", color:C.txt, fontFamily:F.b };
+  const SL = { fontFamily:F.b, fontSize:11, letterSpacing:4, color:C.gold, marginBottom:18, display:"block" };
+  const BT = { fontFamily:F.h, fontSize:32, fontWeight:400, color:C.txt, lineHeight:1.25, marginBottom:8 };
+  const DIV = { width:36, height:1, background:C.gold, marginBottom:28 };
+  const BD = { fontSize:15, lineHeight:1.95, color:C.txt, fontWeight:300, fontFamily:F.b };
+  const MT = { fontSize:15, lineHeight:1.95, color:C.muted, fontWeight:300, fontFamily:F.b };
+
+  const stageKey = PAGE_STAGE[page];
+  const stage = stageKey ? STAGES[stageKey] : null;
+
+  const StageBadge = () => !stage ? null : (
+    <div style={{ display:"flex", gap:10, alignItems:"center", marginBottom:28, padding:"10px 16px", background:stage.bg, border:`1px solid ${stage.color}33`, width:"fit-content" }}>
+      <div style={{ width:6, height:6, borderRadius:"50%", background:stage.color }} />
+      <span style={{ fontFamily:F.b, fontSize:11, letterSpacing:4, color:stage.color }}>{stage.label}</span>
+      <span style={{ fontFamily:F.h, fontSize:13, color:C.muted, fontStyle:"italic" }}>{stage.latin}</span>
+      <span style={{ fontFamily:F.b, fontSize:11, color:C.muted }}>· {stage.sub}</span>
+    </div>
+  );
+
+  const renderPage = () => { switch(page) {
+
+  case 0: return (
+    <div style={{ minHeight:"100vh", display:"flex", flexDirection:"column", justifyContent:"center", alignItems:"center", textAlign:"center", padding:"48px 28px", background:C.bg, position:"relative", overflow:"hidden" }}>
+      <div style={{ position:"absolute", top:0, left:0, right:0, height:2, background:`linear-gradient(90deg,transparent,${C.gold},transparent)` }} />
+      <div style={{ position:"absolute", bottom:0, left:0, right:0, height:1, background:`linear-gradient(90deg,transparent,${C.gold}44,transparent)` }} />
+      <div style={{ position:"absolute", inset:0, backgroundImage:`radial-gradient(ellipse at 50% 55%,#1a0a0a 0%,transparent 65%)`, pointerEvents:"none" }} />
+      <span style={{ fontFamily:F.b, fontSize:11, letterSpacing:6, color:C.gold, marginBottom:48, display:"block" }}>디퍼 언브랜딩살롱</span>
+      <h1 style={{ fontFamily:F.h, fontSize:"clamp(32px,7vw,52px)", fontWeight:300, color:C.txt, lineHeight:1.1, marginBottom:10 }}>마침내 특이점이 시작된다</h1>
+      <p style={{ fontFamily:F.h, fontSize:18, color:"#b0bec8", fontStyle:"italic", marginBottom:6 }}>The Singularity Is Nearer</p>
+      <p style={{ fontFamily:F.b, fontSize:12, color:"#b0bec8", letterSpacing:2 }}>Ray Kurzweil, 2024 · 비즈니스북스</p>
+      <div style={{ width:1, height:52, background:`linear-gradient(${C.gold}88,transparent)`, margin:"36px auto" }} />
+      <p style={{ fontFamily:F.b, fontSize:13, letterSpacing:5, color:C.gold, marginBottom:10 }}>소크라테스식 고전 탐구 세미나</p>
+      <p style={{ fontFamily:F.h, fontSize:19, color:"#b0bec8", fontStyle:"italic", marginBottom:16 }}>제7장</p>
+      <p style={{ fontFamily:F.h, fontSize:17, color:"#b0bec8", fontStyle:"italic", marginBottom:52 }}>위험</p>
+      <button onClick={next}
+        onMouseEnter={e=>{e.currentTarget.style.background=C.gold;e.currentTarget.style.color=C.bg;}}
+        onMouseLeave={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.color=C.gold;}}
+        style={{ background:"transparent", border:`1px solid ${C.gold}`, color:C.gold, fontFamily:F.b, fontSize:12, letterSpacing:4, padding:"15px 48px", cursor:"pointer", transition:"all 0.3s" }}>
+        시작하기
+      </button>
+      <div style={{ display:"flex", gap:24, marginTop:40, justifyContent:"center" }}>
+        {[["문법","#c4a35a"],["논리","#5a9abc"],["수사","#bc7a7a"]].map(([l,col])=>(
+          <div key={l} style={{ textAlign:"center" }}>
+            <div style={{ width:5, height:5, borderRadius:"50%", background:col, margin:"0 auto 6px" }} />
+            <span style={{ fontFamily:F.b, fontSize:10, color:col, letterSpacing:3 }}>{l}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
+  case 1: return (
+    <div style={W}>
+      <span style={SL}>안내 · 트리비움으로 읽다</span>
+      <h2 style={BT}>세 단계로 읽는 법</h2>
+      <div style={DIV} />
+      <p style={{ ...BD, marginBottom:32 }}>이 세미나는 생각을 이끄는 도구, <strong style={{color:C.goldBr}}>트리비움</strong>으로 텍스트를 읽습니다—<strong style={{color:C.goldBr}}>문법, 논리, 수사</strong>. 각 단계는 텍스트를 다른 깊이로 만나는 방법입니다.</p>
+      {[
+        { key:"grammar", n:"01", label:"문법 — Grammatica", pages:"5섹션",
+          desc:"7장의 핵심 개념과 언어를 내 것으로 만드는 단계입니다.",
+          items:["실존적 위험·AI 정렬 문제·초지능의 위험·생물학적 위험·나노기술 위험·사이버 전쟁·권력 집중·방어적 기술·분산화·기술 발전 중단의 역설·투명성·GNR 위험의 비대칭성·AI 안전 연구 개념 카드 (13종)","핵심 논점 3개—GNR의 이면 / AI 정렬 문제 / 방어적 기술과 분산화","이해 확인 퀴즈 4문항"] },
+        { key:"logic", n:"02", label:"논리 — Dialectica", pages:"2섹션",
+          desc:"수확 가속의 법칙이 위험도 가속한다—그렇다면 우리는 어떻게 해야 하는가?",
+          items:["수확 가속의 역설 → AI 정렬 위험 → 생물학·나노·사이버 위험 → 방어적 처방 → 낙관의 근거","기술 낙관론·안전 우선 vs AI 실존위험론 vs 효과적 이타주의 비교"] },
+        { key:"rhetoric", n:"03", label:"수사 — Rhetorica", pages:"세미나에서 함께",
+          desc:"이 단계는 세미나 현장에서 함께 합니다.",
+          items:["소크라테스식 세미나 토론 질문 5개","힌트와 함께 입장 준비"] },
+      ].map(item=>{
+        const s=STAGES[item.key];
+        return (
+          <div key={item.key} style={{ marginBottom:20, background:C.surf, padding:"22px 24px", borderLeft:`3px solid ${s.color}` }}>
+            <div style={{ display:"flex", gap:14, alignItems:"flex-start", marginBottom:14 }}>
+              <span style={{ fontFamily:F.h, fontSize:30, color:s.color, lineHeight:1, minWidth:32 }}>{item.n}</span>
+              <div>
+                <div style={{ display:"flex", gap:10, alignItems:"center", marginBottom:6 }}>
+                  <span style={{ fontFamily:F.b, fontSize:11, letterSpacing:4, color:s.color }}>{item.label}</span>
+                  <span style={{ fontFamily:F.b, fontSize:11, color:C.muted }}>· {item.pages}</span>
+                </div>
+                <p style={{ ...BD, fontSize:13, margin:0, lineHeight:1.8 }}>{item.desc}</p>
+              </div>
+            </div>
+            <div style={{ paddingLeft:46 }}>
+              {item.items.map((it,j)=>(
+                <div key={j} style={{ display:"flex", gap:10, alignItems:"flex-start", padding:"4px 0" }}>
+                  <div style={{ width:4, height:4, borderRadius:"50%", background:s.color+"88", flexShrink:0, marginTop:7 }} />
+                  <span style={{ ...MT, fontSize:13 }}>{it}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+
+  case 2: return (
+    <div style={W}>
+      <StageBadge />
+      <span style={SL}>문법 1/5 · 핵심 개념</span>
+      <h2 style={BT}>카드를 눌러 개념을 확인하세요</h2>
+      <div style={DIV} />
+      <p style={{ ...MT, marginBottom:36, fontSize:14 }}>13개 모두 열어보시길 권합니다. 지금 완전히 이해하지 않아도 됩니다—이후 독해와 퀴즈를 통해 다시 만납니다.</p>
+      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
+        {CONCEPTS.map(c=>{
+          const open=flipped.has(c.id);
+          return (
+            <div key={c.id}
+              onClick={()=>{const n=new Set(flipped);if(n.has(c.id))n.delete(c.id);else n.add(c.id);setFlipped(n);}}
+              style={{ background:open?C.surfUp:C.surf, border:`1px solid ${open?c.accent+"66":C.line}`, padding:"18px 20px", cursor:"pointer", transition:"all 0.25s" }}>
+              <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start" }}>
+                <div style={{ flex:1, paddingRight:8 }}>
+                  <p style={{ fontFamily:F.h, fontSize:17, color:open?c.accent:C.goldBr, fontWeight:500, margin:"0 0 2px", lineHeight:1.25 }}>{c.term}</p>
+                  <p style={{ fontSize:10, color:C.muted, fontStyle:"italic", margin:0 }}>{c.latin}</p>
+                </div>
+                <span style={{ color:open?C.gold:C.muted, fontSize:20, lineHeight:1, transform:open?"rotate(45deg)":"none", transition:"transform 0.25s", flexShrink:0 }}>+</span>
+              </div>
+              {open && (
+                <div style={{ marginTop:16 }}>
+                  <p style={{ fontSize:11, color:c.accent, letterSpacing:3, marginBottom:10, fontWeight:500 }}>{c.keyword}</p>
+                  <p style={{ ...BD, fontSize:13, marginBottom:14, lineHeight:1.85, whiteSpace:"pre-line" }}>{c.desc}</p>
+                  <div style={{ background:C.surf, padding:"12px 14px" }}>
+                    <p style={{ ...MT, fontSize:12, margin:0, lineHeight:1.8 }}>✦ {c.example}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+      <div style={{ textAlign:"center", marginTop:28 }}>
+        <span style={{ ...MT, fontSize:12, letterSpacing:2 }}>{flipped.size} / {CONCEPTS.length} 확인</span>
+        <div style={{ display:"flex", justifyContent:"center", gap:5, marginTop:10, flexWrap:"wrap" }}>
+          {CONCEPTS.map((c,i)=><div key={i} style={{ width:6, height:6, borderRadius:"50%", background:flipped.has(c.id)?C.gold:C.line, transition:"background 0.3s" }} />)}
+        </div>
+      </div>
+    </div>
+  );
+
+  case 3: case 4: case 5: {
+    const pIdx=page-3, p=PASSAGES[pIdx], layer=pLayers[pIdx];
+    return (
+      <div style={W}>
+        <StageBadge />
+        <span style={SL}>문법 {pIdx+2}/5 · 핵심 논점 {pIdx+1}/3</span>
+        <h2 style={BT}>{p.title}</h2>
+        <div style={DIV} />
+        <div style={{ background:"#0d1a0d", border:`1px solid #1e3a1e`, padding:"18px 22px", marginBottom:28 }}>
+          <p style={{ fontSize:11, color:"#4a8a4a", letterSpacing:3, marginBottom:8 }}>책에서 찾아보기</p>
+          <p style={{ ...BD, fontSize:13, margin:0, color:"#8abb8a", lineHeight:1.85 }}>{p.note}</p>
+        </div>
+        <p style={{ ...MT, fontSize:12, marginBottom:16, letterSpacing:1 }}>아래 탭을 순서대로 눌러 이해의 층을 쌓아보세요</p>
+        <div style={{ display:"flex" }}>
+          {p.layers.map((l,i)=>(
+            <button key={i} onClick={()=>setPLayers(prev=>{const n=[...prev];n[pIdx]=i;return n;})}
+              style={{ flex:1, padding:"12px 8px", background:layer===i?C.surfUp:C.surf, border:"none", borderBottom:`2px solid ${layer===i?C.gold:C.line}`, color:layer===i?C.gold:C.muted, fontFamily:F.b, fontSize:12, letterSpacing:2, cursor:"pointer", transition:"all 0.2s" }}>
+              {l.label}
+            </button>
+          ))}
+        </div>
+        <div style={{ background:C.surfUp, padding:"28px 26px", minHeight:148, borderTop:`1px solid ${C.line}`, marginBottom:32 }}>
+          <p style={{ ...BD, margin:0, lineHeight:2.1, whiteSpace:"pre-line" }}>{p.layers[layer].text}</p>
+        </div>
+        {pIdx<2 && (
+          <div style={{ display:"flex", justifyContent:"center" }}>
+            <button onClick={next} style={{ background:"transparent", border:`1px solid ${C.line}`, color:C.muted, fontFamily:F.b, fontSize:12, letterSpacing:3, padding:"10px 28px", cursor:"pointer" }}>
+              다음 논점으로 →
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  case 6: return (
+    <div style={W}>
+      <StageBadge />
+      <span style={SL}>문법 5/5 · 이해 확인</span>
+      <h2 style={BT}>이해 확인 퀴즈</h2>
+      <div style={DIV} />
+      <p style={{ ...MT, marginBottom:40, fontSize:14 }}>정답을 선택하고 '확인'을 누르면 해설이 나옵니다.</p>
+      {QUIZ.map((q,qi)=>(
+        <div key={qi} style={{ marginBottom:40 }}>
+          <div style={{ display:"flex", gap:14, marginBottom:16, alignItems:"flex-start" }}>
+            <span style={{ fontFamily:F.h, fontSize:26, color:C.gold, lineHeight:1, minWidth:32 }}>Q{qi+1}</span>
+            <p style={{ ...BD, fontWeight:400, lineHeight:1.75, margin:0 }}>{q.q}</p>
+          </div>
+          {q.opts.map((opt,oi)=>{
+            const sel=qSel[qi]===oi, done=qDone[qi], correct=oi===q.ans;
+            let bg=C.surf, border=C.line, color=C.txt;
+            if(done){ if(correct){bg="#0d1a0d";border="#2a5a2a";color="#8acd8a";}else if(sel){bg="#1a0d0d";border="#5a2a2a";color="#cd8a8a";}else{color=C.muted;} }
+            else if(sel){ bg=C.surfUp; border=C.gold+"88"; }
+            return (
+              <div key={oi} onClick={()=>{if(!done){const n=[...qSel];n[qi]=oi;setQSel(n);}}}
+                style={{ background:bg, border:`1px solid ${border}`, padding:"13px 18px", marginBottom:8, cursor:done?"default":"pointer", display:"flex", gap:14, alignItems:"flex-start", transition:"all 0.2s" }}>
+                <span style={{ fontFamily:F.h, fontSize:16, color:done&&correct?"#3a7a3a":(done&&sel?"#7a3a3a":C.muted), minWidth:20, lineHeight:1.6 }}>{String.fromCharCode(65+oi)}</span>
+                <span style={{ ...BD, fontSize:14, color, margin:0, lineHeight:1.7 }}>{opt}</span>
+                {done&&correct&&<span style={{ marginLeft:"auto", color:"#3a7a3a", fontSize:16, flexShrink:0 }}>✓</span>}
+              </div>
+            );
+          })}
+          {!qDone[qi]&&qSel[qi]!==null&&(
+            <button onClick={()=>{const n=[...qDone];n[qi]=true;setQDone(n);}}
+              style={{ marginTop:8, padding:"10px 28px", background:"transparent", border:`1px solid ${C.gold}`, color:C.gold, fontFamily:F.b, fontSize:12, letterSpacing:3, cursor:"pointer" }}>
+              확인
+            </button>
+          )}
+          {qDone[qi]&&(
+            <div style={{ background:"#0a150a", border:`1px solid #1a301a`, padding:"16px 20px", marginTop:12 }}>
+              <p style={{ fontSize:11, color:"#4a8a4a", letterSpacing:3, marginBottom:8 }}>해설</p>
+              <p style={{ ...BD, fontSize:13, color:"#90bb90", margin:0, lineHeight:1.85 }}>{q.exp}</p>
+            </div>
+          )}
+        </div>
+      ))}
+      <div style={{ textAlign:"center", padding:"16px 0", borderTop:`1px solid ${C.line}` }}>
+        <span style={{ ...MT, fontSize:12, letterSpacing:2 }}>{qDone.filter(Boolean).length} / {QUIZ.length} 완료</span>
+      </div>
+    </div>
+  );
+
+  case 7: return (
+    <div style={W}>
+      <StageBadge />
+      <span style={SL}>논리 1/2 · 수확 가속의 법칙은 위험도 가속한다</span>
+      <h2 style={BT}>그렇다면 우리는 어떻게 해야 하는가</h2>
+      <div style={DIV} />
+      <div style={{ background:"#0a1218", border:`1px solid ${STAGES.logic.color}33`, padding:"18px 22px", marginBottom:28 }}>
+        <p style={{ fontSize:11, color:STAGES.logic.color, letterSpacing:3, marginBottom:10 }}>7장의 핵심 긴장</p>
+        <p style={{ fontFamily:F.h, fontSize:17, fontStyle:"italic", color:C.txt, margin:0, lineHeight:1.9 }}>
+          "수확 가속의 법칙은 암 치료도 가속하고, 생물학적 무기 설계도 가속한다. 같은 법칙의 두 얼굴—이것이 7장의 출발점이다."
+        </p>
+      </div>
+      <p style={{ ...MT, marginBottom:28, fontSize:13, lineHeight:1.9 }}>이 긴장을 커즈와일이 어떻게 다루는지—5단계로 따라가보세요.</p>
+      {ARG_STEPS.slice(0,argStep+1).map((step,i)=>(
+        <div key={i} style={{ marginBottom:14, opacity:i===argStep?1:0.5, transition:"opacity 0.3s" }}>
+          <div style={{ display:"flex", alignItems:"stretch" }}>
+            <div style={{ width:4, background:step.color, flexShrink:0 }} />
+            <div style={{ background:i===argStep?C.surfUp:C.surf, padding:"20px 24px", flex:1 }}>
+              <div style={{ display:"flex", gap:12, alignItems:"center", marginBottom:10 }}>
+                <span style={{ fontFamily:F.b, fontSize:10, letterSpacing:4, color:step.color }}>{step.num}</span>
+                <span style={{ fontFamily:F.h, fontSize:18, color:i===argStep?C.txt:C.muted }}>{step.title}</span>
+              </div>
+              <p style={{ ...BD, fontSize:14, lineHeight:1.95, marginBottom:12, whiteSpace:"pre-line" }}>{step.body}</p>
+              <div style={{ padding:"10px 14px", background:C.bg, borderLeft:`2px solid ${step.color}44` }}>
+                <p style={{ ...MT, fontSize:12, margin:0, color:step.color }}>✦ {step.key}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      ))}
+      <div style={{ display:"flex", gap:14, marginTop:24, alignItems:"center" }}>
+        {argStep<ARG_STEPS.length-1 ? (
+          <button onClick={()=>setArgStep(s=>s+1)}
+            onMouseEnter={e=>{e.currentTarget.style.background=ARG_STEPS[argStep+1].color;e.currentTarget.style.color=C.bg;}}
+            onMouseLeave={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.color=ARG_STEPS[argStep+1].color;}}
+            style={{ padding:"12px 28px", background:"transparent", border:`1px solid ${ARG_STEPS[argStep+1].color}`, color:ARG_STEPS[argStep+1].color, fontFamily:F.b, fontSize:12, letterSpacing:3, cursor:"pointer", transition:"all 0.3s" }}>
+            다음 →
+          </button>
+        ) : (
+          <span style={{ ...MT, fontSize:12, letterSpacing:2, color:C.gold }}>논증 완료</span>
+        )}
+        {argStep>0 && <button onClick={()=>setArgStep(0)} style={{ background:"transparent", border:"none", color:C.muted, fontFamily:F.b, fontSize:11, letterSpacing:2, cursor:"pointer" }}>처음부터</button>}
+        <span style={{ marginLeft:"auto", ...MT, fontSize:11 }}>{argStep+1} / {ARG_STEPS.length}</span>
+      </div>
+    </div>
+  );
+
+  case 8: return (
+    <div style={W}>
+      <StageBadge />
+      <span style={SL}>논리 2/2 · 철학적 비교</span>
+      <h2 style={BT}>AI 위험—세 가지 입장</h2>
+      <div style={DIV} />
+      <p style={{ ...MT, marginBottom:24, fontSize:14 }}>세 입장을 눌러 비교해보세요.</p>
+      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:8, marginBottom:36 }}>
+        {POSITIONS.map((pos,i)=>{
+          const open=posOpen===i;
+          return (
+            <div key={i} onClick={()=>setPosOpen(open?null:i)}
+              style={{ background:open?C.surfUp:C.surf, border:`1px solid ${open?pos.color+"88":C.line}`, padding:"16px 14px", cursor:"pointer", transition:"all 0.25s" }}>
+              <p style={{ fontFamily:F.h, fontSize:15, color:open?pos.color:C.muted, margin:"0 0 4px", textAlign:"center", lineHeight:1.3 }}>{pos.label}</p>
+              <p style={{ fontSize:10, color:C.muted, fontStyle:"italic", margin:0, textAlign:"center" }}>{pos.sub}</p>
+              {open && (
+                <div style={{ marginTop:14 }}>
+                  <div style={{ marginBottom:10, paddingBottom:10, borderBottom:`1px solid ${C.line}` }}>
+                    <p style={{ fontSize:10, color:pos.color, letterSpacing:3, marginBottom:6 }}>주장</p>
+                    <p style={{ ...BD, fontSize:12, margin:0, lineHeight:1.75 }}>{pos.claim}</p>
+                  </div>
+                  <div style={{ marginBottom:10 }}>
+                    <p style={{ fontSize:10, color:"#8a6a4a", letterSpacing:3, marginBottom:6 }}>반론·응답</p>
+                    <p style={{ ...BD, fontSize:12, margin:0, lineHeight:1.75, color:"#c4a880" }}>{pos.problem}</p>
+                  </div>
+                  <div style={{ padding:"8px 12px", background:C.surf, borderLeft:`2px solid ${pos.color}44` }}>
+                    <p style={{ fontSize:11, color:pos.color, margin:0, whiteSpace:"pre-line" }}>{pos.quote}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+      <div style={{ background:C.surf, padding:"20px 24px" }}>
+        <p style={{ fontFamily:F.b, fontSize:11, color:STAGES.logic.color, letterSpacing:4, marginBottom:14 }}>핵심 쟁점</p>
+        <p style={{ ...BD, fontSize:14, lineHeight:1.9, margin:0 }}>
+          세 입장 모두: <strong style={{color:C.txt}}>AI 위험은 실재한다.</strong> 갈라지는 것: <strong style={{color:C.txt}}>그 위험이 얼마나 심각한가, 그리고 대응이 기술 발전 중단인가 안전 우선 가속인가.</strong> 이 논쟁은 현재 진행형이며—이 책을 읽는 우리 모두가 참여자다.
+        </p>
+      </div>
+    </div>
+  );
+
+  case 9: return (
+    <div style={W}>
+      <StageBadge />
+      <span style={SL}>수사 · 세미나 준비</span>
+      <h2 style={BT}>이제 함께 탐구합니다</h2>
+      <div style={DIV} />
+      <div style={{ background:"#1a0f0f", border:`1px solid ${STAGES.rhetoric.color}33`, padding:"20px 24px", marginBottom:36 }}>
+        <p style={{ fontFamily:F.b, fontSize:11, color:STAGES.rhetoric.color, letterSpacing:4, marginBottom:10 }}>수사 단계에 대하여</p>
+        <p style={{ ...BD, fontSize:14, margin:0, lineHeight:1.9 }}>
+          문법으로 텍스트를 읽고, 논리로 논증을 분석했습니다. 수사는 그것을 <strong style={{color:C.txt}}>함께 말하는 단계</strong>입니다. 7장의 수사가 향하는 핵심—<strong style={{color:C.txt}}>수확 가속의 법칙이 위험도 가속한다. 그 위험 앞에서 나는 어떤 입장을 가지는가?</strong>
+        </p>
+      </div>
+      <p style={{ fontFamily:F.b, fontSize:11, color:STAGES.rhetoric.color, letterSpacing:4, marginBottom:20 }}>세미나 토론 질문</p>
+      {SEMINAR_QS.map((item,i)=>{
+        const open=seminHints.has(i);
+        return (
+          <div key={i} style={{ marginBottom:20, background:C.surf, padding:"22px 26px", borderLeft:`3px solid ${STAGES.rhetoric.color}${i%2===0?"cc":"44"}` }}>
+            <div style={{ display:"flex", gap:16, alignItems:"flex-start", marginBottom:12 }}>
+              <span style={{ fontFamily:F.h, fontSize:28, color:STAGES.rhetoric.color, lineHeight:1, minWidth:34 }}>S{i+1}</span>
+              <p style={{ ...BD, fontWeight:400, lineHeight:1.8, margin:0, flex:1 }}>{item.q}</p>
+            </div>
+            <div style={{ paddingLeft:50 }}>
+              <button onClick={()=>{const n=new Set(seminHints);if(n.has(i))n.delete(i);else n.add(i);setSeminHints(n);}}
+                style={{ background:"transparent", border:"none", color:C.muted, fontFamily:F.b, fontSize:11, letterSpacing:3, cursor:"pointer", padding:0 }}>
+                {open?"힌트 접기 ↑":"힌트 보기 ↓"}
+              </button>
+              {open && (
+                <div style={{ marginTop:10, padding:"12px 16px", background:C.surfUp, borderLeft:`2px solid ${STAGES.rhetoric.color}33` }}>
+                  <p style={{ ...MT, fontSize:13, fontStyle:"italic", margin:0, lineHeight:1.8 }}>💡 {item.hint}</p>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+
+  case 10: return (
+    <div style={{ minHeight:"100vh", display:"flex", flexDirection:"column", justifyContent:"center", alignItems:"center", textAlign:"center", padding:"48px 28px", background:C.bg, position:"relative" }}>
+      <div style={{ position:"absolute", top:0, left:0, right:0, height:1, background:`linear-gradient(90deg,transparent,${C.gold}44,transparent)` }} />
+      <span style={{ fontFamily:F.b, fontSize:11, letterSpacing:6, color:C.muted, marginBottom:48, display:"block" }}>디퍼 언브랜딩살롱 · 마침내 특이점이 시작된다</span>
+      <div style={{ width:1, height:64, background:`linear-gradient(${C.gold}88,transparent)`, margin:"0 auto 44px" }} />
+      <div style={{ background:C.surf, padding:"36px 40px", maxWidth:640, textAlign:"left", borderLeft:`3px solid ${C.gold}`, marginBottom:52 }}>
+        <p style={{ fontSize:11, color:C.gold, letterSpacing:4, marginBottom:20 }}>오늘의 마지막 문장 · Ray Kurzweil · 제7장 · 위험</p>
+        <p style={{ fontFamily:F.h, fontSize:"clamp(14px,2vw,17px)", fontStyle:"italic", color:C.txt, lineHeight:2.3, margin:0 }}>
+          "기술 발전을 지지하는 사람들과 반대하는 사람들 모두 이 기술이 가진 잠재적 위험을 인식해야 한다. 그리고 그 위험에 맞서기 위해 필요한 것은 후퇴가 아니라—방어적 기술, 투명성, 분산화라는 더 많은 발전이다. 인류의 가치를 가진 행위자들이 이 기술을 먼저 개발하는 것이 최선의 방어다."
+        </p>
+        <p style={{ ...MT, fontSize:12, marginTop:20, marginBottom:0, letterSpacing:2 }}>— 『마침내 특이점이 시작된다』 제7장 위험</p>
+      </div>
+      <div style={{ display:"flex", gap:32, marginBottom:52, justifyContent:"center" }}>
+        {[["문법","Grammar","#c4a35a"],["논리","Logic","#5a9abc"],["수사","Rhetoric","#bc7a7a"]].map(([l,e,col])=>(
+          <div key={l} style={{ textAlign:"center" }}>
+            <div style={{ width:5, height:5, borderRadius:"50%", background:col, margin:"0 auto 8px" }} />
+            <p style={{ fontFamily:F.b, fontSize:11, color:col, letterSpacing:3, marginBottom:5 }}>{l}</p>
+            <p style={{ fontFamily:F.h, fontSize:13, color:C.muted, margin:0, fontStyle:"italic" }}>{e}</p>
+          </div>
+        ))}
+      </div>
+      <button onClick={()=>go(0)} style={{ background:"transparent", border:`1px solid ${C.line}`, color:C.muted, fontFamily:F.b, fontSize:11, letterSpacing:4, padding:"12px 32px", cursor:"pointer" }}>처음으로</button>
+    </div>
+  );
+
+  default: return null;
+  }};
+
+  const navVisible = page>0 && page<10;
+  return (
+    <div style={{ background:C.bg, minHeight:"100vh" }}>
+      {navVisible && (
+        <div style={{ position:"fixed", top:0, left:0, right:0, height:2, background:C.line, zIndex:100 }}>
+          <div style={{ height:"100%", width:`${((page-1)/8)*100}%`, background:stage?stage.color:C.gold, transition:"width 0.4s ease, background 0.4s ease" }} />
+        </div>
+      )}
+      <div style={{ opacity:fading?0:1, transition:"opacity 0.28s ease", paddingTop:navVisible?2:0 }}>
+        {renderPage()}
+      </div>
+      {navVisible && (
+        <div style={{ maxWidth:720, margin:"0 auto", padding:"0 28px 52px", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+          <button onClick={prev} style={{ background:"transparent", border:"none", color:C.muted, fontFamily:F.b, fontSize:12, letterSpacing:3, cursor:"pointer", padding:"12px 0" }}>← 이전</button>
+          <div style={{ display:"flex", gap:4, alignItems:"center", flexWrap:"wrap", justifyContent:"center", maxWidth:160 }}>
+            {Array.from({length:9},(_,i)=>{
+              const ps=PAGE_STAGE[i+2], col=ps?STAGES[ps].color:C.gold, active=i===page-2, done=i<page-2;
+              return <div key={i} style={{ width:active?8:5, height:active?8:5, borderRadius:"50%", background:done||active?col:C.line, transition:"all 0.3s" }} />;
+            })}
+          </div>
+          {page<9 ? (
+            <button onClick={next} style={{ background:"transparent", border:"none", color:stage?stage.color:C.gold, fontFamily:F.b, fontSize:12, letterSpacing:3, cursor:"pointer", padding:"12px 0" }}>다음 →</button>
+          ) : (
+            <button onClick={next}
+              onMouseEnter={e=>{e.currentTarget.style.background=STAGES.rhetoric.color;e.currentTarget.style.color=C.bg;}}
+              onMouseLeave={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.color=STAGES.rhetoric.color;}}
+              style={{ background:"transparent", border:`1px solid ${STAGES.rhetoric.color}`, color:STAGES.rhetoric.color, fontFamily:F.b, fontSize:11, letterSpacing:3, padding:"10px 24px", cursor:"pointer", transition:"all 0.3s" }}>
+              마무리
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
