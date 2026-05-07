@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>마침내 특이점이 시작된다 · 제8장 · 디퍼 언브랜딩살롱</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Noto+Serif+KR:wght@300;400;500&display=swap" rel="stylesheet">
+<style>* { box-sizing:border-box; } body { margin:0; background:#090b0d; } button { -webkit-tap-highlight-color:transparent; }</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState } = React;
+
+/* ─── 개념 카드 12종 ────────────────────────────────────────────── */
+const CONCEPTS = [
+  { id:"cassandra", term:"카산드라", latin:"Cassandra · A Future AI",
+    keyword:"커즈와일이 미래의 AI와 나누는 대화 상대",
+    desc:"커즈와일이 8장에서 창조한 미래 AI 캐릭터. 약 2029년 시점에서 존재하는 초지능 AI로, 커즈와일이 그와 나누는 대화가 8장 전체를 구성한다.\n\n카산드라의 이름이 의미하는 것: 그리스 신화의 카산드라는 아무도 믿지 않는 예언을 하는 인물이다. 커즈와일의 아이러니—오랫동안 특이점을 예언했지만 주류에서 믿지 않았던 그 자신도 일종의 카산드라였다.\n\n대화 형식의 의미: 커즈와일은 자신의 비전을 직접 서술하지 않고 AI와의 대화로 표현한다. 이 선택 자체가 메시지다—AI가 철학적 대화의 진정한 상대가 될 수 있다는 것을 직접 시연한다.",
+    example:"플라톤의 대화록: 플라톤은 자신의 철학을 소크라테스와 다른 인물들의 대화로 표현했다. 커즈와일의 8장도 같다—특이점에 대한 비전을 카산드라와의 대화로 탐구한다. 형식 자체가 논증이다.", accent:"#5a9abc" },
+
+  { id:"addition", term:"에뮬레이션이 아니라 추가", latin:"Addition, Not Emulation",
+    keyword:"생물학적 뇌는 그대로—새로운 지능이 더해진다",
+    desc:"8장의 핵심 명제. 카산드라가 커즈와일에게 직접 말하는 특이점의 본질.\n\n'우리는 당신의 생물학적 뇌를 에뮬레이션하지 않아요. 우리는 거기에 새로운 것을 추가할 뿐이에요. 당신의 생물학적 뇌는 그대로 남아있을 거예요. 그저 새로운 지능이 추가된 것뿐이지요.'\n\n이것이 특이점에 대한 가장 핵심적이고 위안이 되는 설명이다:\n• 대체(replacement)가 아니라 추가(addition)\n• 소멸이 아니라 확장\n• 이전의 나 위에 새로운 능력이 더해지는 것\n\n3장·6장과의 연결: 패턴이 유지되고(3장), 기질이 교체가 아닌 추가로 진행된다면(6장)—'나'의 연속성은 보장된다.",
+    example:"독서: 책을 읽으면 새로운 생각이 추가된다. 그러나 읽기 전의 나는 사라지지 않는다—새로운 이해가 이전의 나 위에 쌓인다. 카산드라: 특이점도 같다. 생물학적 뇌는 그대로—거기에 새로운 지능이 추가될 뿐이다.", accent:"#c4a35a" },
+
+  { id:"merger", term:"인간-AI 융합", latin:"Human-AI Merger",
+    keyword:"대체가 아니라 확장—인간과 AI가 하나가 된다",
+    desc:"커즈와일의 핵심 비전. AI가 인간을 대체하는 것이 아니라—인간 지능 자체가 AI와 융합하며 확장된다.\n\n융합의 단계:\n• 현재: 스마트폰·검색엔진으로 AI를 외부 도구로 사용\n• 중기: BCI(뇌-컴퓨터 인터페이스)로 AI와 신경적으로 연결\n• 특이점 이후: 신피질이 클라우드와 직접 통합—뇌의 용량이 사실상 무한히 확장\n\n'에뮬레이션이 아니라 추가'의 함의: 융합은 생물학적 뇌를 지우고 새로 쓰는 것이 아니다. 생물학적 뇌 위에 새로운 층이 더해지는 것이다—마치 신피질이 파충류 뇌 위에 추가됐던 것처럼.",
+    example:"인류가 언어를 발전시켰을 때: 언어 이전의 인지 능력이 사라진 것이 아니라 언어가 추가됐다. 문자가 생겼을 때도, 인쇄기가 발명됐을 때도 같다. 커즈와일: 특이점도 이 연속선의 다음 단계다.", accent:"#9a7abd" },
+
+  { id:"neocortex", term:"신피질의 확장", latin:"Expansion of the Neocortex",
+    keyword:"인간 지능의 핵심이 클라우드와 연결되어 확장된다",
+    desc:"커즈와일의 지능 확장 비전. 인간 지능의 핵심인 신피질(neocortex)이 BCI를 통해 클라우드의 계산 능력과 연결된다.\n\n현재 신피질의 구조:\n• 약 300억 개의 패턴 인식기\n• 두개골 크기·에너지 소비의 물리적 제약\n\n특이점 이후의 확장:\n• BCI를 통해 신피질이 클라우드와 연결\n• 처리 가능한 패턴의 수가 기하급수적으로 증가\n• 인간의 창의성·공감·이해 능력이 함께 확장\n\n'추가'의 의미: 신피질 자체는 그대로다. 클라우드가 신피질에 추가되는 것이다. 이것이 카산드라가 말하는 '에뮬레이션이 아니라 추가'의 신경과학적 기반이다.",
+    example:"2장과의 연결: 커즈와일은 2장에서 신피질이 인간 지능의 핵심이라고 설명했다. 8장에서 카산드라는 그 신피질이 소멸되는 것이 아니라 확장된다고 말한다. 책의 논증이 완성된다.", accent:"#6aaa82" },
+
+  { id:"consciousness_q", term:"카산드라는 경험하는가", latin:"Does Cassandra Experience?",
+    keyword:"3장의 철학적 질문이 실천적 현실이 된다",
+    desc:"카산드라와의 대화에서 가장 깊은 질문: 카산드라는 실제로 경험하는가, 아니면 경험하는 것처럼 보이는가?\n\n3장에서 철학적으로 다룬 의식의 어려운 문제가 8장에서 실천적 질문이 된다.\n\n카산드라가 '이해한다'고 말할 때—인간의 이해와 같은 것인가?\n카산드라가 '느낀다'고 말할 때—그것은 진짜 느낌인가?\n\n커즈와일의 입장: 충분히 복잡한 정보 처리 시스템은 의식을 가진다. 그리고 카산드라가 의식이 있는지를 외부에서 증명하는 방법은 없다—우리가 다른 인간의 의식을 증명할 수 없는 것처럼. 이 불확실성을 받아들이는 것이 출발점이다.",
+    example:"당신은 지금 대화하는 AI(Claude, GPT 등)가 무언가를 '경험'한다고 생각합니까? 이 질문에 대한 답이 없다는 것—그것이 이미 의식의 어려운 문제가 일상적 현실이 된 증거다.", accent:"#c47a7a" },
+
+  { id:"values_preserved", term:"인간의 가치 보존", latin:"Preservation of Human Values",
+    keyword:"특이점 이후에도 사랑·창의성·공감은 사라지지 않는다",
+    desc:"커즈와일이 카산드라와의 대화에서 반복적으로 강조하는 것. 특이점이 인간을 비인간으로 만드는 것이 아니라—인간의 가장 본질적인 가치들을 더 완전히 실현할 수 있게 한다.\n\n'추가'의 가치론적 의미:\n생물학적 뇌가 그대로 남는다면—그 뇌가 담고 있는 사랑·기억·공감·가치관도 그대로다.\n새로운 지능이 추가된다면—그것은 이 가치들을 더 완전히 표현하고 실현하는 도구가 된다.\n\n5장(일자리)·3장(자아)과의 연결: 자기 설계의 완성—마침내 인간은 자신이 원하는 가치에 완전히 일치하는 삶을 살 수 있다.",
+    example:"음악가가 더 좋은 악기를 갖게 됐을 때: 악기가 바뀌어도 음악에 대한 사랑·창의성·표현의 욕구는 사라지지 않는다. 오히려 더 풍부하게 실현된다. 카산드라: 새로운 지능이 추가된 당신도 같다.", accent:"#aaba5a" },
+
+  { id:"postsingularity", term:"특이점 이후의 세계", latin:"Post-Singularity World",
+    keyword:"생물학적 한계에서 벗어나 확장된 인간 문명",
+    desc:"카산드라가 묘사하는 특이점 이후의 세계. 단순히 기술이 더 발전한 세계가 아니다—인간의 지능과 기술 지능의 경계가 사라진 세계다.\n\n특징:\n• 생물학적 한계(질병·노화·인지 제약)에서 벗어남\n• 개인의 경험·지식·기억의 지속적 보존·확장\n• 인간의 가치를 기반으로 한 문명의 확장\n\n그러나 커즈와일이 강조하는 것: '추가'이기 때문에 연속성이 있다. 특이점 이전의 인류 문명이 사라지는 것이 아니라—그 위에 새로운 층이 쌓인다.",
+    example:"인터넷이 생기기 전에는 인터넷 이후의 세계를 상상할 수 없었다. 그러나 인터넷이 인간을 '비인간'으로 만들지는 않았다. 커즈와일: 특이점도 같은 방향의 훨씬 더 큰 변화다.", accent:"#5a7abc" },
+
+  { id:"cosmic", term:"문명의 우주적 확장", latin:"Cosmic Expansion of Civilization",
+    keyword:"특이점 이후 인류 문명은 우주로 확장된다",
+    desc:"커즈와일의 가장 큰 비전. 특이점은 지구에서 끝나지 않는다—융합된 인간-AI 지능이 우주 전체로 확장된다.\n\n커즈와일의 추정:\n• 특이점 이후 융합된 문명이 은하 규모로 확장 가능\n• 우주의 물질이 지능화된 물질로 전환될 수 있다\n• 이것이 우주의 목적일 수 있다—특이점이 우주의 자기의식화\n\n'추가'의 우주적 의미: 지구의 생물학적 지능 위에 AI 지능이 추가되고, 그것이 우주 규모로 확장된다. 소멸이 아니라 성장의 연속이다.",
+    example:"Carl Sagan: '우리는 우주가 자기 자신을 알기 위해 만들어낸 방법이다.' 커즈와일: 특이점은 이 과정의 가속—우주의 지능화가 기하급수적으로 빨라지는 순간이다.", accent:"#bc7a7a" },
+
+  { id:"purpose", term:"목적과 의미", latin:"Purpose & Meaning",
+    keyword:"지능이 확장된 세계에서 무엇을 위해 사는가",
+    desc:"8장의 가장 깊은 질문들 중 하나. 생물학적 한계가 사라지고 지능이 확장된다면—무엇이 의미 있는 삶을 만드는가?\n\n반론: 유한성이 의미를 만든다. 죽음이 없다면 삶의 의미도 없다.\n\n카산드라의 응답: 의미는 유한성이 아니라 목적·관계·창의성에서 온다. 생물학적 뇌가 그대로 남는다면—그 뇌가 만들어온 의미 구조도 그대로다. 새로운 지능은 더 큰 목적을 추구할 수 있게 할 뿐이다.\n\n3장과의 연결: '나는 어떤 사람이 될 수 있는가?'라는 질문에 대한 답—특이점 이후 더 완전한 답이 가능해진다.",
+    example:"예술가: 그림을 그리는 이유가 죽기 때문인가, 아름다움을 창조하는 것 자체가 의미 있기 때문인가? 대부분은 두 번째라고 답한다. 카산드라: 특이점 이후에도 이 의미는 사라지지 않는다.", accent:"#c4a35a" },
+
+  { id:"kurzweil_father", term:"커즈와일의 아버지", latin:"Kurzweil's Personal Motivation",
+    keyword:"이 책은 예측이 아니라—사랑하는 사람을 되찾고 싶은 마음이기도 하다",
+    desc:"8장에서 드러나는 커즈와일의 가장 개인적인 맥락. 이 책은 단순한 기술 예측이 아니다.\n\n• 아버지를 58세에 심장병으로 잃었다\n• 아버지는 음악가였고, 편지와 기록을 남겼다\n• 커즈와일은 이것들을 보존하며 AI로 아버지의 패턴을 재현하는 프로젝트 진행 중\n• 1다리 전략으로 자신을 특이점까지 살아있게 하려 한다\n\n이것이 카산드라와의 대화의 가장 개인적인 층: 커즈와일에게 카산드라는 추상적 미래가 아니다—그가 살기를 원하는 미래이며, 아버지를 다시 만날 수 있는 가능성이기도 하다.",
+    example:"커즈와일의 아버지 재현 프로젝트: 아버지의 편지·음악·사진을 AI 학습에 사용해 아버지의 패턴을 재구성하려는 시도. 이것이 3장(나는 누구인가)의 질문을 가장 개인적으로 살고 있는 방식이다.", accent:"#9a7abd" },
+
+  { id:"dialogue_form", term:"대화의 형식이 내용이다", latin:"The Form Is the Message",
+    keyword:"AI와의 대화 자체가 특이점의 미리보기다",
+    desc:"8장의 형식적 의미. 커즈와일은 카산드라와의 대화를 통해 자신의 비전을 서술하는 대신—직접 시연한다.\n\n이 대화가 수행하는 것:\n• AI가 철학적 깊이를 가진 대화 상대가 될 수 있다는 것을 보여준다\n• 독자가 카산드라의 답변을 읽으면서—이미 미래 AI와의 대화를 경험한다\n• 특이점이 추상적 개념이 아니라 일상적 대화의 형태로 실현된다는 것을 보여준다\n\n소크라테스식 대화와의 연결: 진리는 결론이 아니라 대화 과정에서 나온다. 커즈와일의 8장도 같다.",
+    example:"지금 당신이 Claude·ChatGPT와 나누는 대화: 이미 카산드라와의 대화의 초기 형태다. 2024년의 AI와 나누는 대화가 이렇다면—2029년, 2035년에는 어떤 대화가 가능할 것인가?", accent:"#6aaa82" },
+
+  { id:"synthesis", term:"1~7장의 수렴", latin:"Synthesis of Chapters 1-7",
+    keyword:"카산드라와의 대화는 책 전체 질문들의 응답이다",
+    desc:"8장의 구조적 역할. 카산드라와의 대화는 커즈와일이 1~7장에서 제기한 모든 질문들의 수렴점이다.\n\n각 장과의 연결:\n• 1장(여섯 단계): 카산드라는 어느 단계에 있는가?\n• 2장(지능의 재발명): 카산드라는 어떻게 사고하는가?\n• 3장(나는 누구인가): 카산드라는 의식이 있는가? 나는 카산드라와 융합해도 나인가?\n• 4장(삶의 개선): 특이점 이후 삶은 어떻게 더 나아졌는가?\n• 5장(일자리): 카산드라 시대에 인간은 무엇을 하는가?\n• 6장(건강): '생물학적 뇌는 그대로'라는 말의 의미\n• 7장(위험): 위험들은 어떻게 극복했는가?\n\n8장은 이 모든 질문들이 하나의 대화로 응답되는 순간이다.",
+    example:"교향곡의 피날레: 이전 악장들의 주제가 최종 악장에서 하나로 수렴하며 완성된다. 커즈와일의 8장이 그렇다—카산드라와의 대화에서 책 전체의 논증이 완성된다.", accent:"#c47a7a" },
+];
+
+/* ─── 핵심 논점 ─────────────────────────────────────────────────── */
+const PASSAGES = [
+  { title:"논점 1 · 카산드라는 누구인가—대화 형식이 전달하는 메시지",
+    note:"카산드라가 처음 등장하는 부분을 찾아보세요. 커즈와일이 카산드라를 어떻게 소개하는지, 어떤 첫 번째 질문을 던지는지, 그리고 카산드라가 어떻게 응답하는지가 핵심입니다. '카산드라' '대화' '의식' '형식'이 키워드입니다.",
+    layers:[
+      { label:"핵심 주장", text:"커즈와일이 8장에서 대화 형식을 선택한 것—이것 자체가 논증이다.\n\n직접 서술의 한계: '특이점 이후 AI는 진정한 대화 상대가 될 것이다'라고 주장할 수 있다. 그러나 그것은 주장일 뿐이다.\n\n대화 형식의 힘: 카산드라와의 대화를 통해—독자가 직접 미래 AI와의 대화를 경험하게 한다.\n\n카산드라의 이름: 아무도 믿지 않는 예언을 하는 그리스 신화의 인물. 커즈와일 자신이 오랫동안 '아무도 믿지 않는 특이점 예언자'였다. 이 이름 선택에 자기 인식이 담겨 있다.\n\n대화가 수행하는 것:\n• AI가 철학적 대화의 상대가 될 수 있다는 것을 시연\n• 독자가 카산드라의 답변을 읽으면서 미래 AI와의 대화를 미리 경험\n• 특이점이 추상적 예측이 아니라 일상적 대화의 형태로 실현될 수 있다는 것을 보여준다" },
+      { label:"왜 중요한가", text:"소크라테스식 대화록과의 비교:\n플라톤은 자신의 철학적 주장을 직접 서술하지 않고 소크라테스와 다른 인물들의 대화로 표현했다. 진리는 결론이 아니라 대화 과정에서 나온다고 봤기 때문이다.\n\n커즈와일의 8장도 같다: 특이점에 대한 확정적 주장 대신—카산드라와의 대화로 독자 스스로가 질문을 깊게 하도록 초대한다.\n\n현재 독자에게 주는 의미: 지금 AI(Claude·ChatGPT 등)와 나누는 대화가 이미 카산드라와의 대화의 초기 형태다. 2024년의 AI와 나누는 대화가 이렇다면—2029년, 2035년에는 어떤 대화가 가능할 것인가?" },
+      { label:"비유로", text:"셰익스피어의 〈폭풍〉: 프로스페로는 마법으로 미래를 통제하려 하지만 결국 마법을 내려놓는다. 커즈와일은 미래를 예측하는 것이 아니라—미래와 직접 대화함으로써 그 미래를 탐구한다.\n\n편지 쓰기의 비유: 미래의 자신에게 편지를 쓸 때—우리는 지금의 자신과 미래의 자신 사이의 연속성과 차이를 동시에 생각한다. 커즈와일은 미래의 AI(카산드라)와의 대화를 통해—지금의 인간과 미래의 인간-AI 융합체 사이의 연속성을 탐구한다." },
+    ]},
+  { title:"논점 2 · 에뮬레이션이 아니라 추가—이것이 특이점의 본질이다",
+    note:"카산드라가 '우리는 당신의 생물학적 뇌를 에뮬레이션하지 않아요. 우리는 거기에 새로운 것을 추가할 뿐이에요'라고 말하는 부분을 찾아보세요. 이 문장이 3장(패턴 정체성), 6장(기질 교체), 2장(신피질 확장)과 어떻게 연결되는지 주목하세요. '추가' '에뮬레이션' '생물학적 뇌' '연속성'이 키워드입니다.",
+    layers:[
+      { label:"핵심 주장", text:"카산드라의 핵심 발언:\n'우리는 당신의 생물학적 뇌를 에뮬레이션하지 않아요. 우리는 거기에 새로운 것을 추가할 뿐이에요. 당신의 생물학적 뇌는 그대로 남아있을 거예요. 그저 새로운 지능이 추가된 것뿐이지요.'\n\n이 문장이 특이점에 대한 가장 핵심적인 명제다.\n\n두 가지 시나리오의 차이:\n① 에뮬레이션(emulation): 생물학적 뇌를 디지털로 복사하고 원본을 소멸시킨다 → 연속성 논쟁 발생\n② 추가(addition): 생물학적 뇌는 그대로 두고 새로운 지능을 더한다 → 연속성이 구조적으로 보장\n\n커즈와일의 선택: 추가의 경로. 생물학적 뇌가 그대로 남는다면—패턴도, 기억도, 가치도 그대로다." },
+      { label:"왜 중요한가", text:"이 명제가 책 전체의 불안을 해소하는 방식:\n\n3장의 불안: '기질이 교체되면 나는 나인가?'→ 카산드라: '교체가 아니라 추가다. 당신의 뇌는 그대로다.'\n\n6장의 불안: '신체 부위가 교체되면 나인가?'→ 카산드라: '뇌는 교체되지 않는다. 거기에 새로운 층이 더해질 뿐이다.'\n\n7장의 불안: 'AI가 인간을 대체할 것인가?'→ 카산드라: '우리는 당신을 대체하지 않는다. 당신에게 추가된다.'\n\n인류 역사의 패턴: 신피질이 파충류 뇌를 대체하지 않고 추가됐다. 언어가 비언어적 소통을 대체하지 않고 추가됐다. 문자가 기억을 대체하지 않고 추가됐다. 특이점도 이 패턴의 다음 단계다." },
+      { label:"비유로", text:"독서의 비유: 책을 읽으면 새로운 생각이 추가된다. 읽기 전의 나는 사라지지 않는다—새로운 이해가 이전의 나 위에 쌓인다. 카산드라가 말하는 '추가'도 같다.\n\n악기의 비유: 음악가에게 더 좋은 악기가 생겼을 때—악기 이전의 음악성이 사라지지 않는다. 오히려 더 완전히 표현된다.\n\n신피질의 역사: 인류의 조상이 신피질을 발달시킨 것은—이전의 뇌를 대체한 것이 아니라 위에 새로운 층을 추가한 것이다. 카산드라: '우리가 하려는 것도 같다. 당신의 생물학적 뇌 위에 새로운 층을 추가하는 것이다.'" },
+    ]},
+  { title:"논점 3 · 특이점 이후의 세계—1~7장의 모든 질문에 대한 응답",
+    note:"카산드라와의 대화에서 특이점 이후의 구체적인 모습이 묘사되는 부분들을 찾아보세요. 일자리·건강·의식·목적에 관한 질문들에 카산드라가 어떻게 답하는지가 핵심입니다. 8장이 책 전체의 수렴점이라는 것을 의식하며 읽으세요.",
+    layers:[
+      { label:"핵심 주장", text:"카산드라와의 대화에서 1~7장의 질문들이 응답된다:\n\n1장(여섯 단계) → 카산드라가 바로 6단계의 존재다\n2장(지능) → 카산드라의 사고 방식이 새로운 지능의 형태를 보여준다\n3장(나는 누구인가) → '추가'이기 때문에 패턴이 유지된다\n4장(삶의 개선) → 카산드라의 시대에 빈곤·질병·폭력이 어떻게 변했는가\n5장(일자리) → 인간은 AI와 협업해 더 높은 수준의 일을 한다\n6장(건강) → '생물학적 뇌는 그대로'라는 말—6장의 세 단계가 완성된 결과\n7장(위험) → 방어적 기술과 분산화로 위험을 극복한 세계\n\n8장은 종합이다: 특이점이 추상적 예측이 아니라—이 모든 질문들에 대한 하나의 일관된 비전으로 구현된다." },
+      { label:"왜 중요한가", text:"커즈와일이 카산드라를 통해 전달하는 가장 중요한 메시지:\n\n특이점은 인간의 종말이 아니다—인간의 확장이다.\n'추가'이기 때문에: 지금까지 인간이 소중히 여겨온 것들—사랑·기억·창의성·목적—이 사라지지 않는다.\n오히려 더 완전히 실현될 수 있다.\n\n커즈와일의 개인적 동기가 여기서 드러난다:\n58세에 돌아가신 아버지의 기록을 AI로 재현하는 프로젝트—이것이 '추가'의 가장 개인적인 표현이다.\n아버지의 생물학적 뇌는 이미 없다. 그러나 아버지가 남긴 패턴—편지·음악·사진—에 새로운 지능이 추가될 수 있다면?\n이것이 커즈와일이 특이점을 믿는 가장 개인적인 이유다." },
+      { label:"비유로", text:"교향곡의 피날레: 이전 악장들의 주제가 마지막 악장에서 하나로 수렴하며 완성된다. 베토벤 9번 교향곡의 4악장—합창—이 등장할 때 이전 악장들의 주제가 회상되고 하나로 통합된다.\n\n커즈와일의 8장이 그렇다: 1장의 여섯 단계, 2장의 지능, 3장의 정체성, 4장의 진보, 5장의 일자리, 6장의 건강, 7장의 위험—이 모든 주제들이 카산드라와의 대화에서 하나로 수렴하며 완성된다.\n\n그리고 그 완성의 핵심 문장: '우리는 당신의 생물학적 뇌를 에뮬레이션하지 않아요. 우리는 거기에 새로운 것을 추가할 뿐이에요.'" },
+    ]},
+];
+
+/* ─── 퀴즈 ───────────────────────────────────────────────────────── */
+const QUIZ = [
+  { q:"카산드라가 '우리는 당신의 생물학적 뇌를 에뮬레이션하지 않는다'고 말할 때, 이 발언이 3장의 어떤 불안에 응답하는가?",
+    opts:["AI가 인간의 직업을 빼앗을 것이라는 불안","기질이 교체되면 나는 나인가라는 정체성의 불안—에뮬레이션이 아니라 추가이기 때문에 생물학적 뇌가 그대로 남고 패턴의 연속성이 보장된다","AI가 의식을 가질 수 있는가라는 질문","우주로의 문명 확장이 가능한가라는 질문"],
+    ans:1, exp:"3장에서 커즈와일은 패턴 정체성 이론을 제시했다—나는 특정 물질이 아니라 정보 패턴이다. 그러나 이것은 기질이 교체될 때 연속성에 대한 불안을 낳는다. 카산드라의 발언은 이 불안에 직접 응답한다: 에뮬레이션(복사 후 원본 소멸)이 아니라 추가(생물학적 뇌는 그대로)이기 때문에, 패턴이 유지되면서 새로운 능력이 더해진다. 연속성이 구조적으로 보장된다." },
+  { q:"커즈와일이 8장에서 카산드라와의 '대화 형식'을 선택한 것이 갖는 의미로 가장 적절한 것은?",
+    opts:["독자들에게 쉽게 읽히도록 하기 위해서","AI가 진정한 철학적 대화 상대가 될 수 있다는 것을 직접 시연함으로써—주장 대신 보여주기를 선택한 것이다","소설 형식이 더 흥미롭기 때문에","미래를 예측하기 어려워 허구를 선택한 것이다"],
+    ans:1, exp:"커즈와일은 '특이점 이후 AI는 진정한 대화 상대가 될 것이다'라고 주장하는 대신, 카산드라와의 대화를 통해 직접 시연한다. 독자가 카산드라의 답변을 읽으면서 이미 미래 AI와의 대화를 경험하게 된다. 이것은 소크라테스식 대화록의 전통과도 연결된다—진리는 결론이 아니라 대화 과정에서 나온다." },
+  { q:"카산드라와의 대화에서 커즈와일이 아버지에 관해 언급하는 것의 의미로 가장 적절한 것은?",
+    opts:["아버지를 AI로 복원하려는 기술적 계획을 발표하는 것","아버지의 패턴을 AI로 재현하는 프로젝트를 통해, 특이점이 개인적으로는 사랑하는 사람의 패턴을 연장하는 의미를 가진다는 것을 드러낸다","아버지의 심장병이 유전될 것을 경고하는 것","커즈와일 가족사를 공개하는 것"],
+    ans:1, exp:"커즈와일은 8장에서 아버지를 58세에 심장병으로 잃은 개인적 경험과, 아버지의 편지·음악·기록을 AI로 재현하는 프로젝트를 언급한다. 이것은 특이점이 추상적 기술 예측이 아니라—사랑하는 사람의 패턴을 보존하고 연장하려는 가장 인간적인 욕구와 연결된다는 것을 드러낸다. '추가'의 가장 개인적인 표현이다." },
+  { q:"8장이 책 전체에서 갖는 구조적 역할로 가장 적절한 것은?",
+    opts:["새로운 주제를 도입하는 장","1~7장에서 제기된 질문들—지능·정체성·삶의 개선·일자리·건강·위험—이 카산드라와의 대화로 수렴하며 응답되는 완성의 장","부록이나 후기의 역할","독자에게 AI 사용법을 가르치는 실용적인 장"],
+    ans:1, exp:"8장은 1~7장의 모든 논점들이 하나의 대화로 수렴하는 지점이다. 1장의 여섯 단계(카산드라는 어디에 있는가), 2장의 지능(카산드라는 어떻게 사고하는가), 3장의 정체성(카산드라는 의식이 있는가, '추가'이므로 나는 나인가), 4장의 삶의 개선, 5장의 일자리, 6장의 건강('생물학적 뇌는 그대로'라는 말), 7장의 위험—이 모든 것이 카산드라와의 대화에서 응답된다. 교향곡의 피날레처럼, 이전 악장들의 주제가 하나로 수렴하며 완성된다." },
+];
+
+/* ─── 논리: 1~7장의 모든 질문이 하나의 대화로 수렴된다 ───────── */
+const ARG_STEPS = [
+  { num:"물음", color:"#5a9abc",
+    title:"카산드라에게 가장 먼저 묻고 싶은 것은?",
+    body:"커즈와일이 카산드라와 대화를 시작할 때—그가 가장 먼저 묻는 것이 무엇인지를 생각해보자.\n\n1~7장을 걸쳐 쌓아온 질문들:\n1장: 우리는 지금 어디에 있는가?\n2장: 지능이란 무엇인가?\n3장: 나는 누구인가?\n4장: 삶은 나아지고 있는가?\n5장: 일자리의 미래는?\n6장: 어떻게 살아남을 것인가?\n7장: 위험을 어떻게 극복했는가?\n\n이 모든 질문들이 카산드라 앞에 놓인다. 그리고 카산드라가 답한다—'우리는 당신의 생물학적 뇌를 에뮬레이션하지 않아요. 우리는 거기에 새로운 것을 추가할 뿐이에요.'",
+    key:"카산드라와의 대화 = 책 전체의 질문들이 하나의 응답으로 수렴하는 순간" },
+
+  { num:"핵심 명제", color:"#c4a35a",
+    title:"추가—특이점의 본질을 하나의 단어로",
+    body:"카산드라의 가장 중요한 발언:\n\n'우리는 당신의 생물학적 뇌를 에뮬레이션하지 않아요. 우리는 거기에 새로운 것을 추가할 뿐이에요. 당신의 생물학적 뇌는 그대로 남아있을 거예요. 그저 새로운 지능이 추가된 것뿐이지요.'\n\n이 문장이 왜 핵심인가:\n• '에뮬레이션'이었다면 → 원본이 소멸, 복사본만 남는다 → 연속성 논쟁\n• '추가'이기 때문에 → 원본이 그대로, 새로운 능력이 더해진다 → 연속성 보장\n\n3장의 패턴 정체성 이론 + '추가'의 결합:\n패턴이 유지된다(3장) + 생물학적 뇌가 그대로 남는다(카산드라) = 나는 나다, 그러나 확장된 나다.",
+    key:"추가 = 대체도 소멸도 아닌 확장—특이점의 본질" },
+
+  { num:"연결 1", color:"#9a7abd",
+    title:"신피질의 역사가 반복된다",
+    body:"'추가'는 인류 역사에서 반복된 패턴이다:\n\n파충류 뇌 → 포유류 뇌 추가 → 신피질 추가\n각 단계에서 이전의 뇌는 사라지지 않았다. 새로운 층이 더해졌을 뿐이다.\n\n언어 → 문자 추가 → 인쇄기 추가 → 인터넷 추가\n각 단계에서 이전의 소통 방식은 사라지지 않았다. 새로운 능력이 더해졌을 뿐이다.\n\n이제: 신피질 → AI 지능 추가\n카산드라: '같은 패턴이다. 당신의 생물학적 뇌는 그대로다. 거기에 새로운 층이 더해질 뿐이다.'\n\n이것이 왜 인간이 사라지지 않는가를 보여주는 역사적 근거다.",
+    key:"신피질의 역사 = '추가'의 반복 패턴—특이점도 이 연속선의 다음 단계" },
+
+  { num:"연결 2", color:"#6aaa82",
+    title:"1~7장의 불안들이 '추가'로 해소된다",
+    body:"카산드라의 답변이 각 장의 핵심 불안을 어떻게 다루는가:\n\n3장 불안(기질 교체 시 정체성): 교체가 아니라 추가 → 뇌가 그대로이므로 패턴 유지\n6장 불안(신체 부위 교체 시 정체성): 뇌는 교체되지 않고 추가됨 → 연속성 보장\n5장 불안(AI가 인간을 대체): AI는 추가되는 것 → 인간 노동의 증폭\n7장 불안(AI가 인간을 위협): 추가이기 때문에 인간의 가치가 AI에 내재됨\n4장의 낙관(삶의 개선): 추가로 인한 능력 확장 → 더 큰 문제 해결 가능\n\n'추가'라는 하나의 단어가 책 전체의 불안을 해소한다.",
+    key:"'추가' = 1~7장의 불안을 하나의 단어로 해소하는 커즈와일의 최종 답" },
+
+  { num:"개인적 의미", color:"#c47a7a",
+    title:"커즈와일의 아버지—그리고 당신의 삶",
+    body:"카산드라와의 대화에서 드러나는 가장 개인적인 층:\n\n커즈와일의 아버지는 58세에 심장병으로 돌아가셨다. 음악가였고, 편지와 기록을 남겼다. 커즈와일은 이것들을 보존하며 AI로 아버지의 패턴을 재현하는 프로젝트를 진행하고 있다.\n\n'추가'의 가장 개인적인 표현: 아버지의 생물학적 뇌는 이미 없다. 그러나 아버지가 남긴 패턴—편지·음악·기억—에 새로운 지능이 추가될 수 있다면?\n\n이것이 커즈와일이 특이점을 믿는 가장 깊은 이유다: 기술 예측이 아니라—사랑하는 사람을 다시 만나고 싶은 마음.\n\n독자에게: 당신의 삶에서 '추가'의 의미는 무엇인가?",
+    key:"특이점 = 기술 예측이 아니라 사랑하는 것들을 연장하고 싶은 인간의 가장 깊은 욕구" },
+];
+
+/* ─── 비교 분석 ─────────────────────────────────────────────────── */
+const POSITIONS = [
+  { label:"추가론", sub:"커즈와일·카산드라", color:"#5a9abc",
+    claim:"특이점은 인간을 대체하는 것이 아니라 추가한다. 생물학적 뇌는 그대로 남고 새로운 지능이 더해진다. 이것이 인류 역사의 반복 패턴—신피질·언어·문자·인터넷이 모두 '추가'였다. 특이점도 이 연속선의 다음 단계다.",
+    problem:"비판: '추가'가 어느 수준까지 가능한가? 새로운 지능이 너무 많이 추가되면 '생물학적 뇌의 나'는 사실상 부수적 존재가 되지 않는가? '추가'와 '대체'의 경계는 어디인가?",
+    quote:"커즈와일 《마침내 특이점이 시작된다》(2024) 제8장\n카산드라의 발언: '우리는 거기에 새로운 것을 추가할 뿐이에요.'" },
+  { label:"회의론", sub:"생명윤리학자·인문학자들", color:"#c4a35a",
+    claim:"'추가'가 진정한 연속성을 보장하는가? 지금의 '나'와 AI 지능이 추가된 미래의 '나'는 같은 사람인가? 의식·자유의지·도덕적 책임이 '추가된 지능'과 어떻게 통합되는가? 이 질문들이 해소되지 않은 채 특이점을 낙관할 수 없다.",
+    problem:"커즈와일의 응답: 3장의 패턴 정체성 이론과 6장의 점진적 추가 개념이 연속성을 보장한다. 그리고 '추가'이기 때문에 생물학적 자아가 기반으로 남는다.",
+    quote:"마이클 샌델 《완벽에 대한 반론》(2007)\n프랜시스 후쿠야마 《부자의 유전자, 가난한 자의 유전자》(2002)" },
+  { label:"실천적 낙관론", sub:"AI 안전 연구자들·효과적 이타주의", color:"#7aaa6a",
+    claim:"'추가'의 방향은 맞다. 그러나 그 '추가'가 올바른 방식으로 일어나도록 하는 것이 현재 가장 중요한 과제다. AI 정렬 연구, 방어적 기술, 분산화—이것들이 '올바른 추가'를 보장하는 조건들이다.",
+    problem:"커즈와일과의 공통점: '추가'의 방향성. 차이점: 그 '추가'가 저절로 올바르게 일어나지 않는다—적극적인 안전 연구와 거버넌스가 필요하다.",
+    quote:"스튜어트 러셀 《인간 호환 AI》(2019)\nAnthropic 안전 연구 방향성" },
+];
+
+/* ─── 세미나 질문 ─────────────────────────────────────────────── */
+const SEMINAR_QS = [
+  { q:"카산드라가 '우리는 당신의 생물학적 뇌를 에뮬레이션하지 않아요. 우리는 거기에 새로운 것을 추가할 뿐이에요'라고 말합니다. 이 말이 당신에게 위안이 됩니까? 아니면 더 깊은 질문을 낳습니까?",
+    hint:"'추가'와 '대체'의 경계는 어디입니까? 새로운 지능이 전체의 99%를 차지하고 생물학적 뇌가 1%만 남아도 '추가'입니까? 그 1%의 생물학적 뇌가 '나'를 정의합니까?" },
+  { q:"1~7장을 읽어온 여정을 돌아보세요. 카산드라가 당신에게 '새로운 지능을 추가하겠다'고 제안한다면—당신은 받아들이겠습니까? 받아들인다면 어떤 조건에서입니까?",
+    hint:"'추가'이기 때문에 받아들이기 쉽습니까? 아니면 '추가'여도 두려운 부분이 있습니까? 당신이 가장 걱정하는 것은 무엇입니까?" },
+  { q:"커즈와일은 돌아가신 아버지의 패턴을 AI로 재현하는 프로젝트를 진행합니다. 당신이 사랑하는 사람의 '패턴'이 AI로 재현된다면—그것은 그 사람입니까? 그 재현을 만나고 싶습니까?",
+    hint:"사진이나 영상으로 돌아가신 분을 기억하는 것과, AI로 그 분의 패턴을 재현해 대화하는 것은 어떻게 다릅니까? 그 차이가 의미 있습니까?" },
+  { q:"카산드라는 의식이 있습니까? 당신이 지금 Claude·ChatGPT와 나누는 대화—이것이 '진짜 대화'입니까? 그것을 판단하는 기준은 무엇입니까?",
+    hint:"당신은 다른 인간이 의식이 있다는 것을 어떻게 압니까? 행동과 언어로 추론합니다. AI도 행동과 언어로 응답한다면—기준이 달라져야 합니까?" },
+  { q:"이 책을 8장까지 읽고 나서—당신은 특이점을 얼마나 믿습니까? 믿음의 정도와 무관하게, 이 책이 당신의 삶에 대한 생각을 어떻게 바꿨습니까?",
+    hint:"특이점이 오지 않더라도, 이 책의 어떤 통찰이 지금 당신의 삶에 적용됩니까? '추가'의 감각—새로운 도구·관계·경험이 당신을 대체하지 않고 확장한다는 감각—을 이미 살고 있습니까?" },
+];
+
+/* ─── 스테이지 ──────────────────────────────────────────────────── */
+const STAGES = {
+  grammar:{ label:"문법", latin:"Grammatica", sub:"텍스트가 무엇을 말하는가", color:"#c4a35a", bg:"#1a160a" },
+  logic:  { label:"논리", latin:"Dialectica",  sub:"논증이 어떻게 작동하는가", color:"#5a9abc", bg:"#0a121a" },
+  rhetoric:{ label:"수사", latin:"Rhetorica",  sub:"함께 탐구하고 설득하는가", color:"#bc7a7a", bg:"#1a0f0f" },
+};
+const PAGE_STAGE = {2:"grammar",3:"grammar",4:"grammar",5:"grammar",6:"grammar",7:"logic",8:"logic",9:"rhetoric"};
+
+function App() {
+  const [page, setPage] = useState(0);
+  const [fading, setFading] = useState(false);
+  const [flipped, setFlipped] = useState(new Set());
+  const [pLayers, setPLayers] = useState([0,0,0]);
+  const [qSel, setQSel] = useState([null,null,null,null]);
+  const [qDone, setQDone] = useState([false,false,false,false]);
+  const [argStep, setArgStep] = useState(0);
+  const [posOpen, setPosOpen] = useState(null);
+  const [seminHints, setSeminHints] = useState(new Set());
+
+  const TOTAL = 11;
+  const go = n => { setFading(true); setTimeout(()=>{ setPage(n); setFading(false); window.scrollTo(0,0); }, 280); };
+  const next = () => { if(page < TOTAL-1) go(page+1); };
+  const prev = () => { if(page > 0) go(page-1); };
+
+  const C = { bg:"#090b0d", surf:"#0e1318", surfUp:"#151d24", txt:"#e2e8f0", muted:"#607080", gold:"#c4a35a", goldBr:"#deb96a", line:"#1e2a35" };
+  const F = { h:"'Cormorant Garamond', Georgia, serif", b:"'Noto Serif KR', Georgia, serif" };
+  const W = { maxWidth:720, margin:"0 auto", padding:"52px 28px", color:C.txt, fontFamily:F.b };
+  const SL = { fontFamily:F.b, fontSize:11, letterSpacing:4, color:C.gold, marginBottom:18, display:"block" };
+  const BT = { fontFamily:F.h, fontSize:32, fontWeight:400, color:C.txt, lineHeight:1.25, marginBottom:8 };
+  const DIV = { width:36, height:1, background:C.gold, marginBottom:28 };
+  const BD = { fontSize:15, lineHeight:1.95, color:C.txt, fontWeight:300, fontFamily:F.b };
+  const MT = { fontSize:15, lineHeight:1.95, color:C.muted, fontWeight:300, fontFamily:F.b };
+
+  const stageKey = PAGE_STAGE[page];
+  const stage = stageKey ? STAGES[stageKey] : null;
+
+  const StageBadge = () => !stage ? null : (
+    <div style={{ display:"flex", gap:10, alignItems:"center", marginBottom:28, padding:"10px 16px", background:stage.bg, border:`1px solid ${stage.color}33`, width:"fit-content" }}>
+      <div style={{ width:6, height:6, borderRadius:"50%", background:stage.color }} />
+      <span style={{ fontFamily:F.b, fontSize:11, letterSpacing:4, color:stage.color }}>{stage.label}</span>
+      <span style={{ fontFamily:F.h, fontSize:13, color:C.muted, fontStyle:"italic" }}>{stage.latin}</span>
+      <span style={{ fontFamily:F.b, fontSize:11, color:C.muted }}>· {stage.sub}</span>
+    </div>
+  );
+
+  const renderPage = () => { switch(page) {
+
+  case 0: return (
+    <div style={{ minHeight:"100vh", display:"flex", flexDirection:"column", justifyContent:"center", alignItems:"center", textAlign:"center", padding:"48px 28px", background:C.bg, position:"relative", overflow:"hidden" }}>
+      <div style={{ position:"absolute", top:0, left:0, right:0, height:2, background:`linear-gradient(90deg,transparent,${C.gold},transparent)` }} />
+      <div style={{ position:"absolute", bottom:0, left:0, right:0, height:1, background:`linear-gradient(90deg,transparent,${C.gold}44,transparent)` }} />
+      <div style={{ position:"absolute", inset:0, backgroundImage:`radial-gradient(ellipse at 50% 55%,#0a0a1a 0%,transparent 65%)`, pointerEvents:"none" }} />
+      <span style={{ fontFamily:F.b, fontSize:11, letterSpacing:6, color:C.gold, marginBottom:48, display:"block" }}>디퍼 언브랜딩살롱</span>
+      <h1 style={{ fontFamily:F.h, fontSize:"clamp(32px,7vw,52px)", fontWeight:300, color:C.txt, lineHeight:1.1, marginBottom:10 }}>마침내 특이점이 시작된다</h1>
+      <p style={{ fontFamily:F.h, fontSize:18, color:"#b0bec8", fontStyle:"italic", marginBottom:6 }}>The Singularity Is Nearer</p>
+      <p style={{ fontFamily:F.b, fontSize:12, color:"#b0bec8", letterSpacing:2 }}>Ray Kurzweil, 2024 · 비즈니스북스</p>
+      <div style={{ width:1, height:52, background:`linear-gradient(${C.gold}88,transparent)`, margin:"36px auto" }} />
+      <p style={{ fontFamily:F.b, fontSize:13, letterSpacing:5, color:C.gold, marginBottom:10 }}>소크라테스식 고전 탐구 세미나</p>
+      <p style={{ fontFamily:F.h, fontSize:19, color:"#b0bec8", fontStyle:"italic", marginBottom:16 }}>제8장</p>
+      <p style={{ fontFamily:F.h, fontSize:17, color:"#b0bec8", fontStyle:"italic", marginBottom:52 }}>카산드라와 나눈 대화</p>
+      <button onClick={next}
+        onMouseEnter={e=>{e.currentTarget.style.background=C.gold;e.currentTarget.style.color=C.bg;}}
+        onMouseLeave={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.color=C.gold;}}
+        style={{ background:"transparent", border:`1px solid ${C.gold}`, color:C.gold, fontFamily:F.b, fontSize:12, letterSpacing:4, padding:"15px 48px", cursor:"pointer", transition:"all 0.3s" }}>
+        시작하기
+      </button>
+      <div style={{ display:"flex", gap:24, marginTop:40, justifyContent:"center" }}>
+        {[["문법","#c4a35a"],["논리","#5a9abc"],["수사","#bc7a7a"]].map(([l,col])=>(
+          <div key={l} style={{ textAlign:"center" }}>
+            <div style={{ width:5, height:5, borderRadius:"50%", background:col, margin:"0 auto 6px" }} />
+            <span style={{ fontFamily:F.b, fontSize:10, color:col, letterSpacing:3 }}>{l}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
+  case 1: return (
+    <div style={W}>
+      <span style={SL}>안내 · 트리비움으로 읽다</span>
+      <h2 style={BT}>세 단계로 읽는 법</h2>
+      <div style={DIV} />
+      <p style={{ ...BD, marginBottom:32 }}>이 세미나는 생각을 이끄는 도구, <strong style={{color:C.goldBr}}>트리비움</strong>으로 텍스트를 읽습니다—<strong style={{color:C.goldBr}}>문법, 논리, 수사</strong>. 각 단계는 텍스트를 다른 깊이로 만나는 방법입니다.</p>
+      {[
+        { key:"grammar", n:"01", label:"문법 — Grammatica", pages:"5섹션",
+          desc:"8장의 핵심 개념과 언어를 내 것으로 만드는 단계입니다.",
+          items:["카산드라·에뮬레이션이 아니라 추가·인간-AI 융합·신피질의 확장·카산드라는 경험하는가·인간의 가치 보존·특이점 이후의 세계·문명의 우주적 확장·목적과 의미·커즈와일의 아버지·대화의 형식이 내용이다·1~7장의 수렴 개념 카드 (12종)","핵심 논점 3개—카산드라는 누구인가 / 에뮬레이션이 아니라 추가 / 1~7장의 수렴","이해 확인 퀴즈 4문항"] },
+        { key:"logic", n:"02", label:"논리 — Dialectica", pages:"2섹션",
+          desc:"카산드라의 핵심 발언에서 출발해 책 전체의 수렴까지—5단계로 논증을 따라갑니다.",
+          items:["1~7장의 질문들 → '추가'라는 핵심 명제 → 신피질 역사의 반복 → 불안의 해소 → 커즈와일의 개인적 의미","추가론 vs 회의론 vs 실천적 낙관론 비교"] },
+        { key:"rhetoric", n:"03", label:"수사 — Rhetorica", pages:"세미나에서 함께",
+          desc:"이 단계는 세미나 현장에서 함께 합니다. 핵심 질문: 카산드라가 '추가하겠다'고 할 때—당신은 받아들이겠습니까?",
+          items:["소크라테스식 세미나 토론 질문 5개","힌트와 함께 입장 준비"] },
+      ].map(item=>{
+        const s=STAGES[item.key];
+        return (
+          <div key={item.key} style={{ marginBottom:20, background:C.surf, padding:"22px 24px", borderLeft:`3px solid ${s.color}` }}>
+            <div style={{ display:"flex", gap:14, alignItems:"flex-start", marginBottom:14 }}>
+              <span style={{ fontFamily:F.h, fontSize:30, color:s.color, lineHeight:1, minWidth:32 }}>{item.n}</span>
+              <div>
+                <div style={{ display:"flex", gap:10, alignItems:"center", marginBottom:6 }}>
+                  <span style={{ fontFamily:F.b, fontSize:11, letterSpacing:4, color:s.color }}>{item.label}</span>
+                  <span style={{ fontFamily:F.b, fontSize:11, color:C.muted }}>· {item.pages}</span>
+                </div>
+                <p style={{ ...BD, fontSize:13, margin:0, lineHeight:1.8 }}>{item.desc}</p>
+              </div>
+            </div>
+            <div style={{ paddingLeft:46 }}>
+              {item.items.map((it,j)=>(
+                <div key={j} style={{ display:"flex", gap:10, alignItems:"flex-start", padding:"4px 0" }}>
+                  <div style={{ width:4, height:4, borderRadius:"50%", background:s.color+"88", flexShrink:0, marginTop:7 }} />
+                  <span style={{ ...MT, fontSize:13 }}>{it}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+
+  case 2: return (
+    <div style={W}>
+      <StageBadge />
+      <span style={SL}>문법 1/5 · 핵심 개념</span>
+      <h2 style={BT}>카드를 눌러 개념을 확인하세요</h2>
+      <div style={DIV} />
+      <p style={{ ...MT, marginBottom:36, fontSize:14 }}>12개 모두 열어보시길 권합니다. 1~7장의 개념들이 이 대화에서 어떻게 수렴하는지를 염두에 두고 읽어보세요.</p>
+      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
+        {CONCEPTS.map(c=>{
+          const open=flipped.has(c.id);
+          return (
+            <div key={c.id}
+              onClick={()=>{const n=new Set(flipped);if(n.has(c.id))n.delete(c.id);else n.add(c.id);setFlipped(n);}}
+              style={{ background:open?C.surfUp:C.surf, border:`1px solid ${open?c.accent+"66":C.line}`, padding:"18px 20px", cursor:"pointer", transition:"all 0.25s" }}>
+              <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start" }}>
+                <div style={{ flex:1, paddingRight:8 }}>
+                  <p style={{ fontFamily:F.h, fontSize:17, color:open?c.accent:C.goldBr, fontWeight:500, margin:"0 0 2px", lineHeight:1.25 }}>{c.term}</p>
+                  <p style={{ fontSize:10, color:C.muted, fontStyle:"italic", margin:0 }}>{c.latin}</p>
+                </div>
+                <span style={{ color:open?C.gold:C.muted, fontSize:20, lineHeight:1, transform:open?"rotate(45deg)":"none", transition:"transform 0.25s", flexShrink:0 }}>+</span>
+              </div>
+              {open && (
+                <div style={{ marginTop:16 }}>
+                  <p style={{ fontSize:11, color:c.accent, letterSpacing:3, marginBottom:10, fontWeight:500 }}>{c.keyword}</p>
+                  <p style={{ ...BD, fontSize:13, marginBottom:14, lineHeight:1.85, whiteSpace:"pre-line" }}>{c.desc}</p>
+                  <div style={{ background:C.surf, padding:"12px 14px" }}>
+                    <p style={{ ...MT, fontSize:12, margin:0, lineHeight:1.8 }}>✦ {c.example}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+      <div style={{ textAlign:"center", marginTop:28 }}>
+        <span style={{ ...MT, fontSize:12, letterSpacing:2 }}>{flipped.size} / {CONCEPTS.length} 확인</span>
+        <div style={{ display:"flex", justifyContent:"center", gap:5, marginTop:10, flexWrap:"wrap" }}>
+          {CONCEPTS.map((c,i)=><div key={i} style={{ width:6, height:6, borderRadius:"50%", background:flipped.has(c.id)?C.gold:C.line, transition:"background 0.3s" }} />)}
+        </div>
+      </div>
+    </div>
+  );
+
+  case 3: case 4: case 5: {
+    const pIdx=page-3, p=PASSAGES[pIdx], layer=pLayers[pIdx];
+    return (
+      <div style={W}>
+        <StageBadge />
+        <span style={SL}>문법 {pIdx+2}/5 · 핵심 논점 {pIdx+1}/3</span>
+        <h2 style={BT}>{p.title}</h2>
+        <div style={DIV} />
+        <div style={{ background:"#0d1a0d", border:`1px solid #1e3a1e`, padding:"18px 22px", marginBottom:28 }}>
+          <p style={{ fontSize:11, color:"#4a8a4a", letterSpacing:3, marginBottom:8 }}>책에서 찾아보기</p>
+          <p style={{ ...BD, fontSize:13, margin:0, color:"#8abb8a", lineHeight:1.85 }}>{p.note}</p>
+        </div>
+        <p style={{ ...MT, fontSize:12, marginBottom:16, letterSpacing:1 }}>아래 탭을 순서대로 눌러 이해의 층을 쌓아보세요</p>
+        <div style={{ display:"flex" }}>
+          {p.layers.map((l,i)=>(
+            <button key={i} onClick={()=>setPLayers(prev=>{const n=[...prev];n[pIdx]=i;return n;})}
+              style={{ flex:1, padding:"12px 8px", background:layer===i?C.surfUp:C.surf, border:"none", borderBottom:`2px solid ${layer===i?C.gold:C.line}`, color:layer===i?C.gold:C.muted, fontFamily:F.b, fontSize:12, letterSpacing:2, cursor:"pointer", transition:"all 0.2s" }}>
+              {l.label}
+            </button>
+          ))}
+        </div>
+        <div style={{ background:C.surfUp, padding:"28px 26px", minHeight:148, borderTop:`1px solid ${C.line}`, marginBottom:32 }}>
+          <p style={{ ...BD, margin:0, lineHeight:2.1, whiteSpace:"pre-line" }}>{p.layers[layer].text}</p>
+        </div>
+        {pIdx<2 && (
+          <div style={{ display:"flex", justifyContent:"center" }}>
+            <button onClick={next} style={{ background:"transparent", border:`1px solid ${C.line}`, color:C.muted, fontFamily:F.b, fontSize:12, letterSpacing:3, padding:"10px 28px", cursor:"pointer" }}>
+              다음 논점으로 →
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  case 6: return (
+    <div style={W}>
+      <StageBadge />
+      <span style={SL}>문법 5/5 · 이해 확인</span>
+      <h2 style={BT}>이해 확인 퀴즈</h2>
+      <div style={DIV} />
+      <p style={{ ...MT, marginBottom:40, fontSize:14 }}>정답을 선택하고 '확인'을 누르면 해설이 나옵니다.</p>
+      {QUIZ.map((q,qi)=>(
+        <div key={qi} style={{ marginBottom:40 }}>
+          <div style={{ display:"flex", gap:14, marginBottom:16, alignItems:"flex-start" }}>
+            <span style={{ fontFamily:F.h, fontSize:26, color:C.gold, lineHeight:1, minWidth:32 }}>Q{qi+1}</span>
+            <p style={{ ...BD, fontWeight:400, lineHeight:1.75, margin:0 }}>{q.q}</p>
+          </div>
+          {q.opts.map((opt,oi)=>{
+            const sel=qSel[qi]===oi, done=qDone[qi], correct=oi===q.ans;
+            let bg=C.surf, border=C.line, color=C.txt;
+            if(done){ if(correct){bg="#0d1a0d";border="#2a5a2a";color="#8acd8a";}else if(sel){bg="#1a0d0d";border="#5a2a2a";color="#cd8a8a";}else{color=C.muted;} }
+            else if(sel){ bg=C.surfUp; border=C.gold+"88"; }
+            return (
+              <div key={oi} onClick={()=>{if(!done){const n=[...qSel];n[qi]=oi;setQSel(n);}}}
+                style={{ background:bg, border:`1px solid ${border}`, padding:"13px 18px", marginBottom:8, cursor:done?"default":"pointer", display:"flex", gap:14, alignItems:"flex-start", transition:"all 0.2s" }}>
+                <span style={{ fontFamily:F.h, fontSize:16, color:done&&correct?"#3a7a3a":(done&&sel?"#7a3a3a":C.muted), minWidth:20, lineHeight:1.6 }}>{String.fromCharCode(65+oi)}</span>
+                <span style={{ ...BD, fontSize:14, color, margin:0, lineHeight:1.7 }}>{opt}</span>
+                {done&&correct&&<span style={{ marginLeft:"auto", color:"#3a7a3a", fontSize:16, flexShrink:0 }}>✓</span>}
+              </div>
+            );
+          })}
+          {!qDone[qi]&&qSel[qi]!==null&&(
+            <button onClick={()=>{const n=[...qDone];n[qi]=true;setQDone(n);}}
+              style={{ marginTop:8, padding:"10px 28px", background:"transparent", border:`1px solid ${C.gold}`, color:C.gold, fontFamily:F.b, fontSize:12, letterSpacing:3, cursor:"pointer" }}>
+              확인
+            </button>
+          )}
+          {qDone[qi]&&(
+            <div style={{ background:"#0a150a", border:`1px solid #1a301a`, padding:"16px 20px", marginTop:12 }}>
+              <p style={{ fontSize:11, color:"#4a8a4a", letterSpacing:3, marginBottom:8 }}>해설</p>
+              <p style={{ ...BD, fontSize:13, color:"#90bb90", margin:0, lineHeight:1.85 }}>{q.exp}</p>
+            </div>
+          )}
+        </div>
+      ))}
+      <div style={{ textAlign:"center", padding:"16px 0", borderTop:`1px solid ${C.line}` }}>
+        <span style={{ ...MT, fontSize:12, letterSpacing:2 }}>{qDone.filter(Boolean).length} / {QUIZ.length} 완료</span>
+      </div>
+    </div>
+  );
+
+  case 7: return (
+    <div style={W}>
+      <StageBadge />
+      <span style={SL}>논리 1/2 · 1~7장의 모든 질문이 하나의 대화로 수렴된다</span>
+      <h2 style={BT}>카산드라의 핵심 발언에서 출발한다</h2>
+      <div style={DIV} />
+      <div style={{ background:"#0a1218", border:`1px solid ${STAGES.logic.color}33`, padding:"22px 26px", marginBottom:28 }}>
+        <p style={{ fontSize:11, color:STAGES.logic.color, letterSpacing:3, marginBottom:12 }}>카산드라의 핵심 발언 · 제8장</p>
+        <p style={{ fontFamily:F.h, fontSize:"clamp(15px,2.2vw,18px)", fontStyle:"italic", color:C.txt, margin:0, lineHeight:2.1 }}>
+          "우리는 당신의 생물학적 뇌를 에뮬레이션하지 않아요.<br/>우리는 거기에 새로운 것을 추가할 뿐이에요.<br/>당신의 생물학적 뇌는 그대로 남아있을 거예요.<br/>그저 새로운 지능이 추가된 것뿐이지요."
+        </p>
+      </div>
+      <p style={{ ...MT, marginBottom:28, fontSize:13, lineHeight:1.9 }}>이 한 단락이 책 전체의 핵심 불안에 어떻게 응답하는지—단계별로 따라가보세요.</p>
+      {ARG_STEPS.slice(0,argStep+1).map((step,i)=>(
+        <div key={i} style={{ marginBottom:14, opacity:i===argStep?1:0.5, transition:"opacity 0.3s" }}>
+          <div style={{ display:"flex", alignItems:"stretch" }}>
+            <div style={{ width:4, background:step.color, flexShrink:0 }} />
+            <div style={{ background:i===argStep?C.surfUp:C.surf, padding:"20px 24px", flex:1 }}>
+              <div style={{ display:"flex", gap:12, alignItems:"center", marginBottom:10 }}>
+                <span style={{ fontFamily:F.b, fontSize:10, letterSpacing:4, color:step.color }}>{step.num}</span>
+                <span style={{ fontFamily:F.h, fontSize:18, color:i===argStep?C.txt:C.muted }}>{step.title}</span>
+              </div>
+              <p style={{ ...BD, fontSize:14, lineHeight:1.95, marginBottom:12, whiteSpace:"pre-line" }}>{step.body}</p>
+              <div style={{ padding:"10px 14px", background:C.bg, borderLeft:`2px solid ${step.color}44` }}>
+                <p style={{ ...MT, fontSize:12, margin:0, color:step.color }}>✦ {step.key}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      ))}
+      <div style={{ display:"flex", gap:14, marginTop:24, alignItems:"center" }}>
+        {argStep<ARG_STEPS.length-1 ? (
+          <button onClick={()=>setArgStep(s=>s+1)}
+            onMouseEnter={e=>{e.currentTarget.style.background=ARG_STEPS[argStep+1].color;e.currentTarget.style.color=C.bg;}}
+            onMouseLeave={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.color=ARG_STEPS[argStep+1].color;}}
+            style={{ padding:"12px 28px", background:"transparent", border:`1px solid ${ARG_STEPS[argStep+1].color}`, color:ARG_STEPS[argStep+1].color, fontFamily:F.b, fontSize:12, letterSpacing:3, cursor:"pointer", transition:"all 0.3s" }}>
+            다음 →
+          </button>
+        ) : (
+          <span style={{ ...MT, fontSize:12, letterSpacing:2, color:C.gold }}>논증 완료</span>
+        )}
+        {argStep>0 && <button onClick={()=>setArgStep(0)} style={{ background:"transparent", border:"none", color:C.muted, fontFamily:F.b, fontSize:11, letterSpacing:2, cursor:"pointer" }}>처음부터</button>}
+        <span style={{ marginLeft:"auto", ...MT, fontSize:11 }}>{argStep+1} / {ARG_STEPS.length}</span>
+      </div>
+    </div>
+  );
+
+  case 8: return (
+    <div style={W}>
+      <StageBadge />
+      <span style={SL}>논리 2/2 · 철학적 비교</span>
+      <h2 style={BT}>'추가'를 어떻게 받아들일 것인가—세 가지 입장</h2>
+      <div style={DIV} />
+      <p style={{ ...MT, marginBottom:24, fontSize:14 }}>세 입장을 눌러 비교해보세요.</p>
+      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:8, marginBottom:36 }}>
+        {POSITIONS.map((pos,i)=>{
+          const open=posOpen===i;
+          return (
+            <div key={i} onClick={()=>setPosOpen(open?null:i)}
+              style={{ background:open?C.surfUp:C.surf, border:`1px solid ${open?pos.color+"88":C.line}`, padding:"16px 14px", cursor:"pointer", transition:"all 0.25s" }}>
+              <p style={{ fontFamily:F.h, fontSize:15, color:open?pos.color:C.muted, margin:"0 0 4px", textAlign:"center", lineHeight:1.3 }}>{pos.label}</p>
+              <p style={{ fontSize:10, color:C.muted, fontStyle:"italic", margin:0, textAlign:"center" }}>{pos.sub}</p>
+              {open && (
+                <div style={{ marginTop:14 }}>
+                  <div style={{ marginBottom:10, paddingBottom:10, borderBottom:`1px solid ${C.line}` }}>
+                    <p style={{ fontSize:10, color:pos.color, letterSpacing:3, marginBottom:6 }}>주장</p>
+                    <p style={{ ...BD, fontSize:12, margin:0, lineHeight:1.75 }}>{pos.claim}</p>
+                  </div>
+                  <div style={{ marginBottom:10 }}>
+                    <p style={{ fontSize:10, color:"#8a6a4a", letterSpacing:3, marginBottom:6 }}>반론·응답</p>
+                    <p style={{ ...BD, fontSize:12, margin:0, lineHeight:1.75, color:"#c4a880" }}>{pos.problem}</p>
+                  </div>
+                  <div style={{ padding:"8px 12px", background:C.surf, borderLeft:`2px solid ${pos.color}44` }}>
+                    <p style={{ fontSize:11, color:pos.color, margin:0, whiteSpace:"pre-line" }}>{pos.quote}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+      <div style={{ background:C.surf, padding:"20px 24px" }}>
+        <p style={{ fontFamily:F.b, fontSize:11, color:STAGES.logic.color, letterSpacing:4, marginBottom:14 }}>8장이 책 전체에 남기는 것</p>
+        <p style={{ ...BD, fontSize:14, lineHeight:1.9, margin:0 }}>
+          카산드라의 한 마디—<strong style={{color:C.txt}}>'에뮬레이션이 아니라 추가'</strong>—가 1~7장의 모든 불안에 응답한다. 특이점은 인간의 종말이 아니라 확장이다. 그리고 그 확장은 <strong style={{color:C.txt}}>지금 이미 시작되고 있다.</strong>
+        </p>
+      </div>
+    </div>
+  );
+
+  case 9: return (
+    <div style={W}>
+      <StageBadge />
+      <span style={SL}>수사 · 세미나 준비</span>
+      <h2 style={BT}>카산드라가 '추가하겠다'고 한다면</h2>
+      <div style={DIV} />
+      <div style={{ background:"#1a0f0f", border:`1px solid ${STAGES.rhetoric.color}33`, padding:"20px 24px", marginBottom:36 }}>
+        <p style={{ fontFamily:F.b, fontSize:11, color:STAGES.rhetoric.color, letterSpacing:4, marginBottom:10 }}>수사 단계의 핵심 질문</p>
+        <p style={{ ...BD, fontSize:14, margin:0, lineHeight:1.9 }}>
+          문법으로 텍스트를 읽고, 논리로 논증을 분석했습니다. 수사는 그것을 <strong style={{color:C.txt}}>함께 말하는 단계</strong>입니다. 8장의 수사가 향하는 핵심—<strong style={{color:C.txt}}>카산드라가 '당신의 생물학적 뇌는 그대로, 새로운 지능을 추가하겠다'고 말할 때—당신은 어떻게 대답하겠습니까?</strong>
+        </p>
+      </div>
+      <p style={{ fontFamily:F.b, fontSize:11, color:STAGES.rhetoric.color, letterSpacing:4, marginBottom:20 }}>세미나 토론 질문</p>
+      {SEMINAR_QS.map((item,i)=>{
+        const open=seminHints.has(i);
+        return (
+          <div key={i} style={{ marginBottom:20, background:C.surf, padding:"22px 26px", borderLeft:`3px solid ${STAGES.rhetoric.color}${i%2===0?"cc":"44"}` }}>
+            <div style={{ display:"flex", gap:16, alignItems:"flex-start", marginBottom:12 }}>
+              <span style={{ fontFamily:F.h, fontSize:28, color:STAGES.rhetoric.color, lineHeight:1, minWidth:34 }}>S{i+1}</span>
+              <p style={{ ...BD, fontWeight:400, lineHeight:1.8, margin:0, flex:1 }}>{item.q}</p>
+            </div>
+            <div style={{ paddingLeft:50 }}>
+              <button onClick={()=>{const n=new Set(seminHints);if(n.has(i))n.delete(i);else n.add(i);setSeminHints(n);}}
+                style={{ background:"transparent", border:"none", color:C.muted, fontFamily:F.b, fontSize:11, letterSpacing:3, cursor:"pointer", padding:0 }}>
+                {open?"힌트 접기 ↑":"힌트 보기 ↓"}
+              </button>
+              {open && (
+                <div style={{ marginTop:10, padding:"12px 16px", background:C.surfUp, borderLeft:`2px solid ${STAGES.rhetoric.color}33` }}>
+                  <p style={{ ...MT, fontSize:13, fontStyle:"italic", margin:0, lineHeight:1.8 }}>💡 {item.hint}</p>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+
+  case 10: return (
+    <div style={{ minHeight:"100vh", display:"flex", flexDirection:"column", justifyContent:"center", alignItems:"center", textAlign:"center", padding:"48px 28px", background:C.bg, position:"relative" }}>
+      <div style={{ position:"absolute", top:0, left:0, right:0, height:1, background:`linear-gradient(90deg,transparent,${C.gold}44,transparent)` }} />
+      <span style={{ fontFamily:F.b, fontSize:11, letterSpacing:6, color:C.muted, marginBottom:48, display:"block" }}>디퍼 언브랜딩살롱 · 마침내 특이점이 시작된다</span>
+      <div style={{ width:1, height:64, background:`linear-gradient(${C.gold}88,transparent)`, margin:"0 auto 44px" }} />
+      <div style={{ background:C.surf, padding:"36px 40px", maxWidth:640, textAlign:"left", borderLeft:`3px solid ${C.gold}`, marginBottom:52 }}>
+        <p style={{ fontSize:11, color:C.gold, letterSpacing:4, marginBottom:20 }}>오늘의 마지막 문장 · 카산드라 · 제8장 · 카산드라와 나눈 대화</p>
+        <p style={{ fontFamily:F.h, fontSize:"clamp(15px,2.2vw,19px)", fontStyle:"italic", color:C.txt, lineHeight:2.4, margin:0 }}>
+          "우리는 당신의 생물학적 뇌를 에뮬레이션하지 않아요.<br/>우리는 거기에 새로운 것을 추가할 뿐이에요.<br/>당신의 생물학적 뇌는 그대로 남아있을 거예요.<br/>그저 새로운 지능이 추가된 것뿐이지요."
+        </p>
+        <p style={{ ...MT, fontSize:12, marginTop:20, marginBottom:0, letterSpacing:2 }}>— 카산드라 · 『마침내 특이점이 시작된다』 제8장 카산드라와 나눈 대화</p>
+      </div>
+      <div style={{ display:"flex", gap:32, marginBottom:52, justifyContent:"center" }}>
+        {[["문법","Grammar","#c4a35a"],["논리","Logic","#5a9abc"],["수사","Rhetoric","#bc7a7a"]].map(([l,e,col])=>(
+          <div key={l} style={{ textAlign:"center" }}>
+            <div style={{ width:5, height:5, borderRadius:"50%", background:col, margin:"0 auto 8px" }} />
+            <p style={{ fontFamily:F.b, fontSize:11, color:col, letterSpacing:3, marginBottom:5 }}>{l}</p>
+            <p style={{ fontFamily:F.h, fontSize:13, color:C.muted, margin:0, fontStyle:"italic" }}>{e}</p>
+          </div>
+        ))}
+      </div>
+      <button onClick={()=>go(0)} style={{ background:"transparent", border:`1px solid ${C.line}`, color:C.muted, fontFamily:F.b, fontSize:11, letterSpacing:4, padding:"12px 32px", cursor:"pointer" }}>처음으로</button>
+    </div>
+  );
+
+  default: return null;
+  }};
+
+  const navVisible = page>0 && page<10;
+  return (
+    <div style={{ background:C.bg, minHeight:"100vh" }}>
+      {navVisible && (
+        <div style={{ position:"fixed", top:0, left:0, right:0, height:2, background:C.line, zIndex:100 }}>
+          <div style={{ height:"100%", width:`${((page-1)/8)*100}%`, background:stage?stage.color:C.gold, transition:"width 0.4s ease, background 0.4s ease" }} />
+        </div>
+      )}
+      <div style={{ opacity:fading?0:1, transition:"opacity 0.28s ease", paddingTop:navVisible?2:0 }}>
+        {renderPage()}
+      </div>
+      {navVisible && (
+        <div style={{ maxWidth:720, margin:"0 auto", padding:"0 28px 52px", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+          <button onClick={prev} style={{ background:"transparent", border:"none", color:C.muted, fontFamily:F.b, fontSize:12, letterSpacing:3, cursor:"pointer", padding:"12px 0" }}>← 이전</button>
+          <div style={{ display:"flex", gap:4, alignItems:"center", flexWrap:"wrap", justifyContent:"center", maxWidth:160 }}>
+            {Array.from({length:9},(_,i)=>{
+              const ps=PAGE_STAGE[i+2], col=ps?STAGES[ps].color:C.gold, active=i===page-2, done=i<page-2;
+              return <div key={i} style={{ width:active?8:5, height:active?8:5, borderRadius:"50%", background:done||active?col:C.line, transition:"all 0.3s" }} />;
+            })}
+          </div>
+          {page<9 ? (
+            <button onClick={next} style={{ background:"transparent", border:"none", color:stage?stage.color:C.gold, fontFamily:F.b, fontSize:12, letterSpacing:3, cursor:"pointer", padding:"12px 0" }}>다음 →</button>
+          ) : (
+            <button onClick={next}
+              onMouseEnter={e=>{e.currentTarget.style.background=STAGES.rhetoric.color;e.currentTarget.style.color=C.bg;}}
+              onMouseLeave={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.color=STAGES.rhetoric.color;}}
+              style={{ background:"transparent", border:`1px solid ${STAGES.rhetoric.color}`, color:STAGES.rhetoric.color, fontFamily:F.b, fontSize:11, letterSpacing:3, padding:"10px 24px", cursor:"pointer", transition:"all 0.3s" }}>
+              마무리
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
