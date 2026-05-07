@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>마침내 특이점이 시작된다 · 제6장 · 디퍼 언브랜딩살롱</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Noto+Serif+KR:wght@300;400;500&display=swap" rel="stylesheet">
+<style>* { box-sizing:border-box; } body { margin:0; background:#090b0d; } button { -webkit-tap-highlight-color:transparent; }</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState } = React;
+
+/* ─── 개념 카드 12종 ────────────────────────────────────────────── */
+const CONCEPTS = [
+  { id:"bioinfo", term:"생물학 = 정보 기술", latin:"Biology as Information Technology",
+    keyword:"생명의 소스코드를 읽고 쓸 수 있게 됐다",
+    desc:"커즈와일 6장의 핵심 전제. 생물학은 본질적으로 정보 처리 시스템이다. DNA는 소프트웨어이고, 단백질은 그 실행 결과이며, 세포는 프로세서다.\n\n이 전환이 중요한 이유: 정보 기술이 되면—수확 가속의 법칙이 적용된다. 생물학적 과정을 정보로 이해할 수 있게 되면, 버그를 찾아 패치할 수 있다.\n\n실증: 유전체 분석 비용이 2001년 $3억에서 2023년 $200 이하로 감소. 이 속도 자체가 수확 가속의 법칙이 생물학에 적용된 증거다.\n\n함의: 노화·질병·유전 장애를 소프트웨어 버그처럼 찾아 수정할 수 있다.",
+    example:"인간 게놈 프로젝트: 완성에 13년·$27억 소요(1990~2003). 오늘날 같은 작업이 하루·$200 이하. 이 속도가 수확 가속의 법칙이 생물학에 적용된 결과다.", accent:"#5a9abc" },
+
+  { id:"stages", term:"세 단계", latin:"Three Stages to Longevity",
+    keyword:"특이점까지 살아있기 위한 전략적 프레임워크",
+    desc:"커즈와일이 6장에서 제시하는 수명 연장의 세 단계 전략. 생물학적 수명을 특이점까지 연장하는 단계적 경로.\n\n• 1단계(지금): 영양·보충제·예방 의학으로 생물학을 최대한 활용한다. 커즈와일 자신이 하루 약 100가지 보충제를 복용하는 이유다.\n• 2단계(10~20년 후): 생명공학 혁명—유전자 편집·역분화 줄기세포·유전자 치료로 생물학을 직접 재프로그래밍한다.\n• 3단계(20~30년 후): 나노기술—혈류 속 나노봇이 세포 수준에서 의료를 수행한다.\n\n핵심 논리: 1단계가 2단계까지, 2단계가 3단계까지 살아있게 해준다. 3단계에 도달하면—수명 탈출 속도(LEV)가 달성된다.",
+    example:"커즈와일의 개인적 실천: 그는 아버지를 58세에 심장병으로 잃었다. 자신이 같은 유전적 위험을 가지고 있다고 판단해—공격적인 예방 의학(1단계)으로 자신의 생물학적 나이를 실제 나이보다 낮게 유지하고 있다고 주장한다.", accent:"#c4a35a" },
+
+  { id:"pattern_body", term:"패턴 정체성과 신체적 기질", latin:"Pattern Identity & Physical Substrate",
+    keyword:"나의 생존은 신체 어느 부위의 생존에 달려있지 않다",
+    desc:"3장의 패턴 정체성 이론이 6장에서 의료적 함의를 갖는다. 커즈와일의 주장: '나'는 특정 생물학적 기질(뉴런·세포·장기)이 아니라 정보 패턴이다.\n\n따라서: 생물학적 부위를 하나씩 기술적인 것으로 교체해도—패턴이 유지되는 한 '나'는 존속한다.\n\n6장에서의 적용: 인공 심장, 나노봇이 대체한 면역 세포, 디지털로 보완된 신피질—이것들 각각이 '나'를 대체하는 것이 아니라 '나'를 지속시키는 수단이다.\n\n핵심 질문: 우리 자신의 생존이 신체 어떤 부위의 생존 여부에 좌우되지 않는다는 것을—어떻게 받아들일 것인가?",
+    example:"심장 이식 수술을 받은 사람: 원래의 심장이 없어도 '나'는 존속한다. 커즈와일은 이 논리를 뇌 세포 하나하나에까지 확장한다. 결국 '나'는 어떤 특정 물질이 아니라 그 물질들이 이루는 패턴이다.", accent:"#9a7abd" },
+
+  { id:"reprogramming", term:"생물학 재프로그래밍", latin:"Reprogramming Biology",
+    keyword:"노화는 수정 가능한 소프트웨어 오류다",
+    desc:"커즈와일 6장의 2단계 핵심 개념. 노화를 '운명'이 아니라 '재프로그래밍 가능한 정보의 오류'로 본다.\n\n재프로그래밍의 두 방향:\n• 유전체 수준: DNA 서열의 오류를 직접 수정하거나 발현을 조절\n• 세포 수준: 노화된 세포를 젊은 상태로 되돌리거나 제거\n\n이것이 '생물학 = 소프트웨어'라는 명제의 실천적 의미다: 소프트웨어에 버그가 생기면 패치를 배포한다. 생물학도 같은 방식으로 접근하기 시작했다.\n\n현재 상태: 동물 실험에서 다수의 재프로그래밍 성공 사례. 인간 임상으로 이행하는 단계.",
+    example:"야마나카 인자(Yamanaka factors): 4개의 유전자를 활성화해 성체 세포를 줄기세포 수준으로 역분화시킬 수 있다(2006년 발견, 2012년 노벨상). 이 발견이 '노화는 되돌릴 수 없다'는 전제를 뒤집었다.", accent:"#6aaa82" },
+
+  { id:"senolytics", term:"노화 세포 제거", latin:"Senolytics",
+    keyword:"분열을 멈추고 염증을 유발하는 세포를 제거한다",
+    desc:"세포 노화(cellular senescence): 분열을 멈추고 염증성 물질을 분비하는 '좀비 세포'. 이것들이 조직에 축적되면서 노화·암·심장병의 원인이 된다.\n\n커즈와일의 6장 논거: 이 노화 세포를 선택적으로 제거하면 조직이 젊어진다.\n\n진행 상황: 동물 실험에서 노화 세포 제거 후 수명 25~36% 연장, 신체·인지 기능 개선 확인. 인간 임상 시험 진행 중.\n\n커즈와일의 예측: 노화 세포 제거가 2단계의 핵심 도구로 발전한다.",
+    example:"생쥐 실험: 6개월령 생쥐(인간 연령 중년)에게 노화 세포를 제거하는 처리를 했을 때—수명과 건강 수명이 모두 개선됐다. '젊음의 샘'에 가장 가까이 온 기술 중 하나로 평가된다.", accent:"#c47a7a" },
+
+  { id:"genetherapy", term:"유전자 치료", latin:"Gene Therapy",
+    keyword:"결함이 있는 유전자를 수정하거나 교체한다",
+    desc:"유전자 치료: 질병의 원인이 되는 유전자 결함을 직접 수정하거나, 치료 단백질을 생산하는 유전자를 세포에 전달하는 치료법.\n\n커즈와일이 6장에서 강조하는 내용: 유전자 치료가 이제 실험실을 벗어나 임상 현실이 됐다.\n\n현재 승인된 치료:\n• 겸상 적혈구 빈혈증: CRISPR 기반 Casgevy(2023 FDA 승인)\n• 척수성 근위축증(SMA): Zolgensma—단회 투여로 근치 가능\n• 혈우병: 유전자 치료로 평생 주사 필요 없어짐\n\n커즈와일의 전망: 유전자 치료가 노화 관련 유전자를 표적으로 하는 2단계로 확장된다.",
+    example:"레베르 선천성 흑암시(유전성 실명): 유전자 치료 Luxturna로 실명 환자의 시력을 부분 회복. 이전까지 불치였던 유전 질환이 일회성 치료로 개선됐다. 생물학의 소프트웨어 패치가 실현된 사례다.", accent:"#aaba5a" },
+
+  { id:"stemcell", term:"역분화 줄기세포", latin:"iPS Cells · Induced Pluripotent Stem Cells",
+    keyword:"성체 세포를 줄기세포로 되돌려 조직을 재생한다",
+    desc:"역분화 줄기세포(iPS): 야마나카 신야가 2006년 발견. 이미 분화된 성체 세포(피부세포 등)를 4개의 유전자로 처리해 배아 줄기세포와 유사한 상태로 역분화시킨다.\n\n중요성:\n• 윤리 논란 없이 맞춤형 줄기세포 생성 가능\n• 환자 자신의 세포로 만들어—면역 거부 반응 없음\n• 고갈된 조직·장기의 재생 가능성\n\n커즈와일의 6장 논거: iPS 세포가 2단계의 핵심 재생 의학 도구. 노화로 고갈된 줄기세포 군을 iPS 세포로 보충하면—조직 노화를 역전시킬 수 있다.",
+    example:"iPS 세포 기반 파킨슨병 치료: 환자의 피부세포 → iPS 세포 → 도파민 신경세포로 분화 → 뇌에 이식. 손상된 신경세포를 환자 자신의 세포로 대체하는 개인 맞춤 재생 의학의 방향이다.", accent:"#5a7abc" },
+
+  { id:"nanobot", term:"나노봇 의료", latin:"Nanomedicine · Nanobots",
+    keyword:"혈류 속 나노봇이 세포 수준에서 의료를 수행한다",
+    desc:"나노봇(nanobot): 나노미터 수준의 초소형 기계. 커즈와일의 3단계 핵심 기술.\n\n커즈와일의 비전:\n• 혈류 속 나노봇이 면역 세포를 보강하거나 대체\n• 암세포를 실시간으로 감지하고 제거\n• 노화 세포를 지속적으로 청소\n• 영양소를 세포에 직접 전달\n• 혈관 플라크 제거\n\n현재 진행:\n• DNA 나노구조(DNA origami): 약물을 암세포에 선택적 전달하는 나노 운반체\n• 나노입자 암 치료: 항암제를 종양에만 전달—부작용 감소\n• mRNA 백신의 지질 나노입자: 이미 수십억 명이 사용한 나노 전달 시스템",
+    example:"코로나19 mRNA 백신: 지질 나노입자가 mRNA를 세포 내로 전달한다. 이것이 나노의학의 첫 번째 대규모 인류 적용이다. 커즈와일: 이것이 3단계 나노봇 의료의 전조다.", accent:"#bc7a7a" },
+
+  { id:"lev", term:"장수 탈출 속도", latin:"Longevity Escape Velocity · LEV",
+    keyword:"매년 과학이 수명을 1년 이상 연장하면—죽음은 계속 후퇴한다",
+    desc:"커즈와일이 6장에서 목표로 제시하는 개념. 과학이 매년 남은 기대 수명을 1년 이상 연장하는 시점—이 시점이 되면 수명이 지속적으로 연장된다.\n\n커즈와일의 예측: 세 단계가 순서대로 성숙하면서 2030년대 초 LEV 달성 가능.\n\n현재 진행 속도: 20세기 동안 기대 수명이 매년 약 3개월씩 연장됐다. 생명공학 기술들이 동시에 가속되면서 이 속도가 빨라지고 있다. LEV에 도달하려면 이 속도가 연 12개월(1년)을 초과해야 한다.\n\n세 단계와의 연결: 1단계→2단계→3단계의 순서가 LEV를 달성하는 경로다.",
+    example:"100미터 달리기 비유: 1초에 10미터를 달리는 선수가 있다. 출발선에서 100미터 앞에 마감선이 있다. 그런데 선수가 1초에 10미터를 달리는 동안 마감선이 15미터씩 멀어진다면—결코 도달할 수 없다. LEV는 반대 상황: 마감선(죽음)이 달리는 속도보다 느리게 이동한다.", accent:"#c4a35a" },
+
+  { id:"gnr", term:"GNR 혁명", latin:"GNR Revolution · G·N·R",
+    keyword:"유전공학·나노기술·로봇공학의 수렴이 의료를 재정의한다",
+    desc:"커즈와일이 제시하는 21세기 전반기 세 기술 혁명의 수렴. 6장에서 의료에 적용되는 방식으로 논의된다.\n\n• G (유전공학·Genetics): DNA 수준에서 생명을 재프로그래밍—유전자 치료·역분화 줄기세포·유전자 편집. 2단계의 핵심.\n• N (나노기술·Nanotechnology): 원자·분자 수준에서 의료를 수행—나노봇·나노 약물 전달. 3단계의 핵심.\n• R (로봇공학·Robotics): AI 포함—신약 발견 가속·수술 로봇·AI 진단. 모든 단계를 가속.\n\nGNR이 의료에서 수렴하는 방식: G가 2단계, N이 3단계, R(AI)이 전체를 가속한다.",
+    example:"mRNA 백신: G(RNA 서열 설계)·N(지질 나노입자 전달)·R(AI가 서열 최적화)가 동시에 작동했다. GNR 혁명이 코로나19에서 처음 대규모로 실현된 사례다.", accent:"#9a7abd" },
+
+  { id:"gradual", term:"점진적 기질 교체", latin:"Gradual Substrate Replacement",
+    keyword:"하나씩 교체하면 언제 내가 아닌 존재가 되는가",
+    desc:"3장의 점진적 대체 사고실험이 6장에서 의료적 현실이 된다. 심장 → 인공 심장, 관절 → 인공 관절, 면역 세포 → 나노봇, 신피질 → 디지털 신피질.\n\n이미 일어나고 있는 것:\n• 심장 박동기·인공 심장: 수십만 명이 사용 중\n• 인공 와우(달팽이관): 청각 장애 치료\n• 인공 망막: 시각 장애 부분 회복\n\n커즈와일의 확장: 이 교체가 단순히 기능 회복에서 기능 향상으로, 그리고 노화 역전으로 확장된다.\n\n핵심 질문: 교체되는 비율이 높아질수록—나는 여전히 나인가? 그리고 이것이 중요한가?",
+    example:"인공 심장: 자연적 심장 없이도 완전히 정상적 삶을 사는 사람들이 있다. 아무도 그들을 '인간이 아니다'라고 말하지 않는다. 커즈와일: 이 직관을 뇌 세포에까지 확장하라.", accent:"#6aaa82" },
+
+  { id:"aging_reversal", term:"노화 역전", latin:"Aging Reversal",
+    keyword:"노화는 거스를 수 없는 자연이 아니라 해결 가능한 기술 문제다",
+    desc:"커즈와일 6장의 핵심 주장. 노화를 불가피한 생물학적 운명이 아니라—정보 기술로 해결 가능한 공학적 문제로 재정의한다.\n\n노화 역전의 두 가지 경로:\n① 손상 수리(Damage Repair): 축적된 분자·세포 손상을 찾아 수리한다. 노화 세포 제거, DNA 손상 수선, 단백질 응집체 제거.\n② 재프로그래밍(Reprogramming): 세포의 나이를 되돌린다. 역분화 줄기세포, 후성유전학적 리셋.\n\n두 경로가 동시에, 기하급수적으로 발전하고 있다는 것이 커즈와일의 낙관의 근거다.",
+    example:"혈액 공유 실험(파라비오시스): 젊은 생쥐와 늙은 생쥐의 혈액을 연결하면 늙은 생쥐의 근육·간·뇌가 젊어진다. 이것은 노화가 '마모'가 아니라 혈액 내 신호 분자의 변화에 의해 조절된다는 것을 보여준다—재프로그래밍이 가능하다는 증거다.", accent:"#c47a7a" },
+];
+
+/* ─── 핵심 논점 ─────────────────────────────────────────────────── */
+const PASSAGES = [
+  { title:"논점 1 · 생물학이 정보 기술이 됐다—수확 가속의 법칙이 의료에 적용된다",
+    note:"생물학이 정보 기술로 전환된다는 커즈와일의 핵심 주장이 제시되는 부분을 찾아보세요. 유전체 분석 비용의 기하급수적 하락, DNA를 소프트웨어로 보는 시각이 핵심입니다. '생물학' '정보 기술' '소프트웨어' '수확 가속의 법칙'이 키워드입니다.",
+    layers:[
+      { label:"핵심 주장", text:"커즈와일의 핵심 전환: 생물학은 본질적으로 정보 처리 시스템이다.\n\nDNA = 소프트웨어 (약 30억 개의 염기쌍이 쓰인 코드)\n단백질 = 소프트웨어의 실행 결과\n세포 = 프로세서\n노화 = 소프트웨어 버그의 축적\n\n이 전환이 결정적인 이유: 정보 기술이 되면—수확 가속의 법칙이 적용된다.\n\n증거:\n유전체 분석 비용: 2001년 $3억 → 2023년 $200 이하 (약 백만 배 감소)\n이 속도는 무어의 법칙을 능가한다\n\n논리적 귀결: 버그는 패치할 수 있다. 노화도 마찬가지다. 그리고 이 패치 기술이 기하급수적 속도로 발전하고 있다." },
+      { label:"왜 중요한가", text:"이 전환이 이전 의학 패러다임과 근본적으로 다른 이유:\n\n기존 의학: 증상을 치료한다. 암이 생기면 잘라내거나 독소로 죽인다. 대증 치료(symptomatic treatment)다.\n\n정보 기술로서의 의학: 원인—소프트웨어 수준—을 수정한다. 암이 생기기 전에 암을 유발하는 유전자 변이를 수정한다. 노화 세포가 축적되기 전에 제거한다.\n\n수확 가속의 법칙의 적용:\n1980년대: 유전자의 존재는 알았지만 읽을 수 없었다\n2000년대: 읽을 수 있게 됐지만 비쌌다\n2020년대: 저렴하게 읽고 수정할 수 있게 됐다\n2030년대: 실시간으로 모니터링하고 수정할 것이다\n\n이것이 의료의 패러다임 전환이다." },
+      { label:"비유로", text:"컴퓨터 바이러스 치료의 비유: 1990년대 컴퓨터 바이러스를 치료하는 방법은 감염된 파일을 삭제하는 것이었다. 오늘날 안티바이러스 소프트웨어는 실시간으로 바이러스 코드 패턴을 인식해 제거한다.\n\n의학도 같은 방향으로 진화하고 있다:\n노화 세포를 수술로 제거하는 것(구식) → 약물이 노화 세포의 단백질 패턴을 인식해 선택적으로 제거하는 것(현재) → 나노봇이 실시간으로 노화 세포를 감지·제거하는 것(미래)\n\n이것이 의학이 정보 기술이 되는 과정이다." },
+    ]},
+  { title:"논점 2 · 세 단계 전략—지금 당신은 어느 단계에 있는가",
+    note:"커즈와일의 '세 단계' 전략이 설명되는 부분을 찾아보세요. 각 단계의 구체적 내용과 현재 어느 단계에 와 있는지, 그리고 커즈와일 자신이 1단계로 무엇을 실천하는지가 나오는 단락입니다. '세 단계' '장수 탈출 속도' '나노봇' 'GNR 혁명'이 키워드입니다.",
+    layers:[
+      { label:"핵심 주장", text:"세 단계 전략:\n\n1단계 (지금): 현재의 최선으로 몸을 최대한 유지한다.\n• 공격적 예방 의학: 정기 혈액 검사·바이오마커 모니터링\n• 영양 최적화: 커즈와일은 하루 약 100가지 보충제 복용\n• 생활 습관: 저혈당 식단·규칙적 운동·스트레스 관리\n• 목표: 2단계가 성숙하는 10~20년 후까지 살아있기\n\n2단계 (10~20년 후): 생명공학 혁명\n• 유전자 편집으로 노화 관련 유전자 수정\n• 노화 세포 제거(세노리틱스)\n• 역분화 줄기세포로 조직 재생\n• 유전자 치료로 유전 질환 근치\n\n3단계 (20~30년 후): 나노기술\n• 혈류 속 나노봇이 세포 수준 의료 수행\n• 면역 시스템을 나노봇이 보강·대체\n• 장수 탈출 속도(LEV) 달성" },
+      { label:"왜 중요한가", text:"각 단계의 현재 상황:\n\n1단계: 이미 가능하다. 예방 의학·영양 최적화·운동이 기대 수명을 연장할 수 있다는 증거가 풍부하다.\n\n2단계: 지금 가속 중이다.\n• 유전자 치료 최초 FDA 승인(겸상 적혈구 빈혈증 근치)\n• 역분화 줄기세포 임상 연구 진행\n• 노화 세포 제거 임상 시험 시작\n\n3단계: 연구 단계이지만 발전 중.\n• 나노 약물 전달 시스템(mRNA 백신 등)이 이미 실용화\n• 나노봇 전임상 연구 단계\n\n핵심 메시지: 1단계가 2단계까지, 2단계가 3단계까지 연결한다. 지금 살아있는 것이 중요하다." },
+      { label:"비유로", text:"접이식 다리의 비유: 강을 건너려면 다리가 필요하다. 아직 완성된 다리가 없지만—임시 다리(1단계)로 강의 중간 지점까지 가면, 거기서 더 나은 다리(2단계)로 갈아탈 수 있다. 2단계에서 최종 목적지(특이점)까지의 완전한 다리(3단계)가 완성된다.\n\n커즈와일의 핵심 메시지: 임시 다리(1단계)를 무시하지 마라. 그것이 더 나은 다리들을 기다리는 동안 살아있게 해준다.\n\n그리고 수확 가속의 법칙이 이 전환을 보장한다: 기본적인 기하급수적 증가 추세에 달려있기 때문에, 세부 가정이 크게 변해도 그 단계에 이르는 시점에는 큰 변화가 없을 것이다." },
+    ]},
+  { title:"논점 3 · 우리 자신의 생존은 신체 어느 부위의 생존에 달려있지 않다",
+    note:"점진적 기질 교체와 패턴 정체성이 연결되는 부분을 찾아보세요. 인공 심장·나노봇 면역 세포·디지털 신피질로의 점진적 교체가 논의되는 단락입니다. 3장의 '나는 누구인가'와 6장의 의료 기술이 만나는 지점입니다. '기질 교체' '패턴' '정체성' '연속성'이 키워드입니다.",
+    layers:[
+      { label:"핵심 주장", text:"커즈와일의 3장 논증이 6장에서 의료적 함의를 갖는다:\n\n3장: '나'는 특정 물질이 아니라 정보 패턴이다.\n6장: 따라서 생물학적 기질을 기술적인 것으로 교체해도—패턴이 유지되는 한 '나'는 존속한다.\n\n이미 일어나고 있는 교체들:\n• 심장 박동기·인공 심장 → 나는 여전히 나다\n• 인공 관절·인공 와우·인공 망막 → 나는 여전히 나다\n• 나노봇이 면역 세포를 대체한다 → 나는 여전히 나다\n• 디지털 신피질이 생물학적 신피질을 보완한다 → 나는 여전히 나다\n\n커즈와일의 결론: 우리 자신의 생존은 신체 어느 특정 부위의 생존 여부에 달려있지 않다." },
+      { label:"왜 중요한가", text:"이것이 6장에서 가장 중요한 철학적·실천적 질문을 만든다:\n\n수용의 문제: 인공 심장을 가진 사람은 쉽게 받아들인다. 그런데 AI가 보완하는 뇌를 가진 사람은? 나노봇이 면역 시스템을 대체한 사람은?\n\n직관의 저항: 우리는 '뇌'가 '나'라는 직관을 갖고 있다. 심장이 교체돼도 '나'라고 느끼지만—뇌가 교체되면 '나'일까?\n\n커즈와일의 답: 점진적으로 일어나면—패턴이 유지되므로 연속성이 있다. 3장의 점진적 대체 사고실험이 여기서 의료적 현실이 된다.\n\n핵심 수용의 과제: 특이점을 향한 여정에서, 우리는 자신의 생물학적 구성이 점점 더 많이 기술로 대체되는 것을 어떻게 받아들일 것인가?" },
+      { label:"비유로", text:"테세우스의 배(3장) + 의료 기술(6장):\n3장에서 배의 판자가 하나씩 교체돼도 같은 배인지를 물었다. 6장에서는 이 질문이 실제 의료 기술로 온다.\n\n이미 받아들여진 것:\n심장 박동기(전기 신호로 심장 조절)→인공 심장(기계가 혈액 펌핑)→나노봇 면역 세포(기계가 면역 기능 수행)→디지털 신피질(AI가 인지 기능 보완)\n\n각 단계가 이전 단계와 '질적으로' 다른가—아니면 정도의 차이인가?\n\n커즈와일의 답: 정도의 차이다. 패턴이 유지되는 한, 어느 단계도 '나'가 아닌 존재가 되는 단절점이 없다." },
+    ]},
+];
+
+/* ─── 퀴즈 ───────────────────────────────────────────────────────── */
+const QUIZ = [
+  { q:"커즈와일이 6장에서 말하는 '세 단계' 전략에서 1단계가 중요한 이유로 가장 적절한 것은?",
+    opts:["현재 의학 기술이 완벽하기 때문에","영양 보충제와 예방 의학으로 2단계 생명공학이 성숙하는 10~20년 후까지 살아있기 위한 전략이기 때문에","1단계가 노화를 완전히 역전시킬 수 있기 때문에","커즈와일이 건강보조식품 회사를 소유하고 있기 때문에"],
+    ans:1, exp:"커즈와일의 세 단계 논리: 1단계(현재의 예방 의학)가 2단계(생명공학 혁명)까지, 2단계가 3단계(나노기술)까지 살아있게 해주는 연결 역할을 한다. 1단계 자체가 노화를 역전시키지는 못하지만—2단계 기술이 성숙할 때까지 살아있는 것이 목표다. 이것이 '세 단계가 다리처럼 연결된다'는 커즈와일의 전략적 프레임이다." },
+  { q:"커즈와일이 '생물학 = 정보 기술'이라는 주장의 가장 강력한 증거로 제시하는 것은?",
+    opts:["생물학을 공부하면 컴퓨터를 잘할 수 있다","유전체 분석 비용이 2001년 약 $3억에서 2023년 약 $200 이하로 감소했다—수확 가속의 법칙이 생물학에 적용되고 있다는 증거","생물학 연구소에서 컴퓨터를 많이 사용한다","인체의 신경계가 전기 신호를 사용한다"],
+    ans:1, exp:"유전체 분석 비용의 극적 하락($3억 → $200 이하)은 수확 가속의 법칙이 생물학에 적용되고 있다는 가장 강력한 증거다. 무어의 법칙을 능가하는 속도로 비용이 하락하는 이것은—생물학이 정보 기술이 됐을 때 일어나는 전형적 패턴이다. 커즈와일은 이것이 이전에 다른 정보 기술 분야에서 본 것과 같은 패턴이라고 강조한다." },
+  { q:"커즈와일이 6장에서 주장하는 '우리 자신의 생존은 신체 어느 부위의 생존에 달려있지 않다'는 명제와 가장 직접적으로 연결된 개념은?",
+    opts:["나의 생존은 뇌의 생존에 달려있다","3장의 패턴 정체성 이론—'나'는 특정 물질이 아니라 정보 패턴이므로, 기질이 교체돼도 패턴이 유지되면 존속한다","나는 몸 전체가 살아있어야 '나'다","디지털 복사본은 '나'가 아니다"],
+    ans:1, exp:"커즈와일의 6장 논증은 3장의 패턴 정체성 이론을 의료에 적용한 것이다. '나'는 특정 생물학적 기질(심장·뉴런·면역 세포)이 아니라 그것들이 이루는 정보 패턴이다. 따라서 심장 박동기·인공 관절·나노봇 면역 세포·디지털 신피질로 점진적으로 교체해도—패턴이 유지되는 한 '나'는 존속한다. 이것이 '신체 어느 부위의 생존에 달려있지 않다'는 주장의 근거다." },
+  { q:"커즈와일이 말하는 '장수 탈출 속도(LEV)'의 개념으로 가장 적절한 것은?",
+    opts:["100세 이상 사는 것을 목표로 하는 전략","과학이 매년 남은 기대 수명을 1년 이상 연장하는 시점—이 시점이 되면 죽음이 계속 후퇴한다","로켓이 지구 중력을 벗어나는 속도","특정 나이에 노화가 완전히 멈추는 현상"],
+    ans:1, exp:"장수 탈출 속도(LEV): 과학이 매년 남은 기대 수명을 1년 이상 연장하는 속도에 도달하면—죽음이 계속 후퇴한다. 커즈와일은 세 단계가 순서대로 성숙하면서 2030년대 초 LEV 달성이 가능하다고 예측한다. 현재 기대 수명 증가 속도(연 약 3개월)가 LEV(연 1년 이상)에 도달하려면—생명공학 기술들의 기하급수적 발전이 임계점을 넘어야 한다." },
+];
+
+/* ─── 논리: 우리 자신의 생존이 신체 어느 부위에 달려있지 않다 ──── */
+const ARG_STEPS = [
+  { num:"핵심 전환", color:"#5a9abc",
+    title:"생물학이 정보 기술이 됐다",
+    body:"6장의 출발점: 하나의 패러다임 전환.\n\n이전: 의학은 화학이었다. 원인을 이해하지 못한 채 증상을 치료했다.\n지금: 의학은 정보 기술이 되고 있다. DNA를 읽고, 유전자를 편집하고, 세포를 재프로그래밍한다.\n\n전환의 증거:\n유전체 분석 비용: 2001년 $3억 → 2023년 $200 이하\n유전자 치료: 겸상 적혈구 빈혈증 근치(2023)\n역분화 줄기세포: 노화 세포를 젊은 상태로 역전(동물 실험)\n\n이 전환이 의미하는 것: 수확 가속의 법칙이 의료에 적용되기 시작했다. 그리고 이 가속은 이제 막 시작됐다.",
+    key:"생물학 = 정보 기술 = 수확 가속의 법칙의 새로운 적용 영역" },
+
+  { num:"전략", color:"#c4a35a",
+    title:"세 단계—특이점까지 살아있기 위한 경로",
+    body:"커즈와일의 실용적 전략:\n\n1단계 (지금~): 현재 최선의 예방 의학\n공격적 바이오마커 모니터링, 영양 최적화, 생활 습관 개선\n→ 커즈와일 자신이 하루 약 100가지 보충제를 복용\n\n2단계 (10~20년 후): 생명공학 혁명\n노화 세포 제거, 유전자 편집, 역분화 줄기세포\n→ 이미 시작된 기술들이 성숙해지는 단계\n\n3단계 (20~30년 후): 나노기술\n혈류 속 나노봇이 세포 수준 실시간 의료 수행\n→ 장수 탈출 속도(LEV) 달성\n\n핵심 논리: 각 단계가 다음 단계를 기다리는 동안 살아있게 해준다.",
+    key:"세 단계 = 기하급수적 기술을 기다리는 동안 살아있기 위한 연결 경로" },
+
+  { num:"기술 수렴", color:"#9a7abd",
+    title:"GNR 혁명—유전공학·나노기술·로봇공학의 수렴",
+    body:"커즈와일의 예측: 21세기 전반기에 세 기술 혁명이 수렴한다.\n\nG (유전공학): DNA 수준에서 생명을 재프로그래밍 → 2단계의 핵심\n• 유전자 치료, 역분화 줄기세포, 노화 세포 제거\n\nN (나노기술): 분자 수준에서 의료를 수행 → 3단계의 핵심\n• 나노봇이 혈류 속에서 세포 수준 치료\n\nR (로봇공학·AI): 모든 단계를 가속 → 전체 과정의 엔진\n• AI가 신약 발견·유전자 편집·임상 연구 가속\n\n수렴의 효과: 각 기술이 독립적으로 발전해도 수명이 연장된다. 이것들이 동시에 수렴할 때—LEV를 달성한다.",
+    key:"GNR 수렴 = 세 단계가 완성되는 기술적 근거" },
+
+  { num:"핵심 질문", color:"#6aaa82",
+    title:"우리 자신의 생존은 신체 어느 부위의 생존에 달려있지 않다",
+    body:"커즈와일이 6장에서 제기하는 가장 깊은 질문:\n\n'나'는 특정 생물학적 기질이 아니라 정보 패턴이다(3장). 따라서 생물학적 부위를 기술적인 것으로 교체해도—패턴이 유지되는 한 '나'는 존속한다.\n\n이미 받아들인 것들:\n심장 박동기 → '나는 여전히 나다'\n인공 관절·인공 와우 → '나는 여전히 나다'\n\n앞으로 받아들여야 할 것들:\n나노봇이 면역 세포를 대체한다 → '나는 여전히 나다'?\nAI가 신피질을 보완한다 → '나는 여전히 나다'?\n\n커즈와일의 답: 점진적으로 일어나면 연속성이 있다. 우리 자신의 생존이 신체 어떤 부위의 생존 여부에 좌우되지 않는다는 것—이것이 세 단계 전략의 철학적 기반이다.",
+    key:"생물학적 기질의 교체 = 나의 소멸이 아니라 나의 연장" },
+
+  { num:"견고성", color:"#c47a7a",
+    title:"기하급수적 추세의 견고성—세부 가정이 변해도 방향은 변하지 않는다",
+    body:"커즈와일의 핵심 주장: 이 미래는 기본적인 기하급수적 증가 추세에 달려있기 때문에—특정 기술이 예상보다 느리게 발전해도 전체 방향은 변하지 않는다.\n\n이유:\n• 수확 가속의 법칙은 특정 기술이 아니라 기술 발전 전체에 적용된다\n• 하나의 경로가 막히면 다른 경로가 열린다\n• G·N·R 중 하나가 느려도 나머지가 가속한다\n\n따라서: 설령 우리 자신의 디지털화가 얼마나 쉽게 일어날 것인가에 대한 가정이 크게 변하더라도, 그 단계에 이르는 시점에는 큰 변화가 없을 것이다.\n\n이것이 커즈와일이 구체적인 불확실성을 인정하면서도 전체 방향에 대해 낙관하는 이유다.",
+    key:"기하급수적 추세의 견고성 = 세부 예측이 틀려도 전체 방향은 맞다" },
+];
+
+/* ─── 비교 분석 ─────────────────────────────────────────────────── */
+const POSITIONS = [
+  { label:"급진적 수명 연장론", sub:"커즈와일·오브리 드 그레이", color:"#5a7abc",
+    claim:"노화는 해결 가능한 기술적 문제다. 생물학이 정보 기술이 되면서 수확 가속의 법칙이 적용된다. 세 단계 전략으로 2030년대 LEV 달성이 가능하다. 지금 살아있는 사람들이 사실상 마지막으로 죽는 세대가 될 수 있다.",
+    problem:"비판: 기술 낙관론이 의학적 현실을 과대평가한다. 임상 시험은 예상보다 항상 느리다. 동물 실험 결과가 인간에게 그대로 적용되지 않는 경우가 많다.",
+    quote:"커즈와일·테리 그로스만 《환상적인 여정》(Fantastic Voyage, 2004)\n커즈와일 《마침내 특이점이 시작된다》(2024) 제6장" },
+  { label:"생명윤리적 우려", sub:"샌델·후쿠야마", color:"#c4a35a",
+    claim:"급진적 수명 연장은 인간 조건의 근본을 바꾼다. 죽음의 부재는 삶의 의미를 어떻게 바꾸는가? 불평등한 접근이 '수명 카스트'를 만들 수 있다. 유한성이 인간을 인간답게 만드는 요소일 수 있다.",
+    problem:"커즈와일의 응답: 모든 의료 기술은 처음에 불평등하게 분배됐지만 결국 민주화됐다. 그리고 죽음이 '의미'를 주는가—아니면 죽음을 극복하는 것이 더 큰 의미인가?",
+    quote:"마이클 샌델 《완벽에 대한 반론》(2007)\n프랜시스 후쿠야마 《부자의 유전자, 가난한 자의 유전자》(2002)" },
+  { label:"현실주의적 접근", sub:"노화 과학자들의 신중론", color:"#7aaa6a",
+    claim:"노화 연구가 빠르게 발전하고 있다는 것은 사실이다. 그러나 복잡계 생물학은 예측하기 어렵다. 더 현실적인 목표는 건강하게 사는 시간(건강 수명)을 늘리는 것이다. LEV의 타임라인에 회의적이다.",
+    problem:"커즈와일과의 공통점: 기술이 의미 있는 수명 연장을 가져올 것이다. 차이점: 30년이라는 타임라인과 LEV 달성 가능성에 대한 구체적 예측에 회의적이다.",
+    quote:"NIH 국립노화연구소(NIA): 건강 수명 연장 중심 접근\n다수의 노화 연구자들: 타임라인 신중론" },
+];
+
+/* ─── 세미나 질문 ─────────────────────────────────────────────── */
+const SEMINAR_QS = [
+  { q:"커즈와일은 '우리 자신의 생존이 신체 어떤 부위의 생존 여부에 좌우되지 않는다'고 말합니다. 심장 박동기를 가진 사람은 이미 이 명제를 몸으로 살고 있습니다. 당신은 어디까지 받아들일 수 있습니까—나노봇 면역 세포? AI가 보완하는 기억? 디지털 신피질?",
+    hint:"어느 지점에서 불편함이 시작됩니까? 그 불편함이 논리적 근거를 가진 것입니까, 아니면 익숙함의 문제입니까? 심장 박동기와 AI 신피질의 차이는 무엇입니까?" },
+  { q:"커즈와일은 하루 약 100가지 보충제를 복용하며 1단계를 실천합니다. '2단계 기술이 올 때까지 살아있기 위해'입니다. 당신은 지금 당신의 몸에 얼마나 투자하고 있습니까? 그리고 그 투자의 근거는 무엇입니까?",
+    hint:"예방 의학을 '기술을 기다리는 전략'으로 보면—건강 관리의 의미가 바뀝니까? 아니면 그 프레임이 과도합니까?" },
+  { q:"장수 탈출 속도(LEV)가 달성되어 수명이 사실상 무한히 연장된다면—하지만 그 혜택이 처음에는 소수에게만 돌아간다면—이것은 어떤 세계를 만들겠습니까? 그리고 그 불평등은 어떻게 다뤄야 합니까?",
+    hint:"민주주의는 세대 교체를 전제합니다. 500세 노인과 20세 청년이 같은 사회에서 산다면—권력·경제·문화는 어떻게 작동합니까?" },
+  { q:"커즈와일은 생물학이 정보 기술이 됐기 때문에—노화는 '수정 가능한 소프트웨어 버그'라고 말합니다. 죽음을 '기술적 문제'로 보는 시각이 삶을 살아가는 방식에 어떤 영향을 미칩니까?",
+    hint:"유한성을 알기 때문에 지금 이 순간이 소중하다는 감각—이것이 수명이 연장된다면 어떻게 달라집니까? 더 잘 살게 됩니까, 아니면 지금을 덜 소중히 여기게 됩니까?" },
+  { q:"커즈와일은 '이 미래는 기본적인 기하급수적 증가 추세에 달려있기 때문에, 세부 가정이 크게 변해도 그 단계에 이르는 시점에는 큰 변화가 없을 것이다'라고 말합니다. 이 기하급수적 추세에 대한 믿음이 당신에게 얼마나 설득력이 있습니까? 그 믿음이 지금 당신의 삶에서 어떤 결정을 바꿀 수 있습니까?",
+    hint:"기하급수적 추세가 실재한다면—지금 건강에 투자하는 것은 단순한 자기 관리가 아니라 '특이점까지 살아있기 위한 전략'이 됩니다. 이 프레임이 당신의 일상적 선택에 영향을 미칩니까?" },
+];
+
+/* ─── 스테이지 ──────────────────────────────────────────────────── */
+const STAGES = {
+  grammar:{ label:"문법", latin:"Grammatica", sub:"텍스트가 무엇을 말하는가", color:"#c4a35a", bg:"#1a160a" },
+  logic:  { label:"논리", latin:"Dialectica",  sub:"논증이 어떻게 작동하는가", color:"#5a9abc", bg:"#0a121a" },
+  rhetoric:{ label:"수사", latin:"Rhetorica",  sub:"함께 탐구하고 설득하는가", color:"#bc7a7a", bg:"#1a0f0f" },
+};
+const PAGE_STAGE = {2:"grammar",3:"grammar",4:"grammar",5:"grammar",6:"grammar",7:"logic",8:"logic",9:"rhetoric"};
+
+function App() {
+  const [page, setPage] = useState(0);
+  const [fading, setFading] = useState(false);
+  const [flipped, setFlipped] = useState(new Set());
+  const [pLayers, setPLayers] = useState([0,0,0]);
+  const [qSel, setQSel] = useState([null,null,null,null]);
+  const [qDone, setQDone] = useState([false,false,false,false]);
+  const [argStep, setArgStep] = useState(0);
+  const [posOpen, setPosOpen] = useState(null);
+  const [seminHints, setSeminHints] = useState(new Set());
+
+  const TOTAL = 11;
+  const go = n => { setFading(true); setTimeout(()=>{ setPage(n); setFading(false); window.scrollTo(0,0); }, 280); };
+  const next = () => { if(page < TOTAL-1) go(page+1); };
+  const prev = () => { if(page > 0) go(page-1); };
+
+  const C = { bg:"#090b0d", surf:"#0e1318", surfUp:"#151d24", txt:"#e2e8f0", muted:"#607080", gold:"#c4a35a", goldBr:"#deb96a", line:"#1e2a35" };
+  const F = { h:"'Cormorant Garamond', Georgia, serif", b:"'Noto Serif KR', Georgia, serif" };
+  const W = { maxWidth:720, margin:"0 auto", padding:"52px 28px", color:C.txt, fontFamily:F.b };
+  const SL = { fontFamily:F.b, fontSize:11, letterSpacing:4, color:C.gold, marginBottom:18, display:"block" };
+  const BT = { fontFamily:F.h, fontSize:32, fontWeight:400, color:C.txt, lineHeight:1.25, marginBottom:8 };
+  const DIV = { width:36, height:1, background:C.gold, marginBottom:28 };
+  const BD = { fontSize:15, lineHeight:1.95, color:C.txt, fontWeight:300, fontFamily:F.b };
+  const MT = { fontSize:15, lineHeight:1.95, color:C.muted, fontWeight:300, fontFamily:F.b };
+
+  const stageKey = PAGE_STAGE[page];
+  const stage = stageKey ? STAGES[stageKey] : null;
+
+  const StageBadge = () => !stage ? null : (
+    <div style={{ display:"flex", gap:10, alignItems:"center", marginBottom:28, padding:"10px 16px", background:stage.bg, border:`1px solid ${stage.color}33`, width:"fit-content" }}>
+      <div style={{ width:6, height:6, borderRadius:"50%", background:stage.color }} />
+      <span style={{ fontFamily:F.b, fontSize:11, letterSpacing:4, color:stage.color }}>{stage.label}</span>
+      <span style={{ fontFamily:F.h, fontSize:13, color:C.muted, fontStyle:"italic" }}>{stage.latin}</span>
+      <span style={{ fontFamily:F.b, fontSize:11, color:C.muted }}>· {stage.sub}</span>
+    </div>
+  );
+
+  const renderPage = () => { switch(page) {
+
+  case 0: return (
+    <div style={{ minHeight:"100vh", display:"flex", flexDirection:"column", justifyContent:"center", alignItems:"center", textAlign:"center", padding:"48px 28px", background:C.bg, position:"relative", overflow:"hidden" }}>
+      <div style={{ position:"absolute", top:0, left:0, right:0, height:2, background:`linear-gradient(90deg,transparent,${C.gold},transparent)` }} />
+      <div style={{ position:"absolute", bottom:0, left:0, right:0, height:1, background:`linear-gradient(90deg,transparent,${C.gold}44,transparent)` }} />
+      <div style={{ position:"absolute", inset:0, backgroundImage:`radial-gradient(ellipse at 50% 55%,#0a180a 0%,transparent 65%)`, pointerEvents:"none" }} />
+      <span style={{ fontFamily:F.b, fontSize:11, letterSpacing:6, color:C.gold, marginBottom:48, display:"block" }}>디퍼 언브랜딩살롱</span>
+      <h1 style={{ fontFamily:F.h, fontSize:"clamp(32px,7vw,52px)", fontWeight:300, color:C.txt, lineHeight:1.1, marginBottom:10 }}>마침내 특이점이 시작된다</h1>
+      <p style={{ fontFamily:F.h, fontSize:18, color:"#b0bec8", fontStyle:"italic", marginBottom:6 }}>The Singularity Is Nearer</p>
+      <p style={{ fontFamily:F.b, fontSize:12, color:"#b0bec8", letterSpacing:2 }}>Ray Kurzweil, 2024 · 비즈니스북스</p>
+      <div style={{ width:1, height:52, background:`linear-gradient(${C.gold}88,transparent)`, margin:"36px auto" }} />
+      <p style={{ fontFamily:F.b, fontSize:13, letterSpacing:5, color:C.gold, marginBottom:10 }}>소크라테스식 고전 탐구 세미나</p>
+      <p style={{ fontFamily:F.h, fontSize:19, color:"#b0bec8", fontStyle:"italic", marginBottom:16 }}>제6장</p>
+      <p style={{ fontFamily:F.h, fontSize:17, color:"#b0bec8", fontStyle:"italic", marginBottom:52 }}>향후 30년의 건강과 안녕</p>
+      <button onClick={next}
+        onMouseEnter={e=>{e.currentTarget.style.background=C.gold;e.currentTarget.style.color=C.bg;}}
+        onMouseLeave={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.color=C.gold;}}
+        style={{ background:"transparent", border:`1px solid ${C.gold}`, color:C.gold, fontFamily:F.b, fontSize:12, letterSpacing:4, padding:"15px 48px", cursor:"pointer", transition:"all 0.3s" }}>
+        시작하기
+      </button>
+      <div style={{ display:"flex", gap:24, marginTop:40, justifyContent:"center" }}>
+        {[["문법","#c4a35a"],["논리","#5a9abc"],["수사","#bc7a7a"]].map(([l,col])=>(
+          <div key={l} style={{ textAlign:"center" }}>
+            <div style={{ width:5, height:5, borderRadius:"50%", background:col, margin:"0 auto 6px" }} />
+            <span style={{ fontFamily:F.b, fontSize:10, color:col, letterSpacing:3 }}>{l}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
+  case 1: return (
+    <div style={W}>
+      <span style={SL}>안내 · 트리비움으로 읽다</span>
+      <h2 style={BT}>세 단계로 읽는 법</h2>
+      <div style={DIV} />
+      <p style={{ ...BD, marginBottom:32 }}>이 세미나는 생각을 이끄는 도구, <strong style={{color:C.goldBr}}>트리비움</strong>으로 텍스트를 읽습니다—<strong style={{color:C.goldBr}}>문법, 논리, 수사</strong>. 각 단계는 텍스트를 다른 깊이로 만나는 방법입니다.</p>
+      {[
+        { key:"grammar", n:"01", label:"문법 — Grammatica", pages:"5섹션",
+          desc:"6장의 핵심 개념과 언어를 내 것으로 만드는 단계입니다.",
+          items:["생물학=정보 기술·세 단계·패턴 정체성과 신체적 기질·생물학 재프로그래밍·노화 세포 제거·유전자 치료·역분화 줄기세포·나노봇 의료·장수 탈출 속도·GNR 혁명·점진적 기질 교체·노화 역전 개념 카드 (12종)","핵심 논점 3개—생물학=정보 기술 / 세 단계 전략 / 신체 어느 부위의 생존에 달려있지 않다","이해 확인 퀴즈 4문항"] },
+        { key:"logic", n:"02", label:"논리 — Dialectica", pages:"2섹션",
+          desc:"생물학 전환에서 '우리 자신의 생존은 신체 어느 부위에 달려있지 않다'는 핵심 명제까지—5단계로 논증을 따라갑니다.",
+          items:["핵심 전환 → 세 단계 전략 → GNR 수렴 → 핵심 질문 → 기하급수적 추세의 견고성","급진적 수명 연장론 vs 생명윤리적 우려 vs 신중론 비교"] },
+        { key:"rhetoric", n:"03", label:"수사 — Rhetorica", pages:"세미나에서 함께",
+          desc:"이 단계는 세미나 현장에서 함께 합니다. 핵심 질문: 나는 어디까지 교체돼도 나인가?",
+          items:["소크라테스식 세미나 토론 질문 5개","힌트와 함께 입장 준비"] },
+      ].map(item=>{
+        const s=STAGES[item.key];
+        return (
+          <div key={item.key} style={{ marginBottom:20, background:C.surf, padding:"22px 24px", borderLeft:`3px solid ${s.color}` }}>
+            <div style={{ display:"flex", gap:14, alignItems:"flex-start", marginBottom:14 }}>
+              <span style={{ fontFamily:F.h, fontSize:30, color:s.color, lineHeight:1, minWidth:32 }}>{item.n}</span>
+              <div>
+                <div style={{ display:"flex", gap:10, alignItems:"center", marginBottom:6 }}>
+                  <span style={{ fontFamily:F.b, fontSize:11, letterSpacing:4, color:s.color }}>{item.label}</span>
+                  <span style={{ fontFamily:F.b, fontSize:11, color:C.muted }}>· {item.pages}</span>
+                </div>
+                <p style={{ ...BD, fontSize:13, margin:0, lineHeight:1.8 }}>{item.desc}</p>
+              </div>
+            </div>
+            <div style={{ paddingLeft:46 }}>
+              {item.items.map((it,j)=>(
+                <div key={j} style={{ display:"flex", gap:10, alignItems:"flex-start", padding:"4px 0" }}>
+                  <div style={{ width:4, height:4, borderRadius:"50%", background:s.color+"88", flexShrink:0, marginTop:7 }} />
+                  <span style={{ ...MT, fontSize:13 }}>{it}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+
+  case 2: return (
+    <div style={W}>
+      <StageBadge />
+      <span style={SL}>문법 1/5 · 핵심 개념</span>
+      <h2 style={BT}>카드를 눌러 개념을 확인하세요</h2>
+      <div style={DIV} />
+      <p style={{ ...MT, marginBottom:36, fontSize:14 }}>12개 모두 열어보시길 권합니다. 지금 완전히 이해하지 않아도 됩니다—이후 독해와 퀴즈를 통해 다시 만납니다.</p>
+      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
+        {CONCEPTS.map(c=>{
+          const open=flipped.has(c.id);
+          return (
+            <div key={c.id}
+              onClick={()=>{const n=new Set(flipped);if(n.has(c.id))n.delete(c.id);else n.add(c.id);setFlipped(n);}}
+              style={{ background:open?C.surfUp:C.surf, border:`1px solid ${open?c.accent+"66":C.line}`, padding:"18px 20px", cursor:"pointer", transition:"all 0.25s" }}>
+              <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start" }}>
+                <div style={{ flex:1, paddingRight:8 }}>
+                  <p style={{ fontFamily:F.h, fontSize:17, color:open?c.accent:C.goldBr, fontWeight:500, margin:"0 0 2px", lineHeight:1.25 }}>{c.term}</p>
+                  <p style={{ fontSize:10, color:C.muted, fontStyle:"italic", margin:0 }}>{c.latin}</p>
+                </div>
+                <span style={{ color:open?C.gold:C.muted, fontSize:20, lineHeight:1, transform:open?"rotate(45deg)":"none", transition:"transform 0.25s", flexShrink:0 }}>+</span>
+              </div>
+              {open && (
+                <div style={{ marginTop:16 }}>
+                  <p style={{ fontSize:11, color:c.accent, letterSpacing:3, marginBottom:10, fontWeight:500 }}>{c.keyword}</p>
+                  <p style={{ ...BD, fontSize:13, marginBottom:14, lineHeight:1.85, whiteSpace:"pre-line" }}>{c.desc}</p>
+                  <div style={{ background:C.surf, padding:"12px 14px" }}>
+                    <p style={{ ...MT, fontSize:12, margin:0, lineHeight:1.8 }}>✦ {c.example}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+      <div style={{ textAlign:"center", marginTop:28 }}>
+        <span style={{ ...MT, fontSize:12, letterSpacing:2 }}>{flipped.size} / {CONCEPTS.length} 확인</span>
+        <div style={{ display:"flex", justifyContent:"center", gap:5, marginTop:10, flexWrap:"wrap" }}>
+          {CONCEPTS.map((c,i)=><div key={i} style={{ width:6, height:6, borderRadius:"50%", background:flipped.has(c.id)?C.gold:C.line, transition:"background 0.3s" }} />)}
+        </div>
+      </div>
+    </div>
+  );
+
+  case 3: case 4: case 5: {
+    const pIdx=page-3, p=PASSAGES[pIdx], layer=pLayers[pIdx];
+    return (
+      <div style={W}>
+        <StageBadge />
+        <span style={SL}>문법 {pIdx+2}/5 · 핵심 논점 {pIdx+1}/3</span>
+        <h2 style={BT}>{p.title}</h2>
+        <div style={DIV} />
+        <div style={{ background:"#0d1a0d", border:`1px solid #1e3a1e`, padding:"18px 22px", marginBottom:28 }}>
+          <p style={{ fontSize:11, color:"#4a8a4a", letterSpacing:3, marginBottom:8 }}>책에서 찾아보기</p>
+          <p style={{ ...BD, fontSize:13, margin:0, color:"#8abb8a", lineHeight:1.85 }}>{p.note}</p>
+        </div>
+        <p style={{ ...MT, fontSize:12, marginBottom:16, letterSpacing:1 }}>아래 탭을 순서대로 눌러 이해의 층을 쌓아보세요</p>
+        <div style={{ display:"flex" }}>
+          {p.layers.map((l,i)=>(
+            <button key={i} onClick={()=>setPLayers(prev=>{const n=[...prev];n[pIdx]=i;return n;})}
+              style={{ flex:1, padding:"12px 8px", background:layer===i?C.surfUp:C.surf, border:"none", borderBottom:`2px solid ${layer===i?C.gold:C.line}`, color:layer===i?C.gold:C.muted, fontFamily:F.b, fontSize:12, letterSpacing:2, cursor:"pointer", transition:"all 0.2s" }}>
+              {l.label}
+            </button>
+          ))}
+        </div>
+        <div style={{ background:C.surfUp, padding:"28px 26px", minHeight:148, borderTop:`1px solid ${C.line}`, marginBottom:32 }}>
+          <p style={{ ...BD, margin:0, lineHeight:2.1, whiteSpace:"pre-line" }}>{p.layers[layer].text}</p>
+        </div>
+        {pIdx<2 && (
+          <div style={{ display:"flex", justifyContent:"center" }}>
+            <button onClick={next} style={{ background:"transparent", border:`1px solid ${C.line}`, color:C.muted, fontFamily:F.b, fontSize:12, letterSpacing:3, padding:"10px 28px", cursor:"pointer" }}>
+              다음 논점으로 →
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  case 6: return (
+    <div style={W}>
+      <StageBadge />
+      <span style={SL}>문법 5/5 · 이해 확인</span>
+      <h2 style={BT}>이해 확인 퀴즈</h2>
+      <div style={DIV} />
+      <p style={{ ...MT, marginBottom:40, fontSize:14 }}>정답을 선택하고 '확인'을 누르면 해설이 나옵니다.</p>
+      {QUIZ.map((q,qi)=>(
+        <div key={qi} style={{ marginBottom:40 }}>
+          <div style={{ display:"flex", gap:14, marginBottom:16, alignItems:"flex-start" }}>
+            <span style={{ fontFamily:F.h, fontSize:26, color:C.gold, lineHeight:1, minWidth:32 }}>Q{qi+1}</span>
+            <p style={{ ...BD, fontWeight:400, lineHeight:1.75, margin:0 }}>{q.q}</p>
+          </div>
+          {q.opts.map((opt,oi)=>{
+            const sel=qSel[qi]===oi, done=qDone[qi], correct=oi===q.ans;
+            let bg=C.surf, border=C.line, color=C.txt;
+            if(done){ if(correct){bg="#0d1a0d";border="#2a5a2a";color="#8acd8a";}else if(sel){bg="#1a0d0d";border="#5a2a2a";color="#cd8a8a";}else{color=C.muted;} }
+            else if(sel){ bg=C.surfUp; border=C.gold+"88"; }
+            return (
+              <div key={oi} onClick={()=>{if(!done){const n=[...qSel];n[qi]=oi;setQSel(n);}}}
+                style={{ background:bg, border:`1px solid ${border}`, padding:"13px 18px", marginBottom:8, cursor:done?"default":"pointer", display:"flex", gap:14, alignItems:"flex-start", transition:"all 0.2s" }}>
+                <span style={{ fontFamily:F.h, fontSize:16, color:done&&correct?"#3a7a3a":(done&&sel?"#7a3a3a":C.muted), minWidth:20, lineHeight:1.6 }}>{String.fromCharCode(65+oi)}</span>
+                <span style={{ ...BD, fontSize:14, color, margin:0, lineHeight:1.7 }}>{opt}</span>
+                {done&&correct&&<span style={{ marginLeft:"auto", color:"#3a7a3a", fontSize:16, flexShrink:0 }}>✓</span>}
+              </div>
+            );
+          })}
+          {!qDone[qi]&&qSel[qi]!==null&&(
+            <button onClick={()=>{const n=[...qDone];n[qi]=true;setQDone(n);}}
+              style={{ marginTop:8, padding:"10px 28px", background:"transparent", border:`1px solid ${C.gold}`, color:C.gold, fontFamily:F.b, fontSize:12, letterSpacing:3, cursor:"pointer" }}>
+              확인
+            </button>
+          )}
+          {qDone[qi]&&(
+            <div style={{ background:"#0a150a", border:`1px solid #1a301a`, padding:"16px 20px", marginTop:12 }}>
+              <p style={{ fontSize:11, color:"#4a8a4a", letterSpacing:3, marginBottom:8 }}>해설</p>
+              <p style={{ ...BD, fontSize:13, color:"#90bb90", margin:0, lineHeight:1.85 }}>{q.exp}</p>
+            </div>
+          )}
+        </div>
+      ))}
+      <div style={{ textAlign:"center", padding:"16px 0", borderTop:`1px solid ${C.line}` }}>
+        <span style={{ ...MT, fontSize:12, letterSpacing:2 }}>{qDone.filter(Boolean).length} / {QUIZ.length} 완료</span>
+      </div>
+    </div>
+  );
+
+  case 7: return (
+    <div style={W}>
+      <StageBadge />
+      <span style={SL}>논리 1/2 · 핵심 질문</span>
+      <h2 style={BT}>우리 자신의 생존은 신체 어느 부위에 달려있지 않다</h2>
+      <div style={DIV} />
+      <div style={{ background:"#0a1218", border:`1px solid ${STAGES.logic.color}33`, padding:"18px 22px", marginBottom:28 }}>
+        <p style={{ fontSize:11, color:STAGES.logic.color, letterSpacing:3, marginBottom:10 }}>6장의 핵심 질문</p>
+        <p style={{ fontFamily:F.h, fontSize:17, fontStyle:"italic", color:C.txt, margin:0, lineHeight:1.9 }}>
+          "우리 자신의 생존이 신체 어떤 부위의 생존 여부에 좌우되지 않는다는 것을—우리는 어떻게 받아들일 것인가?"
+        </p>
+      </div>
+      <p style={{ ...MT, marginBottom:28, fontSize:13, lineHeight:1.9 }}>이 질문에 이르는 커즈와일의 논증을 단계별로 따라가보세요.</p>
+      {ARG_STEPS.slice(0,argStep+1).map((step,i)=>(
+        <div key={i} style={{ marginBottom:14, opacity:i===argStep?1:0.5, transition:"opacity 0.3s" }}>
+          <div style={{ display:"flex", alignItems:"stretch" }}>
+            <div style={{ width:4, background:step.color, flexShrink:0 }} />
+            <div style={{ background:i===argStep?C.surfUp:C.surf, padding:"20px 24px", flex:1 }}>
+              <div style={{ display:"flex", gap:12, alignItems:"center", marginBottom:10 }}>
+                <span style={{ fontFamily:F.b, fontSize:10, letterSpacing:4, color:step.color }}>{step.num}</span>
+                <span style={{ fontFamily:F.h, fontSize:18, color:i===argStep?C.txt:C.muted }}>{step.title}</span>
+              </div>
+              <p style={{ ...BD, fontSize:14, lineHeight:1.95, marginBottom:12, whiteSpace:"pre-line" }}>{step.body}</p>
+              <div style={{ padding:"10px 14px", background:C.bg, borderLeft:`2px solid ${step.color}44` }}>
+                <p style={{ ...MT, fontSize:12, margin:0, color:step.color }}>✦ {step.key}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      ))}
+      <div style={{ display:"flex", gap:14, marginTop:24, alignItems:"center" }}>
+        {argStep<ARG_STEPS.length-1 ? (
+          <button onClick={()=>setArgStep(s=>s+1)}
+            onMouseEnter={e=>{e.currentTarget.style.background=ARG_STEPS[argStep+1].color;e.currentTarget.style.color=C.bg;}}
+            onMouseLeave={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.color=ARG_STEPS[argStep+1].color;}}
+            style={{ padding:"12px 28px", background:"transparent", border:`1px solid ${ARG_STEPS[argStep+1].color}`, color:ARG_STEPS[argStep+1].color, fontFamily:F.b, fontSize:12, letterSpacing:3, cursor:"pointer", transition:"all 0.3s" }}>
+            다음 →
+          </button>
+        ) : (
+          <span style={{ ...MT, fontSize:12, letterSpacing:2, color:C.gold }}>논증 완료</span>
+        )}
+        {argStep>0 && <button onClick={()=>setArgStep(0)} style={{ background:"transparent", border:"none", color:C.muted, fontFamily:F.b, fontSize:11, letterSpacing:2, cursor:"pointer" }}>처음부터</button>}
+        <span style={{ marginLeft:"auto", ...MT, fontSize:11 }}>{argStep+1} / {ARG_STEPS.length}</span>
+      </div>
+    </div>
+  );
+
+  case 8: return (
+    <div style={W}>
+      <StageBadge />
+      <span style={SL}>논리 2/2 · 철학적 비교</span>
+      <h2 style={BT}>수명 연장은 인류에게 좋은가—세 가지 답</h2>
+      <div style={DIV} />
+      <p style={{ ...MT, marginBottom:24, fontSize:14 }}>세 입장을 눌러 비교해보세요.</p>
+      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:8, marginBottom:36 }}>
+        {POSITIONS.map((pos,i)=>{
+          const open=posOpen===i;
+          return (
+            <div key={i} onClick={()=>setPosOpen(open?null:i)}
+              style={{ background:open?C.surfUp:C.surf, border:`1px solid ${open?pos.color+"88":C.line}`, padding:"16px 14px", cursor:"pointer", transition:"all 0.25s" }}>
+              <p style={{ fontFamily:F.h, fontSize:15, color:open?pos.color:C.muted, margin:"0 0 4px", textAlign:"center", lineHeight:1.3 }}>{pos.label}</p>
+              <p style={{ fontSize:10, color:C.muted, fontStyle:"italic", margin:0, textAlign:"center" }}>{pos.sub}</p>
+              {open && (
+                <div style={{ marginTop:14 }}>
+                  <div style={{ marginBottom:10, paddingBottom:10, borderBottom:`1px solid ${C.line}` }}>
+                    <p style={{ fontSize:10, color:pos.color, letterSpacing:3, marginBottom:6 }}>주장</p>
+                    <p style={{ ...BD, fontSize:12, margin:0, lineHeight:1.75 }}>{pos.claim}</p>
+                  </div>
+                  <div style={{ marginBottom:10 }}>
+                    <p style={{ fontSize:10, color:"#8a6a4a", letterSpacing:3, marginBottom:6 }}>반론·응답</p>
+                    <p style={{ ...BD, fontSize:12, margin:0, lineHeight:1.75, color:"#c4a880" }}>{pos.problem}</p>
+                  </div>
+                  <div style={{ padding:"8px 12px", background:C.surf, borderLeft:`2px solid ${pos.color}44` }}>
+                    <p style={{ fontSize:11, color:pos.color, margin:0, whiteSpace:"pre-line" }}>{pos.quote}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+      <div style={{ background:C.surf, padding:"20px 24px" }}>
+        <p style={{ fontFamily:F.b, fontSize:11, color:STAGES.logic.color, letterSpacing:4, marginBottom:14 }}>핵심 쟁점</p>
+        <p style={{ ...BD, fontSize:14, lineHeight:1.9, margin:0 }}>
+          세 입장이 공유하는 것: <strong style={{color:C.txt}}>수명 연장 기술이 발전하고 있다.</strong> 갈라지는 것: <strong style={{color:C.txt}}>얼마나 빠르게, 누구에게, 그리고 이것이 인간 조건을 어떻게 바꾸는가.</strong> 커즈와일이 던지는 핵심 질문—우리 자신의 생존이 신체 어느 부위에 달려있지 않다는 것을 받아들일 수 있는가—은 세 입장 모두가 답해야 하는 질문이다.
+        </p>
+      </div>
+    </div>
+  );
+
+  case 9: return (
+    <div style={W}>
+      <StageBadge />
+      <span style={SL}>수사 · 세미나 준비</span>
+      <h2 style={BT}>나는 어디까지 교체돼도 나인가</h2>
+      <div style={DIV} />
+      <div style={{ background:"#1a0f0f", border:`1px solid ${STAGES.rhetoric.color}33`, padding:"20px 24px", marginBottom:36 }}>
+        <p style={{ fontFamily:F.b, fontSize:11, color:STAGES.rhetoric.color, letterSpacing:4, marginBottom:10 }}>수사 단계의 핵심 질문</p>
+        <p style={{ ...BD, fontSize:14, margin:0, lineHeight:1.9 }}>
+          문법으로 텍스트를 읽고, 논리로 논증을 분석했습니다. 수사는 그것을 <strong style={{color:C.txt}}>함께 말하는 단계</strong>입니다. 6장의 수사가 향하는 핵심—<strong style={{color:C.txt}}>우리 자신의 생존이 신체 어떤 부위의 생존 여부에 좌우되지 않는다는 것을, 나는 어떻게 받아들이는가?</strong>
+        </p>
+      </div>
+      <p style={{ fontFamily:F.b, fontSize:11, color:STAGES.rhetoric.color, letterSpacing:4, marginBottom:20 }}>세미나 토론 질문</p>
+      {SEMINAR_QS.map((item,i)=>{
+        const open=seminHints.has(i);
+        return (
+          <div key={i} style={{ marginBottom:20, background:C.surf, padding:"22px 26px", borderLeft:`3px solid ${STAGES.rhetoric.color}${i%2===0?"cc":"44"}` }}>
+            <div style={{ display:"flex", gap:16, alignItems:"flex-start", marginBottom:12 }}>
+              <span style={{ fontFamily:F.h, fontSize:28, color:STAGES.rhetoric.color, lineHeight:1, minWidth:34 }}>S{i+1}</span>
+              <p style={{ ...BD, fontWeight:400, lineHeight:1.8, margin:0, flex:1 }}>{item.q}</p>
+            </div>
+            <div style={{ paddingLeft:50 }}>
+              <button onClick={()=>{const n=new Set(seminHints);if(n.has(i))n.delete(i);else n.add(i);setSeminHints(n);}}
+                style={{ background:"transparent", border:"none", color:C.muted, fontFamily:F.b, fontSize:11, letterSpacing:3, cursor:"pointer", padding:0 }}>
+                {open?"힌트 접기 ↑":"힌트 보기 ↓"}
+              </button>
+              {open && (
+                <div style={{ marginTop:10, padding:"12px 16px", background:C.surfUp, borderLeft:`2px solid ${STAGES.rhetoric.color}33` }}>
+                  <p style={{ ...MT, fontSize:13, fontStyle:"italic", margin:0, lineHeight:1.8 }}>💡 {item.hint}</p>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+
+  case 10: return (
+    <div style={{ minHeight:"100vh", display:"flex", flexDirection:"column", justifyContent:"center", alignItems:"center", textAlign:"center", padding:"48px 28px", background:C.bg, position:"relative" }}>
+      <div style={{ position:"absolute", top:0, left:0, right:0, height:1, background:`linear-gradient(90deg,transparent,${C.gold}44,transparent)` }} />
+      <span style={{ fontFamily:F.b, fontSize:11, letterSpacing:6, color:C.muted, marginBottom:48, display:"block" }}>디퍼 언브랜딩살롱 · 마침내 특이점이 시작된다</span>
+      <div style={{ width:1, height:64, background:`linear-gradient(${C.gold}88,transparent)`, margin:"0 auto 44px" }} />
+      <div style={{ background:C.surf, padding:"36px 40px", maxWidth:640, textAlign:"left", borderLeft:`3px solid ${C.gold}`, marginBottom:52 }}>
+        <p style={{ fontSize:11, color:C.gold, letterSpacing:4, marginBottom:20 }}>오늘의 마지막 문장 · Ray Kurzweil · 제6장 · 향후 30년의 건강과 안녕</p>
+        <p style={{ fontFamily:F.h, fontSize:"clamp(14px,2vw,17px)", fontStyle:"italic", color:C.txt, lineHeight:2.3, margin:0 }}>
+          "이 미래는 기본적인 기하급수적 증가 추세에 달려있기 때문에 설령 우리 자신의 디지털화가 얼마나 쉽게 일어날 것인가에 대한 가정이 크게 변하더라도, 그 단계에 이르는 시점에는 큰 변화가 없을 것이다."
+        </p>
+        <p style={{ ...MT, fontSize:12, marginTop:20, marginBottom:0, letterSpacing:2 }}>— 『마침내 특이점이 시작된다』 제6장 향후 30년의 건강과 안녕</p>
+      </div>
+      <div style={{ display:"flex", gap:32, marginBottom:52, justifyContent:"center" }}>
+        {[["문법","Grammar","#c4a35a"],["논리","Logic","#5a9abc"],["수사","Rhetoric","#bc7a7a"]].map(([l,e,col])=>(
+          <div key={l} style={{ textAlign:"center" }}>
+            <div style={{ width:5, height:5, borderRadius:"50%", background:col, margin:"0 auto 8px" }} />
+            <p style={{ fontFamily:F.b, fontSize:11, color:col, letterSpacing:3, marginBottom:5 }}>{l}</p>
+            <p style={{ fontFamily:F.h, fontSize:13, color:C.muted, margin:0, fontStyle:"italic" }}>{e}</p>
+          </div>
+        ))}
+      </div>
+      <button onClick={()=>go(0)} style={{ background:"transparent", border:`1px solid ${C.line}`, color:C.muted, fontFamily:F.b, fontSize:11, letterSpacing:4, padding:"12px 32px", cursor:"pointer" }}>처음으로</button>
+    </div>
+  );
+
+  default: return null;
+  }};
+
+  const navVisible = page>0 && page<10;
+  return (
+    <div style={{ background:C.bg, minHeight:"100vh" }}>
+      {navVisible && (
+        <div style={{ position:"fixed", top:0, left:0, right:0, height:2, background:C.line, zIndex:100 }}>
+          <div style={{ height:"100%", width:`${((page-1)/8)*100}%`, background:stage?stage.color:C.gold, transition:"width 0.4s ease, background 0.4s ease" }} />
+        </div>
+      )}
+      <div style={{ opacity:fading?0:1, transition:"opacity 0.28s ease", paddingTop:navVisible?2:0 }}>
+        {renderPage()}
+      </div>
+      {navVisible && (
+        <div style={{ maxWidth:720, margin:"0 auto", padding:"0 28px 52px", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+          <button onClick={prev} style={{ background:"transparent", border:"none", color:C.muted, fontFamily:F.b, fontSize:12, letterSpacing:3, cursor:"pointer", padding:"12px 0" }}>← 이전</button>
+          <div style={{ display:"flex", gap:4, alignItems:"center", flexWrap:"wrap", justifyContent:"center", maxWidth:160 }}>
+            {Array.from({length:9},(_,i)=>{
+              const ps=PAGE_STAGE[i+2], col=ps?STAGES[ps].color:C.gold, active=i===page-2, done=i<page-2;
+              return <div key={i} style={{ width:active?8:5, height:active?8:5, borderRadius:"50%", background:done||active?col:C.line, transition:"all 0.3s" }} />;
+            })}
+          </div>
+          {page<9 ? (
+            <button onClick={next} style={{ background:"transparent", border:"none", color:stage?stage.color:C.gold, fontFamily:F.b, fontSize:12, letterSpacing:3, cursor:"pointer", padding:"12px 0" }}>다음 →</button>
+          ) : (
+            <button onClick={next}
+              onMouseEnter={e=>{e.currentTarget.style.background=STAGES.rhetoric.color;e.currentTarget.style.color=C.bg;}}
+              onMouseLeave={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.color=STAGES.rhetoric.color;}}
+              style={{ background:"transparent", border:`1px solid ${STAGES.rhetoric.color}`, color:STAGES.rhetoric.color, fontFamily:F.b, fontSize:11, letterSpacing:3, padding:"10px 24px", cursor:"pointer", transition:"all 0.3s" }}>
+              마무리
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
