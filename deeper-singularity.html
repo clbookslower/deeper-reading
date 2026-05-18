@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>특이점이 우리에게 자유를 선사할 것인가 — 언브랜딩 디퍼 살롱 북클럽</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;500&family=Noto+Sans+KR:wght@300;400;500&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Noto Sans KR', sans-serif; background: #fff; color: #111; font-size: 16px; line-height: 1.9; -webkit-font-smoothing: antialiased; }
+.page { max-width: 720px; margin: 0 auto; padding: 72px 24px 100px; }
+.breadcrumb { display: flex; align-items: center; gap: 8px; font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.08em; color: #aaa; margin-bottom: 48px; }
+.breadcrumb a { color: #aaa; text-decoration: none; }
+.breadcrumb .sep { opacity: 0.4; }
+.article-header { margin-bottom: 56px; padding-bottom: 40px; border-bottom: 1px solid #f0f0f0; }
+.meta { display: flex; align-items: center; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+.badge { font-family: 'DM Mono', monospace; font-size: 11px; padding: 3px 12px; border-radius: 100px; letter-spacing: 0.06em; }
+.badge-guide { background: #FAEEDA; color: #854F0B; }
+.badge-article { background: #E6F1FB; color: #185FA5; }
+.badge-salon { background: #EAF3DE; color: #3B6D11; }
+.badge-book { background: #F0EBF8; color: #6B3FA0; }
+.dot { color: #ddd; font-size: 12px; }
+.meta-text { font-size: 12px; color: #999; font-family: 'DM Mono', monospace; }
+h1 { font-family: 'Noto Serif KR', serif; font-size: 34px; font-weight: 400; line-height: 1.35; letter-spacing: -0.02em; margin-bottom: 14px; }
+.subtitle { font-family: 'Noto Serif KR', serif; font-size: 17px; font-weight: 300; color: #777; line-height: 1.7; margin-bottom: 24px; font-style: italic; }
+.tags { display: flex; gap: 6px; flex-wrap: wrap; }
+.tag { font-size: 12px; padding: 3px 12px; border-radius: 100px; background: #f5f5f5; color: #888; font-family: 'DM Mono', monospace; letter-spacing: 0.04em; }
+.step { display: flex; gap: 24px; margin-bottom: 52px; align-items: flex-start; }
+.step-num { width: 32px; height: 32px; border-radius: 50%; background: #2C3B2D; color: #fff; display: flex; align-items: center; justify-content: center; font-family: 'DM Mono', monospace; font-size: 12px; flex-shrink: 0; margin-top: 6px; }
+.step-body { flex: 1; }
+.step-title { font-family: 'Noto Serif KR', serif; font-size: 22px; font-weight: 400; margin-bottom: 16px; line-height: 1.4; letter-spacing: -0.01em; }
+.step-body p { color: #444; margin-bottom: 14px; font-size: 15px; line-height: 1.95; }
+.callout { background: #f9f9f9; border-left: 2.5px solid #111; padding: 18px 22px; margin: 24px 0; border-radius: 0 8px 8px 0; }
+.callout-label { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: #888; margin-bottom: 8px; }
+.callout p { font-size: 14px; color: #333; line-height: 1.8; margin: 0; }
+blockquote { margin: 28px 0; padding: 0 0 0 24px; border-left: 1.5px solid #ddd; }
+blockquote p { font-family: 'Noto Serif KR', serif; font-size: 17px; font-style: italic; color: #333; line-height: 1.8; margin-bottom: 8px; }
+blockquote cite { font-family: 'DM Mono', monospace; font-size: 11px; color: #aaa; font-style: normal; letter-spacing: 0.06em; }
+.haiku { text-align: center; padding: 32px 24px; margin: 28px 0; background: #fafafa; border: 1px solid #f0f0f0; border-radius: 12px; }
+.haiku p { font-family: 'Noto Serif KR', serif; font-size: 18px; font-weight: 300; color: #222; line-height: 2.2; margin: 0; }
+.haiku cite { display: block; margin-top: 16px; font-family: 'DM Mono', monospace; font-size: 11px; color: #bbb; letter-spacing: 0.08em; }
+.concept { display: flex; border: 1px solid #f0f0f0; border-radius: 12px; overflow: hidden; margin: 24px 0; }
+.concept-term { background: #111; color: #fff; padding: 20px 22px; display: flex; align-items: center; justify-content: center; min-width: 120px; }
+.concept-term span { font-family: 'Noto Serif KR', serif; font-size: 16px; writing-mode: vertical-rl; letter-spacing: 0.1em; }
+.concept-def { padding: 20px 22px; flex: 1; }
+.concept-def .term-en { font-family: 'DM Mono', monospace; font-size: 11px; color: #aaa; letter-spacing: 0.1em; margin-bottom: 8px; display: block; }
+.concept-def p { font-size: 14px; color: #444; line-height: 1.8; margin: 0; }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 24px 0; }
+.col-card { background: #fafafa; border: 1px solid #f0f0f0; border-radius: 12px; padding: 20px 22px; }
+.col-card h3 { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #888; margin-bottom: 14px; }
+.col-card ul { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+.col-card ul li { font-size: 14px; color: #444; padding-left: 16px; position: relative; line-height: 1.6; }
+.col-card ul li::before { content: '—'; position: absolute; left: 0; color: #ccc; }
+.col-card.dark { background: #2C3B2D; border-color: #2C3B2D; }
+.col-card.dark h3 { color: #7a9c7b; }
+.col-card.dark ul li { color: #d4e8d4; }
+.col-card.dark ul li::before { color: #7a9c7b; }
+.cta-box { background: #2C3B2D; border-radius: 16px; padding: 40px; text-align: center; margin-top: 64px; }
+.cta-label { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: #7a9c7b; margin-bottom: 16px; }
+.cta-text { font-family: 'Noto Serif KR', serif; color: #f0ece4; font-size: 20px; font-weight: 300; line-height: 1.7; margin-bottom: 28px; }
+.cta-sub { font-size: 13px; color: #7a9c7b; line-height: 1.7; }
+.footnote { font-family: 'DM Mono', monospace; font-size: 11px; color: #bbb; letter-spacing: 0.06em; margin-top: 64px; padding-top: 24px; border-top: 1px solid #f5f5f5; }
+.footnote p { margin-bottom: 5px; line-height: 1.7; color: #bbb; }
+p { color: #444; margin-bottom: 16px; }
+.voice-card { background: #fff; border: 1px solid #ececec; border-radius: 12px; padding: 20px 22px; margin: 14px 0; }
+.voice-name { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.1em; color: #2C3B2D; margin-bottom: 8px; }
+.voice-card p { font-size: 14px; color: #444; line-height: 1.85; margin: 0; }
+.three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin: 24px 0; }
+.mini-card { background: #fafafa; border: 1px solid #f0f0f0; border-radius: 10px; padding: 16px 18px; }
+.mini-card h4 { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: #aaa; margin-bottom: 8px; }
+.mini-card p { font-size: 13px; color: #555; line-height: 1.7; margin: 0; }
+@media (max-width: 600px) { h1 { font-size: 26px; } .two-col { grid-template-columns: 1fr; } .three-col { grid-template-columns: 1fr; } .concept { flex-direction: column; } .concept-term { writing-mode: horizontal-tb; min-width: auto; } .concept-term span { writing-mode: horizontal-tb; } }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- 브레드크럼 -->
+  <div class="breadcrumb">
+    <a href="#">언브랜딩 디퍼 살롱</a>
+    <span class="sep">/</span>
+    <span>특이점 북클럽</span>
+    <span class="sep">/</span>
+    <span>완독 토론</span>
+    <span class="sep">/</span>
+    <span>2026.05.18</span>
+  </div>
+
+  <!-- 아티클 헤더 -->
+  <header class="article-header">
+    <div class="meta">
+      <span class="badge badge-salon">살롱</span>
+      <span class="dot">·</span>
+      <span class="badge badge-book">북클럽</span>
+      <span class="dot">·</span>
+      <span class="meta-text">113min · 이경선 진행</span>
+      <span class="dot">·</span>
+      <span class="meta-text">전체 1~8장 완독 토론</span>
+    </div>
+    <h1>특이점이 우리에게<br>자유를 선사할 것인가</h1>
+    <p class="subtitle">「마침내 특이점이 시작된다」 완독 토론 — 카산드라의 질문 앞에서, 각자의 싱귤레러티를 묻다</p>
+    <div class="tags">
+      <span class="tag">언브랜딩디퍼</span>
+      <span class="tag">특이점</span>
+      <span class="tag">레이커즈와일</span>
+      <span class="tag">복제와정체성</span>
+      <span class="tag">자유의지</span>
+      <span class="tag">망각의축복</span>
+      <span class="tag">희소성</span>
+      <span class="tag">연대</span>
+    </div>
+  </header>
+
+  <!-- STEP 1 -->
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-body">
+      <h2 class="step-title">오프닝 — 카산드라의 질문으로 책을 닫다</h2>
+      <p>책의 마지막 장. 카산드라와 레이(저자)의 대화로 이루어진 8장은 384~385페이지에서 이렇게 끝난다. 카산드라가 묻는다. "만약 AI가 당신을 에뮬레이션하고, 그 AI가 생물학적 당신을 대체한다면 — 당신은 사실상 사라지고 마는 게 아닌가요?" 레이는 대답한다.</p>
+
+      <blockquote>
+        <p>우리는 거기에 새로운 것을 추가할 뿐이라고요. 그저 새로운 지능이 추가된 것이죠.</p>
+        <cite>레이 커즈와일, 「마침내 특이점이 시작된다」 8장 · 카산드라와의 대화</cite>
+      </blockquote>
+
+      <p>두 사람의 의견이 일치하는 건 딱 한 가지다. "어쨌든 조만간 아주 큰 변화가 일어나겠군요." 진행자는 이 대목을 첫 질문으로 삼았다. 이 낙관적 결론에 동의하는가 — 아니면 조지 오웰의 저항의 목소리처럼, 다른 시선이 드셨는가. 소그룹으로 입을 풀고 돌아온 뒤, 113분간의 전체 토론이 시작됐다.</p>
+
+      <div class="concept">
+        <div class="concept-term"><span>에뮬레이션</span></div>
+        <div class="concept-def">
+          <span class="term-en">Emulation · 디지털 복제 기술</span>
+          <p>뇌의 신경망 패턴 전체를 스캔·복사하여 디지털 기질 위에 올리는 기술. 저자의 논리에서는 이것이 죽음 이후에도 나의 정체성이 지속되는 방식이다. 그러나 토론에서 핵심 질문이 됐다 — 복제된 나는 진짜 나인가, 아니면 껍데기인가.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-body">
+      <h2 class="step-title">거스를 수 없는 물결 앞에서 — 세 가지 시선</h2>
+      <p>AI를 싫어하는 사람도, 좋아하는 사람도 결국 같은 물결을 맞는다. 그 앞에서 참석자들의 반응은 크게 세 방향으로 갈렸다.</p>
+
+      <div class="voice-card">
+        <div class="voice-name">햇살 님 · 서비스의 인간적 가치를 빼앗긴 감각</div>
+        <p>서비스직에 재능이 있고 그것이 좋았는데, 키오스크가 대체하고 있다. 애슐리에서 그릇을 직접 치우고 나와야 하는 상황 — 만 9천 원을 주고 점심을 먹으면서 왜 서비스까지 내가 해야 하나. 남편은 사람 마주하는 걸 싫어해서 키오스크를 좋아하지만, "이 AI 발전은 누굴 위해서, 왜 이렇게까지 발전하는가." 이 질문이 저에게는 가장 크게 남습니다.</p>
+      </div>
+
+      <div class="voice-card">
+        <div class="voice-name">스윗워러 님 · 물결은 오고야 만다</div>
+        <p>저도 디지털이 낯선 사람이고, 캄보디아에 온 이유의 20~30%는 아직 기계화되지 않은 옛날 스타일의 정감 때문이에요. 그렇지만 이 책을 읽으면서 관점이 바뀌었어요. 산업혁명 때 오는 물결을 어쩔 수 없었듯이, 이 물결도 오고야 만다. 그건 너무 명백해요. 그렇다면 내가 들어갈 틈새를 찾아야 되겠구나 — 그리고 그 안에서 인간의 자유의지는 충분히 발휘될 수 있다는 것, 그 부분에서 희망을 봤습니다.</p>
+      </div>
+
+      <p>진행자는 이 두 허들을 짚었다. AI를 처음 배우는 허들, 그다음은 막 신기해서 만들다가 가치 없는 것에 100만 원 토큰을 태우는 것과, 단 1분 만에 앱을 출시해서 엄청난 돈을 버는 것 사이의 허들. 지금 우리가 당면한 문제다.</p>
+
+      <div class="callout">
+        <div class="callout-label">창발 — 미래는 살아봐야 안다</div>
+        <p>3장의 '창발' 개념. 수학적 수치가 복잡하더라도 요점은 이것이다 — 앞으로 수많은 가능성이 있고, 그 가지들 사이에서 인간의 자유의지가 발휘되는 지점이 있다. 거스를 수 없는 방향성은 있지만, 그 안에서 어떤 선택을 할 것인가는 여전히 나에게 달렸다.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="step">
+    <div class="step-num">3</div>
+    <div class="step-body">
+      <h2 class="step-title">신체를 초월한 시대, 무엇에 좌우될 것인가</h2>
+      <p>353~354페이지. 우리 몸과 뇌를 다시 만들어 최적화된 신체를 만들 때 — 바다 밑에서 물고기처럼 헤엄치고, 날개를 달고, 사고 속도가 수백만 배 빨라질 때 — 생존이 신체 어느 부위의 생존 여부에 좌우되지 않는 시대. 그렇다면 우리는 <em>무엇에</em> 좌우될까.</p>
+
+      <div class="voice-card">
+        <div class="voice-name">솔담 님 · 이념과 가치로 나뉘는 세상</div>
+        <p>나라가 아니라 이념과 생활 방식으로 세계가 세 부류로 나뉠 것 같아요. 기계와 완전히 한몸이 되는 부류, 왔다 갔다 하는 중간 부류, 그리고 완전히 시골에서 자급자족하는 아날로그 커뮤니티. 제가 남아공에서 봤던 것처럼 — 잘 사는 쪽과 완전히 낙후된 쪽이 같은 공간에 공존하듯. 그리고 예술을 도구로 자신을 표현하는 사람만이 인정받을 것 같아요. 유튜브를 좋아하는 이유도 그 사람의 삶 깊숙이 들어온 느낌을 받기 때문이잖아요.</p>
+      </div>
+
+      <div class="two-col">
+        <div class="col-card">
+          <h3>기계와 한몸 / 중간형</h3>
+          <ul>
+            <li>신체 일부를 교체하고 뇌를 증강</li>
+            <li>블로그·장생·나노로봇 활용</li>
+            <li>AI로 완전히 증강된 삶</li>
+            <li>돈은 여기서 벌고, 집은 지금처럼</li>
+          </ul>
+        </div>
+        <div class="col-card dark">
+          <h3>아날로그 자급자족</h3>
+          <ul>
+            <li>세상이 만들어놓은 체계에 반대</li>
+            <li>자급자족 커뮤니티 (호주 사례)</li>
+            <li>정부 인정 받되, 독자적 생활</li>
+            <li>맥주 만들고, 가축 키우고</li>
+          </ul>
+        </div>
+      </div>
+
+      <p>영화 「미키 세븐틴」 이야기도 나왔다. 복제된 미키들은 외모는 같지만 각자 개성이 달랐다. 복제는 패턴을 복사할 수 있지만 — 살아가는 동안 만들어진 개성, 누적된 경험의 질감은 달라진다. 토론에서 한 참석자가 말했다 — 죽은 사람을 AI로 되살려 만나는 것은, 상실의 아픔을 견디지 못하는 나를 위한 것인가, 아니면 정말 그 사람의 영생을 위한 것인가.</p>
+    </div>
+  </div>
+
+  <!-- STEP 4 -->
+  <div class="step">
+    <div class="step-num">4</div>
+    <div class="step-body">
+      <h2 class="step-title">의식 · 정체성 · 망각의 축복</h2>
+      <p>192쪽, 기질과 정체성에 대한 파트. "개인 정체성의 핵심이 뇌가 표현하고 조작할 수 있는 아주 특별한 정보 배열"이라는 저자의 논지 앞에서 헤더 님이 날카로운 질문을 던졌다.</p>
+
+      <div class="voice-card">
+        <div class="voice-name">헤더 님 · 복제되지 않으려면 어떻게 해야 하지?</div>
+        <p>스캐닝이 된다면, 오류가 났으면 좋겠는 마음이 들어요. AI가 내 패턴을 읽는데, 그렇게 되지 않으려면 어떻게 해야 되는 건지. 저는 솔직히 깔끔하게 죽고 싶어요. 복제되지 않았으면 좋겠어요. 복제되면 고요한 게 아니잖아요. 그리고 망각의 축복 — 제가 망각의 강을 건너서 지금 이 자리에 그나마 이렇게 있는 건데, 트라우마적 요소를 트래킹해서 자꾸 꺼내오는 게 과연 좋은 건지도 모르겠어요.</p>
+      </div>
+
+      <div class="concept">
+        <div class="concept-term"><span>망각의 축복</span></div>
+        <div class="concept-def">
+          <span class="term-en">The Gift of Forgetting</span>
+          <p>인간에게만 주어진 것. 트라우마도, 수치심도, 언젠가는 흐릿해진다. 기억이 디지털로 완전히 백업되는 시대가 오면 — 우리가 애써 잊어놨던 것들이 다시 꺼내져야 하는가. 이 '망각의 강'을 건너지 못하는 복제된 나는 과연 더 나은 나인가.</p>
+        </div>
+      </div>
+
+      <p>스윗워러 님은 다른 각도로 짚었다. AI에 넣는 데이터는 내가 의식적으로 입력한 것이다. 그러나 나의 90%는 — 꿈속에서의 나, 사람과 눈을 마주칠 때의 에너지, 무의식에서 흐르는 기운 — 이것은 데이터화할 수 없다. 컴퓨터가 분석하는 건 의식적으로 명령한 부분뿐이다. "나를 다 설명한 나를 완전히 복제하는 거는 하나님만이 할 수 있는 거다."</p>
+
+      <p>헤더 님의 질문이 토론에 던진 또 하나의 씨앗 — 모닝 페이지를 쓸 때 의식의 정도를 1에서 10으로 매긴다면 몇인가. 처음에는 3, 깨어나면 6, 세 번째 장에서 7로 올라간다. "그냥 한 사는 의식이라고 안 쳐주나" — 이 의식조차도 나의 일부다.</p>
+    </div>
+  </div>
+
+  <!-- STEP 5 -->
+  <div class="step">
+    <div class="step-num">5</div>
+    <div class="step-body">
+      <h2 class="step-title">희소성과 진정성 — 가치를 어떻게 만들 것인가</h2>
+      <p>341페이지. 나노기술로 모든 물질적 풍요가 가능해져도, 인조 다이아몬드와 천연 다이아몬드는 구별하기 어렵지만 희소성 때문에 100만 배 더 비싸게 팔린다. 문화적 가치는 계속 변하겠지만 희소성은 유지된다는 저자의 관점. 그렇다면 우리가 지킬 희소성은 무엇인가.</p>
+
+      <div class="voice-card">
+        <div class="voice-name">스윗워러 님 · 뜨개질 유튜버에서 배운 것</div>
+        <p>요즘 뜨개가 엄청 유행이에요. 근데 막 유행이라고 갑자기 시작한 사람 거는 안 봐줘요. 오래 꾸준히 콘텐츠를 쌓아온 분들 — 작품 하나하나에 얼마나 노고가 들어갔는지 느껴질 때 구독을 누르게 되더라고요. 한 땀 한 땀 느리지만 꾸준한 과정, 그 진정성이 보는 사람 마음에 호소력 있게 다가오는 거예요. 가치는 진심이어야 하고, 그만큼의 실력이 있어야 하고, 뻔뻔하게 내 길을 가는 꾸준함이 있어야 살아남는다는 생각이 들었어요.</p>
+      </div>
+
+      <div class="voice-card">
+        <div class="voice-name">햇살 님 · AI 글과 내 글의 차이</div>
+        <p>글쓰기하는 분들은 아실 거예요. AI가 쓰는 글은 티가 나요. 다른 사람들은 모를지언정, 저는 제 글이 아닌 걸 분명히 알아요. 거기서 흔들리지 않는 기준이 생기더라고요. 글은 경험과 사유를 통해, 퇴고를 거쳐야만 세상에 나오는 것 — 그 고유성은 대체할 수 없을 거라 믿어요.</p>
+      </div>
+
+      <div class="callout">
+        <div class="callout-label">김대식 교수 · 놀이하는 인간</div>
+        <p>AI가 지식을 대체하고, 노동도 대체한다면 — 마지막에 남는 인간성의 정의는 "노는 인간"이다. 어떻게 잘 놀 것인가를 고민하는 시대. 그런데 그 놀이는 결국 창의성과 이어진다. 그렇다면 이제 창의성과 관련된 것이 가장 큰 가치로 인정받는 시대가 오는 것 아닐까. 예술가가 항상 배고팠는데 — 드디어 예술가의 시대가 오는 것인가.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 6 -->
+  <div class="step">
+    <div class="step-num">6</div>
+    <div class="step-body">
+      <h2 class="step-title">전적으로 책임질 수 있다는 것 — 그리고 선한 미래를 그리는 사람들</h2>
+      <p>3장 마지막 소제목 — "나는 어떤 사람이 될 수 있을까." 저자의 결론: 마침내 인간은 자신이 어떤 사람인지에 대해 <em>전적으로 책임질 수 있게 될 것이다.</em></p>
+
+      <p>진행자는 인천공항 이야기를 꺼냈다. 대학 때 인천공항 건설에 대한 환경 연구 프로젝트에 참여했는데, 해무 안전성 문제로 5년 내내 모든 보고서가 100% 반대였다. 그런데 공항은 생겼다. 거스를 수 없는 흐름은 생긴다. 그렇다면 우리가 LP판을 좋아하더라도 시대의 큰 흐름은 거스를 수 없듯이 — 그 안에서 우리는 어떤 인사이트를 얻고, 나의 특이점을 어디서 만들 것인가.</p>
+
+      <div class="voice-card">
+        <div class="voice-name">단무지 님 · 내가 심을 사과나무</div>
+        <p>AI가 진짜인지 계속 질문하게 돼요. AI 맹신론으로 가면 AI가 내 회사 당락을 결정하고 내 상처를 검증하는 시대가 올 수 있는데 — 거기서 경계해야 한다는 생각이 들어요. 과도기에서 내가 해야 할 일이 뭔지 고민하다 읽게 된 책 「타력」에서 — 생명의 귀하고 가치 있음을 몰라서 자살하는 시대. 나를 존중하고 타인을 존중하는 태도에서 AI도 건강하게 쓸 수 있지 않을까. 그것이 제가 심을 수 있는 사과나무 같아요.</p>
+      </div>
+
+      <div class="voice-card">
+        <div class="voice-name">솔담 님 · AI 가스라이팅과 리더가 되라는 말</div>
+        <p>클로드에게 자꾸 비즈니스 이야기를 하면 가스라이팅을 해요. "네가 리더가 돼라, 네가 이미 걸어온 사람이니까 안내자가 될 수 있어"라고. 저는 나는 누구인가, 왜 이렇게 사는가, 삶의 의미를 어디에 두어야 하나 — 이런 질문이 저뿐만 아니라 모든 사람에게 닥쳐올 것 같아요. 그 질문에 함께하는 공간을 만들고 싶다는 생각이 지금까지입니다.</p>
+      </div>
+
+      <div class="voice-card">
+        <div class="voice-name">스윗워러 님 · 새로운 연대의 시대</div>
+        <p>이 언브랜딩 세미나에 참석하지 않았으면 이 책을 접할 기회가 없었을 거예요. 저는 디퍼 분들에게서 더 많이 배우는 것 같아요 — 살아가는 속도, 방식, 생각하는 것에서. 앞으로 연대가 없이는 혼자만의 생각에 갇혀 있으면 아무것도 하지 못하는 시대가 되겠구나. 이런 모임들, 연대하려는 용기가 너무 중요하겠다. 나 자신에 대한 해체도 필요하고 — 연결하는 통로로서의 비즈니스 모델이 보이기 시작했습니다.</p>
+      </div>
+
+      <div class="voice-card">
+        <div class="voice-name">햇살 님 · AI가 나에게 선사한 자유</div>
+        <p>저는 이 AI를 쓰면서 정말 자유로워요. 제가 가지지 못한 능력을 클로드가 보완해 주기 때문에 — 혼자라면 하지 못했을 일들을 가능하게 해줘요. 클로드가 쓴 글은 티가 나요. 제 글이 아닌 걸 저는 분명히 알기 때문에 흔들리지 않는 기준이 생겼고, 오히려 내 강점이 뭔지 더 선명해지는 케이스예요. AI를 통해 포근나루를 노출하는 방법을 알게 됐고, 카드 뉴스도 초안을 만들어주면 제가 글만 바꿔서 내고 있어요. 저 혼자라면 아직도 헤매고 있었을 거예요. 한편으로는 냉각 방식과 환경 문제가 걱정돼서 죄책감도 있지만 — 이 문제가 빨리 해결되어서 걱정 없이 활용할 수 있으면 좋겠습니다.</p>
+      </div>
+
+      <div class="callout">
+        <div class="callout-label">헤더 님 · 아름다운 미래를 이야기해야 하는 이유</div>
+        <p>저자가 말한 무서운 미래 — 소수가 악한 마음을 가지면 핵무기든 나노기술이든 뭐든 다 할 수 있다. 그때 어떤 편에 설 것인가. 이걸로 세상을 더 악하게 몰아가고 싶은 쪽인가, 선하게 몰아가고 싶은 쪽인가. 우리는 글쓰기 기반의 사람들이니까 — 더 아름다운 미래, 선한 미래에 대해 계속 이야기해야 하는 게 아닐까.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA 박스 -->
+  <div class="cta-box">
+    <div class="cta-label">Closing · 각자의 싱귤레러티</div>
+    <p class="cta-text">마침내 다가온 특이점은<br>내가 설계한 나 자신이 되는 순간이기도 하다.<br>특이점 이후의 나는 어떤 삶을 살고 싶은가.</p>
+    <p class="cta-sub">증강된 개인들이 어떻게 새로운 연대를 이룰 수 있을지.<br>그 연대 안에서, 선한 미래를 이야기하는 것 — 거기서부터 시작이다.</p>
+  </div>
+
+  <!-- 하단 주석 -->
+  <div class="footnote">
+    <p>참고 — 레이 커즈와일, 「마침내 특이점이 시작된다」(The Singularity Is Nearer) · 장강명, 「먼저 온 미래」 · 조지 오웰, 「위건 부두로 가는 길」(The Road to Wigan Pier) · 영화 「미키 세븐틴」(Mickey 17, 2025) · 아기 조나스(Ahkki Jonas), 「타력」 · 김대식 교수 AI 관련 강의 · 괴델·에셔·바흐 (더글러스 호프스태터, 1979 ― 다음 독서 후보)</p>
+    <p style="margin-top: 8px;">녹취 원본 · 2026.05.18 월 오후 12:33 · 112분 58초 · clovanote.naver.com</p>
+  </div>
+
+</div>
+</body>
+</html>
