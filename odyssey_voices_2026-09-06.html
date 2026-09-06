@@ -67,6 +67,19 @@ blockquote cite { font-family: 'DM Mono', monospace; font-size: 11px; color: #aa
 .footnote { font-family: 'DM Mono', monospace; font-size: 11px; color: #bbb; letter-spacing: 0.06em; margin-top: 64px; padding-top: 24px; border-top: 1px solid #f5f5f5; }
 p { color: #444; margin-bottom: 16px; }
 @media (max-width: 600px) { h1 { font-size: 26px; } .two-col { grid-template-columns: 1fr; } .concept { flex-direction: column; } .concept-term { writing-mode: horizontal-tb; min-width: auto; } .concept-term span { writing-mode: horizontal-tb; } }
+
+/* 본문(호메로스) 인용 — 초록 결 */
+.step-body p.verse { font-family: 'Noto Serif KR', serif; color: #24382A; background: #F6F9F4; border-left: 2.5px solid #A9C29E; padding: 18px 22px; margin: 22px 0; border-radius: 0 8px 8px 0; font-size: 15.5px; line-height: 2.0; }
+.step-body p.verse .src { display: block; margin-top: 10px; font-family: 'DM Mono', monospace; font-size: 11px; color: #8CA684; letter-spacing: 0.06em; font-style: normal; }
+/* 그 밤에 던져진 물음 — 골드 결 */
+.step-body p.ask { font-family: 'Noto Serif KR', serif; color: #8A6A28; font-size: 17px; line-height: 1.9; margin: 22px 0; padding-left: 20px; border-left: 2.5px solid #C9A96A; }
+/* 소그룹에서 나눈 물음 */
+.groups { background: #FBFAF7; border: 1px solid #EFEBE2; border-radius: 12px; padding: 24px 26px; margin: 28px 0; }
+.groups .gl { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: #A08A5E; margin-bottom: 16px; }
+.groups ol { list-style: none; counter-reset: g; display: flex; flex-direction: column; gap: 16px; }
+.groups ol li { counter-increment: g; position: relative; padding-left: 28px; font-family: 'Noto Serif KR', serif; font-size: 15.5px; color: #3A3630; line-height: 1.9; }
+.groups ol li::before { content: counter(g); position: absolute; left: 0; top: 2px; font-family: 'DM Mono', monospace; font-size: 11px; color: #C9A96A; }
+.groups ol li .gs { display: block; margin-top: 6px; font-family: 'Noto Sans KR', sans-serif; font-size: 13px; color: #8A8478; line-height: 1.75; }
 </style>
 </head>
 <body>
@@ -117,12 +130,23 @@ p { color: #444; margin-bottom: 16px; }
     </div>
   </div>
 
+  <div class="groups">
+    <div class="gl">그날 소그룹에서 나눈 물음 둘</div>
+    <ol>
+      <li>이 두 권에는 이야기 속에 이야기가 박혀 있다. 그 가운데 어떤 이야기가 가장 마음에 끌렸는가.
+        <span class="gs">초코칩 쿠키의 초코처럼 이야기가 박혀 있다는 말과 함께 열린 첫 나눔이었다.</span></li>
+      <li>요즘 나에게 흰 돛을 달고 떠나야겠다는 마음이 들게 하는 일, 용기를 불어넣는 일이 있는가.
+        <span class="gs">2권 끝에서 배가 떠나는 대목을 읽은 뒤에 물었다.</span></li>
+    </ol>
+  </div>
+
   <!-- 2 -->
   <div class="step">
     <div class="step-num">2</div>
     <div class="step-body">
       <h2 class="step-title">신들을 탓하곤 하지</h2>
-      <p>1권 32행부터 34행, 제우스가 입을 연다. 인간들은 걸핏하면 신들을 탓하곤 하지. 재앙이 우리에게서 비롯된다고 하지만, 그들은 그들 자신의 못된 짓으로 정해진 몫 이상의 고통을 당하는 것이오.</p>
+      <p>1권 32행에서 34행, 제우스가 입을 연다.</p>
+      <p class="verse">인간들은 걸핏하면 신들을 탓하곤 하지. 재앙이 우리에게서 비롯된다고 하지만, 그들은 그들 자신의 못된 짓으로 정해진 몫 이상의 고통을 당하는 것이오.<span class="src">제1권 32~34행</span></p>
       <p>저자가 하고 싶은 말이 서른 행 만에 나온다. 고통에 대한 이야기를 열면서 여는 것이다.</p>
       <div class="concept">
         <div class="concept-term"><span>무도함</span></div>
@@ -131,7 +155,8 @@ p { color: #444; margin-bottom: 16px; }
           <p>천병희 판의 「못된 짓」을 김현 판은 「무도함」으로 옮겼다. 신이 정한 몫을 넘어서는 인간 쪽의 어리석음을 가리키는 말이다. 1권 7행에서 오뒷세우스의 전우들이 그것으로 파멸했다고 나온다. 32행에서 제우스가 같은 말을 다시 한다.</p>
         </div>
       </div>
-      <p>이 대목에서 물음이 하나 자랐다. 못된 짓이라는 게 결국 삶의 발목을 잡는 것이라면, 오뒷세우스는 거기서 어떻게 자유로워지는가.</p>
+      <p>이 대목에서 물음이 하나 자랐다.</p>
+      <p class="ask">못된 짓이라는 게 결국 삶의 발목을 잡는 것이라면, 오뒷세우스는 거기서 어떻게 자유로워지는가.</p>
       <p>운명과 의지 이야기도 나왔다. 아무리 애써도 안 되는 일이 있다고. 힘을 빼고 있는데도 그냥 살아지는 때가 있다고. 아테나가 텔레마코스 곁에 서듯 각자의 삶에도 누가 한 번씩 툭툭 건드려 주는 것은 아닐까 하는 말이었다.</p>
       <blockquote>
         <p>영웅의 일대기를 강조한 게 아니라 그 이면을 보게 한 것 같아요. 스무 해의 마지막 시점에서 과거를 부르잖아요. 지금 여기에서 선택해야 하는 상황을 딱 보여 주니까, 위인전이 아니라 내 얘기로 가져오는 힘이 생기는 것 같아요.</p>
@@ -160,7 +185,7 @@ p { color: #444; margin-bottom: 16px; }
           <p>신의 모습을 한, 신을 닮은. 아테나가 찾아오는 그 순간부터 텔레마코스는 「신과 같은 텔레마코스」다. 신을 한 번 만나면 그다음이 달라진다. 회의장에서 연설을 잘하니 사람들이 신에게 배웠나 보다고 한다.</p>
         </div>
       </div>
-      <p>제목은 오뒷세이아인데 앞의 네 권을 왜 아들에게 내주었을까.</p>
+      <p class="ask">제목은 오뒷세이아인데, 앞의 네 권을 왜 아들에게 내주었을까.</p>
       <blockquote>
         <p>아직 신과 같은, 이라는 말이 안에 들어 있는 게 아닐까 싶었어요. 한 사람은 이미 인간으로서 죄도 짓고 한계도 겪어 보고, 신의 제한에서 벗어나 버린 사람이 오뒷세우스고요. 아직 텔레마코스는 신과 같은이니까, 아직 때묻지 않은, 신이 정해 놓은 길에서 아직 벗어나지 않은 인물이지 않았을까.</p>
         <cite>— 디퍼님 · 1권 나눔</cite>
@@ -171,7 +196,8 @@ p { color: #444; margin-bottom: 16px; }
         <cite>— 디퍼님 · 1권 나눔</cite>
       </blockquote>
       <p>자유의지 쪽에서 읽은 분도 있었다. 2권 305행의 「그대가 스스로 알아서 하되」라는 구절이 이번에는 눈에 들어왔다고. 스스로 하는 것은 신과 같은 것이 아닌데, 그러면 재앙을 부르는 그 자유의지도 신이 준 것 아니냐는 말이었다.</p>
-      <p>아버지의 부재가 아들에게 무엇을 만들어 주었는가. 1권 117행에서 텔레마코스는 마음속으로 훌륭한 아버지를 그린다. 한 번도 본 적 없는 사람을.</p>
+      <p class="ask">아버지의 부재가 아들에게 무엇을 만들어 주었는가.</p>
+      <p>1권 117행에서 텔레마코스는 마음속으로 훌륭한 아버지를 그린다. 한 번도 본 적 없는 사람을.</p>
     </div>
   </div>
 
@@ -180,9 +206,10 @@ p { color: #444; margin-bottom: 16px; }
     <div class="step-num">4</div>
     <div class="step-body">
       <h2 class="step-title">이름도 묻기 전에</h2>
-      <p>1권 123행에서 124행. 어서 오시오 나그네여, 이곳 우리 곁에서 그대는 환대받을 것이오. 우선 식사부터 하고 그대 용건을 말하시오.</p>
+      <p class="verse">어서 오시오 나그네여, 이곳 우리 곁에서 그대는 환대받을 것이오. 우선 식사부터 하고 그대 용건을 말하시오.<span class="src">제1권 123~124행</span></p>
       <p>이름을 묻지 않는다. 먼저 대접하고 그다음에 누구인지 묻는다. 신이 사람의 모습으로 오기 때문이다. 지금 문 앞에 선 이가 사람인지 변장한 신인지 알 수 없으니, 일단 다 잘해 주자는 세계다.</p>
-      <p>그런 세계에서 벌어지는 이야기가 우리에게 무엇인가. 그 물음은 던져진 채로 남았다.</p>
+      <p class="ask">이름을 묻기 전에 먼저 대접하는 세계란 어떤 세계인가. 거기서 벌어지는 이야기는 우리에게 무엇인가.</p>
+      <p>그 물음은 던져진 채로 남았다.</p>
       <p>그리스 사람들이 마음을 어디에 두었는지에 대한 이야기가 이어졌다.</p>
       <blockquote>
         <p>김현 교수님은 마음을 다 횡격막으로 옮겨요. 횡격막이 엄청 많이 나와요. 서문에 길게 쓰셨는데, 호메로스 당시 사람들은 횡격막에 영혼이 들어갔다 나온다고 여겼기 때문에 그걸 살리고 싶었다고 하시더라고요.</p>
@@ -197,13 +224,14 @@ p { color: #444; margin-bottom: 16px; }
     <div class="step-num">5</div>
     <div class="step-body">
       <h2 class="step-title">텔레마코스의 모습을 하고</h2>
-      <p>2권 382행. 빛나는 눈의 여신 아테나가 또 다른 일을 생각해 낸다. 텔레마코스의 모습을 하고 온 시내를 돌아다니며, 남자들을 만날 때마다 곁에 다가서서 말을 걸고 저녁에 배 옆으로 모이라고 이른다.</p>
+      <p class="verse">그때 빛나는 눈의 여신 아테나가 또 다른 일을 생각해 냈다. 텔레마코스의 모습을 하고 온 시내를 돌아다니며, 남자들을 만날 때마다 그 옆으로 다가서서 말을 걸고, 저녁이 되면 날랜 배 옆으로 모이라고 일렀다.<span class="src">제2권 382행 이하</span></p>
       <p>앞에서는 텔레마코스가 신과 같았다. 여기서는 신이 텔레마코스의 모습을 한다. 사람들 눈에는 그냥 텔레마코스다. 아무도 구별하지 못한다.</p>
       <blockquote>
         <p>우리도 뭔가 일을 하고 나서 돌아보면 이걸 내가 다 한 건가 싶을 때가 있잖아요. 그때 나는 왜 그런 생각을 했지, 하고 되짚어 보면 다 내가 한 것 같지가 않아요. 내가 한 것 이상으로 뭔가를 많이 받았다 싶을 때 감사가 생기더라고요.</p>
         <cite>— 디퍼님 · 2권 나눔</cite>
       </blockquote>
-      <p>떠나면서 어머니에게 알리지 않는 대목도 함께 놓였다. 유모에게는 맹세를 시키고 어머니에게는 말하지 않는다. 왜 떠남에 비밀이 필요한가. 이것이 아버지를 찾는 여정인가 자신을 찾는 여정인가.</p>
+      <p>떠나면서 어머니에게 알리지 않는 대목도 함께 놓였다. 유모에게는 맹세를 시키고 어머니에게는 말하지 않는다.</p>
+      <p class="ask">왜 떠남에 비밀이 필요한가. 이것은 아버지를 찾는 길인가, 자신을 찾는 길인가.</p>
       <p>처음에는 아버지를 찾는 길이었는데 그 길에서 자신을 찾게 된다. 두 길이 함께 가는 것 아니겠느냐는 말로 그 대목이 닫혔다.</p>
       <div class="concept">
         <div class="concept-term"><span>아무도 아닌 자</span></div>
@@ -212,7 +240,8 @@ p { color: #444; margin-bottom: 16px; }
           <p>이름이 지워진 자리를 부르는 말. 텔레마코스가 떠나기 전에는 아무도 오뒷세우스를 기억하지 못했다. 아킬레우스가 싸우다 죽는 쪽을 택한 것은 이름이 명예롭게 회자되기 때문인데, 오뒷세우스는 잘 싸우고도 잊혔다. 기억에서 지워지는 두 번째 죽음이다. 첫 낱말이 그냥 「한 남자」인 까닭이 여기 있다.</p>
         </div>
       </div>
-      <p>2권 끝, 돛대를 세우고 흰 돛을 달아 올린다. 돛은 가슴에 바람을 잔뜩 안았고, 배가 나아갈 때 용골 주위에서 검푸른 파도가 소리를 냈다. 밤새도록, 그리고 새벽에도 배는 목적지를 향해 나아갔다.</p>
+      <p>2권은 이렇게 닫힌다.</p>
+      <p class="verse">돛대를 세워 밀어 넣고 밧줄로 묶은 다음, 소가죽 끈으로 흰 돛을 달아 올렸다. 그러자 돛은 가슴에 바람을 잔뜩 안았고, 배가 나아갈 때 용골 주위에서는 검푸른 파도가 요란한 소리를 냈다. 밤새도록, 그리고 새벽에도 배는 목적지를 향해 나아갔다.<span class="src">제2권 424행 이하</span></p>
       <div class="callout">
         <div class="callout-label">그 밤이 남긴 자리</div>
         <p>페넬로페 이야기는 꺼내지도 못한 채 열 시 반이 되었다. 수의를 세 해 동안 짜고 풀었던 사람의 자리는 다음으로 넘어갔다.</p>
