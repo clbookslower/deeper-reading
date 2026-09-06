@@ -71,16 +71,9 @@ h2 .en { font-family: 'Cormorant Garamond', 'Times New Roman', serif; font-style
 .gk { font-family: 'EB Garamond', 'Cormorant Garamond', 'Times New Roman', serif; font-style: italic; font-weight: 500; font-size: 1.06em; color: #B5731A; letter-spacing: .02em; padding: 0 1px; }
 .note .en { font-family: 'Cormorant Garamond', 'Times New Roman', serif; font-style: italic; font-size: 16px; color: #B5731A; }
 .fig { margin: 8px 0 26px; }
+    .fig.chart { max-width: 560px; }
 .fig svg { display: block; width: 100%; max-width: 420px; height: auto; margin: 0 auto; }
 .fig figcaption { margin-top: 10px; text-align: center; }
-.tbl-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 6px 0 12px; border: 1px solid #E6E8E2; border-radius: 10px; background: #fff; }
-.tbl { border-collapse: collapse; min-width: 640px; width: 100%; font-size: 13.5px; line-height: 1.5; }
-.tbl th, .tbl td { padding: 10px 12px; text-align: left; vertical-align: top; border-bottom: 1px solid #E6E8E2; white-space: nowrap; }
-.tbl th { font-weight: 500; color: #1A4A35; background: #F0F3EE; font-size: 12.5px; }
-.tbl th .th-sub { display: block; font-weight: 300; font-size: 11px; color: #8A948D; letter-spacing: .02em; }
-.tbl td b { font-weight: 500; color: #1F2A24; }
-.tbl td.n { font-family: 'DM Mono', monospace; color: #1A4A35; }
-.tbl tbody tr:last-child td { border-bottom: 0; }
 footer .sig { font-family: 'Noto Serif KR', serif; color: #1A4A35; font-size: 14px; margin-bottom: 8px; }
 @media (max-width: 560px) {
   .hero { padding: 36px 20px 44px; }
@@ -108,7 +101,7 @@ footer .sig { font-family: 'Noto Serif KR', serif; color: #1A4A35; font-size: 14
 
 <main>
   <div class="wrap">
-    <p class="lead">토요일 아침, 칩을 만드는 사람의 이야기를 폅니다. 그는 십 년 동안 아무도 사지 않는 것을 만들었습니다. 스스로 '없는 시장'이라 불렀습니다. 주주들은 그만두라고 했고요. 그 십 년이 왜 필요했는지 — 그것이 토론하는 토요일 아침의 물음입니다.</p>
+    <p class="lead">토요일 아침, 칩을 만드는 사람의 이야기를 폅니다. 그는 십 년 동안 아무도 사지 않는 것을 만들었습니다. 스스로 '없는 시장'이라 불렀습니다. 주주들은 그만두라고 했습니다. 그 십 년이 왜 필요했는지 — 그것이 토론하는 토요일 아침의 물음입니다.</p>
 
     <h2>기계는 어떻게 생각하는가 <span class="en">Machine</span></h2>
     <div class="rule"></div>
@@ -200,36 +193,54 @@ footer .sig { font-family: 'Noto Serif KR', serif; color: #1A4A35; font-size: 14
     <p>모델 하나를 한 번 불러 끝나는 일은 드뭅니다. 사막여우가 볼트를 읽고, 파일을 만들고, 다시 읽는 동안 모델은 여러 번 불립니다. 여기서 두 말이 갈립니다. 순서를 사람이 미리 정해 두고 모델이 그 길을 따라가면 <b>워크플로우</b>, 다음에 무엇을 할지 모델이 스스로 정하고 도구를 고르면 <b>에이전트</b>. 2024년 12월 앤트로픽이 이 둘을 그렇게 갈라 적었습니다.</p>
     <p>에이전트에게 무엇을 읽히느냐가 일의 절반입니다. 창 하나에 담을 수 있는 분량에는 끝이 있고, 많이 넣을수록 앞의 것을 흐리게 기억합니다. 필요한 문서만 그때그때 찾아 넣어 주는 방법을 RAG <span class="en">retrieval-augmented generation</span>, 문서 사이의 관계를 그물로 엮어 두고 그 그물을 따라 찾는 방법을 그래프 RAG, 무엇을 넣고 무엇을 뺄지 통째로 설계하는 일을 컨텍스트 엔지니어링이라 부릅니다. 이름은 셋이지만 묻는 것은 하나입니다. 기계가 지금 무엇을 보고 있는가.</p>
 
+    <h3>책에서 만나는 낱말</h3>
+    <ul class="kinds">
+      <li><span class="tag">GPU</span>화면을 그리려고 만든 칩입니다. 작은 계산기 수천 개가 한꺼번에 돕니다. 병렬 처리·쿠다·알렉스넷·「0억 달러 시장」은 문법 계단에서 다시 만납니다.</li>
+      <li><span class="tag">신경망</span>숫자를 층층이 쌓아 두고, 틀릴 때마다 조금씩 고쳐 맞히게 하는 방식입니다. 위에서 본 학습이 그 고치기이고, 트랜스포머도 신경망의 한 모양입니다.</li>
+      <li><span class="tag">AI 팩토리</span>젠슨 황이 데이터센터를 부르는 이름입니다. 데이터를 넣으면 답(토큰)이 나오는 공장으로 보자는 말입니다.</li>
+      <li><span class="tag">하이퍼스케일</span>아마존·마이크로소프트·구글처럼 데이터센터를 도시 크기로 짓고 굴리는 일, 그런 회사들을 하이퍼스케일러라 부릅니다.</li>
+      <li><span class="tag">파운드리</span>남이 그린 칩을 대신 찍어 주는 공장입니다. 이 회사는 칩을 설계만 하고 만들지는 않습니다. 대만 TSMC가 찍고, 논리 계단의 「대만 한곳」이 그 공장입니다.</li>
+    </ul>
+
     <h3>지금의 지형 — 2026년 9월 7일</h3>
-    <p>이름을 몇 개 적어 둡니다. 이 표는 반드시 낡습니다. 그것을 알고 싣습니다. 채점표 셋이 1등을 서로 다르게 꼽는데, 그 어긋남까지가 지금의 지형입니다.</p>
-    <div class="tbl-wrap">
-      <table class="tbl">
-        <thead>
-          <tr>
-            <th>모델 · 회사</th>
-            <th>공개</th>
-            <th>가중치</th>
-            <th>AA 지능지수<span class="th-sub">독립 · 0~100</span></th>
-            <th>Arena<span class="th-sub">독립 · 사람 투표</span></th>
-            <th>Epoch ECI<span class="th-sub">독립 · 지수</span></th>
-            <th>제조사가 내세운 숫자<span class="th-sub">자체 발표</span></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr><td><b>Claude Fable 5.1</b><br>앤트로픽</td><td>9/1</td><td>비공개</td><td class="n">57</td><td class="n">1504</td><td class="n">163</td><td>Terminal-Bench 4.0 · 55.8%</td></tr>
-          <tr><td><b>GPT-6 Astra</b><br>오픈AI</td><td>9/3</td><td>비공개</td><td class="n">55</td><td class="n">—</td><td class="n">169</td><td>Terminal-Bench 4.0 「최고」 · 수치 미공개</td></tr>
-          <tr><td><b>Claude Opus 5</b><br>앤트로픽</td><td>7/24</td><td>비공개</td><td class="n">54</td><td class="n">1493</td><td class="n">—</td><td>Terminal-Bench 4.0 · 52.3%</td></tr>
-          <tr><td><b>Muse Spark 1.3</b><br>메타</td><td>9월</td><td>비공개</td><td class="n">53</td><td class="n">—</td><td class="n">—</td><td>Terminal-Bench 2.1 · 88.8</td></tr>
-          <tr><td><b>Gemini 3.8 Flash</b><br>구글</td><td>9/2</td><td>비공개</td><td class="n">47</td><td class="n">1494</td><td class="n">—</td><td>HLE-Verified · 54.9%</td></tr>
-          <tr><td><b>Qwen3.8</b><br>알리바바</td><td>8월</td><td>공개</td><td class="n">47</td><td class="n">—</td><td class="n">—</td><td>Terminal-Bench 2.1 · 86.6</td></tr>
-          <tr><td><b>DeepSeek V4 Pro</b><br>딥시크</td><td>8/13판</td><td>공개(MIT)</td><td class="n">42</td><td class="n">—</td><td class="n">—</td><td>Terminal-Bench 2.1 · 87.9</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <p class="note">2026년 9월 7일 확인. 「—」는 그 채점표에 그 모델이 아직 오르지 않았거나 20위 안에 없다는 표시입니다. <b>같은 모델도 얼마나 오래 생각하게 하느냐에 따라 점수가 달라집니다.</b> 표의 숫자는 저마다 가장 세게 돌렸을 때의 값입니다. 설정을 낮추면 열 점 가까이 내려갑니다. 앞에서 본 「생각하는 시간」이 여기서 숫자로 드러납니다. <b>AA 지능지수</b>는 평가사 Artificial Analysis가 열 가지 시험(에이전트 업무·코딩·과학 추론·긴 문서 읽기)을 직접 돌려 평균 낸 점수, v4.2. <b>Arena</b>는 사람이 두 답을 나란히 보고 나은 쪽을 고른 팔백만 표로 매긴 점수(9월 2일자, 체스 레이팅 방식). <b>Epoch ECI</b>는 연구소 Epoch AI가 오십여 개 시험을 이어 붙여 만든 한 눈금(GPT-5를 150으로 둠). 마지막 칸은 회사가 스스로 고른 시험과 스스로 낸 숫자입니다. <b>Terminal-Bench</b>는 명령창에서 코딩 과제를 끝까지 해내는지 보는 시험인데 2.1과 4.0은 문제가 다른 판이라 서로 견줄 수 없습니다. <b>HLE</b>는 여러 학문의 전문가급 문제를 모은 시험입니다. 가중치 「공개」는 모델의 숫자 자체를 내려받아 제 컴퓨터에서 돌릴 수 있다는 뜻입니다.</p>
+    <p>이름을 몇 개 적어 둡니다. 이 그림은 반드시 낡습니다. 그것을 알고 싣습니다.</p>
+    <figure class="fig chart">
+      <svg viewBox="0 0 360 276" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Artificial Analysis 지능지수 v4.2, 2026년 9월 7일 확인: 가로 막대 그래프">
+      <defs><pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="6" height="6" fill="#DCE5DC"/><line x1="0" y1="0" x2="0" y2="6" stroke="#1A4A35" stroke-width="1.6"/></pattern></defs>
+      <style>.cl{font-family:'Noto Sans KR',sans-serif;font-size:12.5px;fill:#1F2A24}.cs{font-family:'Noto Sans KR',sans-serif;font-size:10.5px;fill:#8A948D}.cn{font-family:'DM Mono',monospace;font-size:12px;fill:#1A4A35}.cg{stroke:#E6E8E2;stroke-width:1}</style>
+      <line x1="196.0" y1="12" x2="196.0" y2="236" class="cg"/><text x="196.0" y="250" text-anchor="middle" class="cs">20</text>
+      <line x1="264.0" y1="12" x2="264.0" y2="236" class="cg"/><text x="264.0" y="250" text-anchor="middle" class="cs">40</text>
+      <line x1="332.0" y1="12" x2="332.0" y2="236" class="cg"/><text x="332.0" y="250" text-anchor="middle" class="cs">60</text>
+      <line x1="128" y1="12" x2="128" y2="236" stroke="#B9C7B5" stroke-width="1"/>
+      <text x="118" y="27" text-anchor="end" class="cl">Claude Fable 5.1</text><text x="118" y="40" text-anchor="end" class="cs">앤트로픽 · 9/1</text>
+      <rect x="128" y="18" width="193.8" height="18" rx="3" fill="#1A4A35"/>
+      <text x="327.8" y="31" class="cn">57</text>
+      <text x="118" y="59" text-anchor="end" class="cl">GPT-6 Astra</text><text x="118" y="72" text-anchor="end" class="cs">오픈AI · 9/3</text>
+      <rect x="128" y="50" width="187.0" height="18" rx="3" fill="#1A4A35"/>
+      <text x="321.0" y="63" class="cn">55</text>
+      <text x="118" y="91" text-anchor="end" class="cl">Claude Opus 5</text><text x="118" y="104" text-anchor="end" class="cs">앤트로픽 · 7/24</text>
+      <rect x="128" y="82" width="183.6" height="18" rx="3" fill="#1A4A35"/>
+      <text x="317.6" y="95" class="cn">54</text>
+      <text x="118" y="123" text-anchor="end" class="cl">Muse Spark 1.3</text><text x="118" y="136" text-anchor="end" class="cs">메타 · 9월</text>
+      <rect x="128" y="114" width="180.2" height="18" rx="3" fill="#1A4A35"/>
+      <text x="314.2" y="127" class="cn">53</text>
+      <text x="118" y="155" text-anchor="end" class="cl">Gemini 3.8 Flash</text><text x="118" y="168" text-anchor="end" class="cs">구글 · 9/2</text>
+      <rect x="128" y="146" width="159.8" height="18" rx="3" fill="#1A4A35"/>
+      <text x="293.8" y="159" class="cn">47</text>
+      <text x="118" y="187" text-anchor="end" class="cl">Qwen3.8</text><text x="118" y="200" text-anchor="end" class="cs">알리바바 · 8월</text>
+      <rect x="128" y="178" width="159.8" height="18" rx="3" fill="url(#hatch)"/>
+      <text x="293.8" y="191" class="cn">47</text>
+      <text x="118" y="219" text-anchor="end" class="cl">DeepSeek V4 Pro</text><text x="118" y="232" text-anchor="end" class="cs">딥시크 · 8/13판</text>
+      <rect x="128" y="210" width="142.8" height="18" rx="3" fill="url(#hatch)"/>
+      <text x="276.8" y="223" class="cn">42</text>
+      <rect x="128" y="257" width="14" height="10" rx="2" fill="url(#hatch)"/><text x="148" y="266" class="cs">빗금 = 가중치 공개 모델</text>
+      </svg>
+      <figcaption class="note">Artificial Analysis 지능지수 v4.2 · 2026년 9월 7일 확인 · 0~100</figcaption>
+    </figure>
+    <p class="note">평가사 Artificial Analysis가 열 가지 시험(에이전트 업무·코딩·과학 추론·긴 문서 읽기)을 직접 돌려 평균 낸 점수입니다. <b>같은 모델도 얼마나 오래 생각하게 하느냐에 따라 점수가 달라집니다.</b> 위 숫자는 저마다 가장 세게 돌렸을 때의 값이고, 설정을 낮추면 열 점 가까이 내려갑니다. 앞에서 본 「생각하는 시간」이 여기서 숫자로 드러납니다. 빗금 친 모델은 가중치를 내려받아 제 컴퓨터에서 돌릴 수 있는 공개 모델입니다.</p>
+    <p>채점표는 이것 하나가 아닙니다. 사람이 두 답을 나란히 보고 나은 쪽을 고른 팔백만 표(Arena, 9월 2일자)에서는 앞 판인 Fable 5가 1등이고, 연구소 Epoch AI가 오십여 개 시험을 이어 붙인 눈금에서는 GPT-6 Astra가 1등입니다. 셋이 1등을 서로 다르게 꼽습니다. 그 어긋남까지가 지금의 지형입니다. 회사가 스스로 내놓는 숫자도 있는데 — 앤트로픽은 Terminal-Bench 4.0에서 55.8%, 구글은 HLE-Verified에서 54.9% — 시험이 저마다 달라 한 줄에 놓을 수 없습니다.</p>
 
 
-    <p class="note">트리비움은 중세 학교의 세 갈래 길입니다. 도로시 세이어즈는 1947년 옥스퍼드 강연에서 이 길을 배움의 세 단계로 읽었습니다. 문법 <span class="en">Grammar</span>, 사실을 익히는 단계. 논리 <span class="en">Logic</span>, 따져 묻는 단계. 수사 <span class="en">Rhetoric</span>, 내 말로 꺼내는 단계. 이 책을 그 세 계단으로 정리한 TRIVIUM입니다. 읽기 전에 열어도, 읽은 뒤에 열어도 좋습니다. 앞의 두 계단은 책과 서평·저자 인터뷰에서 확인한 것만 담았습니다. 출처는 맨 아래에 적어 두었습니다.</p>
 
     <h2>문법 <span class="en">Grammar</span> · 이 책을 펴기 전에</h2>
     <div class="rule"></div>
@@ -296,8 +307,8 @@ footer .sig { font-family: 'Noto Serif KR', serif; color: #1A4A35; font-size: 14
   <div class="wrap">
     <p>디퍼 리딩 · 전체 디퍼 함께 · 토요일 아침과 일요일 밤</p>
     <p style="margin-top:14px">함께 읽는 책 · 스티븐 위트, 『엔비디아 젠슨 황, 생각하는 기계』(원제 <span class="en">The Thinking Machine: Jensen Huang, Nvidia, and the World's Most Coveted Microchip</span>, 2025).<br>
-    문법 계단의 사실은 책 소개와 서평·저자 인터뷰에서 확인한 것만 담았습니다 — 2025년 파이낸셜 타임스 올해의 비즈니스 책 선정, 이코노미스트 올해의 책, 존 노튼(가디언)·퍼블리셔스 위클리·뉴욕 타임스 서평, 그리고 「0억 달러 시장」·알렉스넷·쿠다에 관한 공개 기록. <b>확인되지 않은 수치는 싣지 않았습니다.</b><br>
-    「기계는 어떻게 생각하는가」는 2026년 9월 7일에 웹으로 확인한 것만 담았습니다 — 트랜스포머: Vaswani 외, 「Attention Is All You Need」(arXiv 1706.03762, 2017) · 추론 모델: OpenAI o1-preview 공개(2024-09-12, 「Learning to Reason with LLMs」) · 워크플로우/에이전트 구분: Anthropic, 「Building Effective Agents」(2024-12-19) · 컨텍스트 엔지니어링: Anthropic, 「Effective Context Engineering for AI Agents」(2025-09-29) · RAG: Lewis 외(arXiv 2005.11401, 2020) · 그래프 RAG: Edge 외(arXiv 2404.16130, 2024). 표의 독립 점수: Artificial Analysis Intelligence Index v4.2(artificialanalysis.ai, 9/7 확인) · Arena Text Leaderboard(arena.ai, 2026-09-02자, 7,999,020표) · Epoch AI Capabilities Index(epoch.ai, 9/7 확인). 제조사 발표 수치: Anthropic 「Claude Fable and Mythos 5.1」(anthropic.com) · OpenAI 「GPT-6 Astra」 발표문(2026-09-03) · Google 「Introducing Gemini 3.8 Flash」(blog.google, 2026-09-02) · Meta Muse Spark 1.3 모델 페이지(developer.meta.com) · Qwen3.8-2.4T-A95B 및 DeepSeek-V4-Pro-0813 모델 카드(huggingface.co). <b>확인하지 못한 수치는 「—」로 비웠습니다.</b><br>
+    문법·논리 두 계단은 책 소개와 서평·저자 인터뷰에서 확인한 것만 담았습니다 — 2025년 파이낸셜 타임스 올해의 비즈니스 책 선정, 이코노미스트 올해의 책, 존 노튼(가디언)·퍼블리셔스 위클리·뉴욕 타임스 서평, 그리고 「0억 달러 시장」·알렉스넷·쿠다에 관한 공개 기록. <b>확인되지 않은 수치는 싣지 않았습니다.</b><br>
+    「기계는 어떻게 생각하는가」는 2026년 9월 7일에 웹으로 확인한 것만 담았습니다 — 트랜스포머: Vaswani 외, 「Attention Is All You Need」(arXiv 1706.03762, 2017) · 추론 모델: OpenAI o1-preview 공개(2024-09-12, 「Learning to Reason with LLMs」) · 워크플로우/에이전트 구분: Anthropic, 「Building Effective Agents」(2024-12-19) · 컨텍스트 엔지니어링: Anthropic, 「Effective Context Engineering for AI Agents」(2025-09-29) · RAG: Lewis 외(arXiv 2005.11401, 2020) · 그래프 RAG: Edge 외(arXiv 2404.16130, 2024) · AI 팩토리: NVIDIA 용어집 · 파운드리: TSMC 회사 소개. 그래프: Artificial Analysis Intelligence Index v4.2(artificialanalysis.ai, 9/7 확인). 본문의 다른 채점표: Arena Text Leaderboard(arena.ai, 2026-09-02자, 7,999,020표) · Epoch AI Capabilities Index(epoch.ai, 9/7 확인). 제조사 발표 수치: Anthropic 「Claude Fable and Mythos 5.1」(anthropic.com, 2026-09-01) · Google 「Introducing Gemini 3.8 Flash」(blog.google, 2026-09-02). 공개일: 각 사 발표문과 huggingface.co 모델 카드(Qwen3.8-2.4T-A95B · DeepSeek-V4-Pro-0813). <b>확인하지 못한 수치는 싣지 않았습니다.</b><br>
     「함께 읽는 자리의 약속 다섯」은 The Great Books Foundation의 Shared Inquiry&trade;에서 배운 방법입니다. 시카고대학 총장 로버트 허친스와 철학자 모티머 애들러가 1947년 시카고에 세운 비영리 교육재단으로, 고전을 함께 읽고 질문으로 이야기하는 독서 모임을 지금까지 이어 오고 있습니다.</p>
     <p style="margin-top:14px">&copy; 2026 DEEPER. All rights reserved.</p>
   </div>
