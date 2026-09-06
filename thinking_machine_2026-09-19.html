@@ -70,6 +70,17 @@ footer .wrap { border-top: 1px solid #E6E8E2; padding-top: 28px; font-size: 13px
 h2 .en { font-family: 'Cormorant Garamond', 'Times New Roman', serif; font-style: italic; font-weight: 500; font-size: 20px; letter-spacing: .04em; color: #B5731A; margin-left: 4px; }
 .gk { font-family: 'EB Garamond', 'Cormorant Garamond', 'Times New Roman', serif; font-style: italic; font-weight: 500; font-size: 1.06em; color: #B5731A; letter-spacing: .02em; padding: 0 1px; }
 .note .en { font-family: 'Cormorant Garamond', 'Times New Roman', serif; font-style: italic; font-size: 16px; color: #B5731A; }
+.fig { margin: 8px 0 26px; }
+.fig svg { display: block; width: 100%; max-width: 420px; height: auto; margin: 0 auto; }
+.fig figcaption { margin-top: 10px; text-align: center; }
+.tbl-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 6px 0 12px; border: 1px solid #E6E8E2; border-radius: 10px; background: #fff; }
+.tbl { border-collapse: collapse; min-width: 640px; width: 100%; font-size: 13.5px; line-height: 1.5; }
+.tbl th, .tbl td { padding: 10px 12px; text-align: left; vertical-align: top; border-bottom: 1px solid #E6E8E2; white-space: nowrap; }
+.tbl th { font-weight: 500; color: #1A4A35; background: #F0F3EE; font-size: 12.5px; }
+.tbl th .th-sub { display: block; font-weight: 300; font-size: 11px; color: #8A948D; letter-spacing: .02em; }
+.tbl td b { font-weight: 500; color: #1F2A24; }
+.tbl td.n { font-family: 'DM Mono', monospace; color: #1A4A35; }
+.tbl tbody tr:last-child td { border-bottom: 0; }
 footer .sig { font-family: 'Noto Serif KR', serif; color: #1A4A35; font-size: 14px; margin-bottom: 8px; }
 @media (max-width: 560px) {
   .hero { padding: 36px 20px 44px; }
@@ -97,38 +108,156 @@ footer .sig { font-family: 'Noto Serif KR', serif; color: #1A4A35; font-size: 14
 
 <main>
   <div class="wrap">
-    <p class="lead">토요일 아침, 칩을 만드는 사람의 이야기를 폅니다. 그는 십 년 동안 아무도 사지 않는 것을 만들었어요. 스스로 '없는 시장'이라 불렀습니다. 주주들은 그만두라고 했고요. 그 십 년이 왜 필요했는지 — 그것이 토론하는 토요일 아침의 물음입니다.</p>
+    <p class="lead">토요일 아침, 칩을 만드는 사람의 이야기를 폅니다. 그는 십 년 동안 아무도 사지 않는 것을 만들었습니다. 스스로 '없는 시장'이라 불렀습니다. 주주들은 그만두라고 했고요. 그 십 년이 왜 필요했는지 — 그것이 토론하는 토요일 아침의 물음입니다.</p>
+
+    <h2>기계는 어떻게 생각하는가 <span class="en">Machine</span></h2>
+    <div class="rule"></div>
+    <p>책을 펴기 전에 한 장을 더 둡니다. 이 회사가 파는 칩 위에서 무엇이 돌아가는지, 우리가 아침마다 여는 창 뒤에 무엇이 있는지. 뒤에 나올 「병렬」이라는 말이 여기서 먼저 눈에 익습니다.</p>
+
+    <h3>낱말을 숫자로 — 트랜스포머</h3>
+    <p>모델은 글자를 읽지 못합니다. 문장을 먼저 조각으로 자릅니다. 「토큰」이라 부르는 그 조각은 낱말 하나이기도 하고 낱말의 반쪽이기도 합니다. 조각마다 긴 숫자 줄 하나가 붙습니다. 그 숫자 줄을 「임베딩」이라 부릅니다. 뜻이 가까운 조각은 숫자도 가깝습니다.</p>
+    <p>그다음이 이 구조에 이름을 준 대목입니다. 2017년 구글 연구진이 낸 논문 제목이 <b>「어텐션이면 충분하다」</b>였습니다. 문장 안의 조각 하나하나가 다른 모든 조각을 <b>한꺼번에</b> 돌아봅니다. 「그」가 누구인지, 「배」가 과일인지 강 위의 배인지, 앞뒤를 동시에 견주어 정합니다. 그 전까지 기계는 문장을 앞에서부터 한 낱말씩 읽었습니다. 한꺼번에 돌아보니 한꺼번에 계산할 수 있고, 한꺼번에 계산하니 게임 카드가 맞습니다. 문법 계단의 병렬이 여기서 나옵니다.</p>
+    <p>이 층을 수십 번 겹쳐 지나면 마지막에 남는 일은 하나입니다. 다음 조각 하나를 고르는 일. 고른 조각을 문장 끝에 붙입니다. 그러고는 처음부터 다시 돌아봅니다. 답이 화면에 한 글자씩 찍히는 동안 기계는 그 되풀이를 하고 있습니다.</p>
+
+    <figure class="fig">
+      <svg viewBox="0 0 360 600" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="트랜스포머의 흐름: 문장, 토큰, 임베딩, 어텐션, 다음 조각 예측, 그리고 되풀이">
+        <defs>
+          <marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#8A948D"/></marker>
+          <marker id="ahg" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#B5731A"/></marker>
+        </defs>
+        <style>
+          .lb{font-family:'Noto Sans KR',sans-serif;font-size:12px;fill:#6B776F}
+          .tx{font-family:'Noto Sans KR',sans-serif;font-size:13px;fill:#1F2A24}
+          .mn{font-family:'DM Mono',monospace;font-size:10.5px;fill:#1A4A35}
+          .bx{fill:#fff;stroke:#CFD8D0;stroke-width:1}
+          .ar{stroke:#8A948D;stroke-width:1.2;fill:none;marker-end:url(#ah)}
+        </style>
+
+        <!-- 1 문장 -->
+        <text x="20" y="22" class="lb">문장</text>
+        <rect x="20" y="30" width="320" height="36" rx="8" class="bx"/>
+        <text x="180" y="53" text-anchor="middle" class="tx">칩을 만드는 사람의 이야기</text>
+        <line x1="180" y1="66" x2="180" y2="92" class="ar"/>
+
+        <!-- 2 토큰 -->
+        <text x="20" y="112" class="lb">토큰 — 조각으로 자른다</text>
+        <g class="tx">
+          <rect x="20" y="120" width="56" height="34" rx="6" class="bx"/><text x="48" y="142" text-anchor="middle">칩을</text>
+          <rect x="86" y="120" width="60" height="34" rx="6" class="bx"/><text x="116" y="142" text-anchor="middle">만드는</text>
+          <rect x="156" y="120" width="60" height="34" rx="6" class="bx"/><text x="186" y="142" text-anchor="middle">사람의</text>
+          <rect x="226" y="120" width="52" height="34" rx="6" class="bx"/><text x="252" y="142" text-anchor="middle">이야</text>
+          <rect x="288" y="120" width="52" height="34" rx="6" class="bx"/><text x="314" y="142" text-anchor="middle">기</text>
+        </g>
+        <line x1="180" y1="154" x2="180" y2="180" class="ar"/>
+
+        <!-- 3 임베딩 -->
+        <text x="20" y="200" class="lb">임베딩 — 조각마다 숫자 줄 하나</text>
+        <g class="mn">
+          <rect x="20" y="208" width="56" height="44" rx="6" class="bx"/><text x="48" y="226" text-anchor="middle">0.12</text><text x="48" y="242" text-anchor="middle">−0.80 …</text>
+          <rect x="86" y="208" width="60" height="44" rx="6" class="bx"/><text x="116" y="226" text-anchor="middle">0.41</text><text x="116" y="242" text-anchor="middle">0.07 …</text>
+          <rect x="156" y="208" width="60" height="44" rx="6" class="bx"/><text x="186" y="226" text-anchor="middle">−0.33</text><text x="186" y="242" text-anchor="middle">0.95 …</text>
+          <rect x="226" y="208" width="52" height="44" rx="6" class="bx"/><text x="252" y="226" text-anchor="middle">0.58</text><text x="252" y="242" text-anchor="middle">−0.21 …</text>
+          <rect x="288" y="208" width="52" height="44" rx="6" class="bx"/><text x="314" y="226" text-anchor="middle">0.60</text><text x="314" y="242" text-anchor="middle">−0.19 …</text>
+        </g>
+        <line x1="180" y1="252" x2="180" y2="278" class="ar"/>
+
+        <!-- 4 어텐션 -->
+        <text x="20" y="298" class="lb">어텐션 — 모든 조각이 서로를 한꺼번에 돌아본다</text>
+        <rect x="20" y="306" width="320" height="120" rx="10" fill="#F0F3EE" stroke="#CFD8D0"/>
+        <g stroke="#C9A96A" stroke-width="1" opacity=".75">
+          <line x1="48" y1="366" x2="116" y2="366"/><line x1="48" y1="366" x2="186" y2="366"/><line x1="48" y1="366" x2="252" y2="366"/><line x1="48" y1="366" x2="314" y2="366"/>
+          <path d="M48 366 Q116 320 186 366" fill="none"/><path d="M48 366 Q150 300 252 366" fill="none"/><path d="M48 366 Q181 290 314 366" fill="none"/>
+          <path d="M116 366 Q184 320 252 366" fill="none"/><path d="M116 366 Q215 300 314 366" fill="none"/>
+          <path d="M186 366 Q250 320 314 366" fill="none"/>
+          <path d="M116 366 Q151 410 186 366" fill="none"/><path d="M186 366 Q219 410 252 366" fill="none"/><path d="M252 366 Q283 410 314 366" fill="none"/>
+          <path d="M48 366 Q117 420 186 366" fill="none"/><path d="M116 366 Q184 420 252 366" fill="none"/><path d="M186 366 Q250 420 314 366" fill="none"/>
+        </g>
+        <g fill="#1A4A35">
+          <circle cx="48" cy="366" r="6"/><circle cx="116" cy="366" r="6"/><circle cx="186" cy="366" r="6"/><circle cx="252" cy="366" r="6"/><circle cx="314" cy="366" r="6"/>
+        </g>
+        <text x="330" y="418" text-anchor="end" class="lb">× 수십 층</text>
+        <line x1="180" y1="426" x2="180" y2="452" class="ar"/>
+
+        <!-- 5 다음 조각 -->
+        <text x="20" y="472" class="lb">다음 조각 하나를 고른다</text>
+        <rect x="20" y="480" width="320" height="40" rx="8" class="bx"/>
+        <text x="180" y="505" text-anchor="middle" class="tx">칩을 만드는 사람의 이야기 <tspan fill="#B5731A" font-weight="500">를</tspan></text>
+
+        <!-- 6 되풀이 -->
+        <path d="M340 500 L352 500 L352 137 L344 137" fill="none" stroke="#B5731A" stroke-width="1.2" marker-end="url(#ahg)"/>
+        <text x="180" y="560" text-anchor="middle" class="lb">고른 조각을 끝에 붙이고, 처음부터 다시 돌아본다</text>
+      </svg>
+      <figcaption class="note">트랜스포머 한 바퀴. 낱말들을 차례로 읽는 대신 서로의 관계를 한꺼번에 봅니다. 답은 이 바퀴를 한 조각마다 다시 돌아 나옵니다.</figcaption>
+    </figure>
+
+    <h3>배우는 때와 쓰는 때 — 학습과 추론</h3>
+    <p>기계의 시간은 둘로 나뉩니다. 배우는 때와 쓰는 때. 배우는 때를 <b>학습</b>이라 부릅니다. 인터넷의 글을 통째로 읽히며 다음 조각 맞히기를 끝없이 시킵니다. 틀릴 때마다 안의 숫자를 조금씩 고칩니다. 쓰는 때가 <b>추론</b>입니다. 다 만들어진 모델이 질문 하나를 받아 답 하나를 내는 일. 학습은 몇 달에 한 번입니다. 추론은 누군가 묻는 순간마다 일어납니다. 모델이 완성된 뒤에도 칩은 그래서 계속 돕니다.</p>
+
+    <h3>답하기 전에 생각하는 시간</h3>
+    <p>2024년 9월, 오픈AI가 o1을 내놓으며 한 가지가 달라졌습니다. 답을 바로 내지 않고 먼저 혼자 길게 써 보고, 지우고, 다시 쓴 뒤에 답합니다. 생각하는 시간을 길게 줄수록 어려운 문제의 정답률이 오릅니다. 지금의 주요 모델은 대개 이 방식입니다. 그 시간을 짧게도 길게도 사용자가 정할 수 있습니다. 영어로는 리즈닝 <span class="en">reasoning</span>이라 따로 부르는데 우리말로는 위의 추론과 같은 낱말로 옮겨서, 어느 쪽 뜻인지 앞뒤로 가려 읽어야 합니다.</p>
+
+    <h3>혼자 일하는 기계 — 워크플로우와 에이전트</h3>
+    <p>모델 하나를 한 번 불러 끝나는 일은 드뭅니다. 사막여우가 볼트를 읽고, 파일을 만들고, 다시 읽는 동안 모델은 여러 번 불립니다. 여기서 두 말이 갈립니다. 순서를 사람이 미리 정해 두고 모델이 그 길을 따라가면 <b>워크플로우</b>, 다음에 무엇을 할지 모델이 스스로 정하고 도구를 고르면 <b>에이전트</b>. 2024년 12월 앤트로픽이 이 둘을 그렇게 갈라 적었습니다.</p>
+    <p>에이전트에게 무엇을 읽히느냐가 일의 절반입니다. 창 하나에 담을 수 있는 분량에는 끝이 있고, 많이 넣을수록 앞의 것을 흐리게 기억합니다. 필요한 문서만 그때그때 찾아 넣어 주는 방법을 RAG <span class="en">retrieval-augmented generation</span>, 문서 사이의 관계를 그물로 엮어 두고 그 그물을 따라 찾는 방법을 그래프 RAG, 무엇을 넣고 무엇을 뺄지 통째로 설계하는 일을 컨텍스트 엔지니어링이라 부릅니다. 이름은 셋이지만 묻는 것은 하나입니다. 기계가 지금 무엇을 보고 있는가.</p>
+
+    <h3>지금의 지형 — 2026년 9월 7일</h3>
+    <p>이름을 몇 개 적어 둡니다. 이 표는 반드시 낡습니다. 그것을 알고 싣습니다. 채점표 셋이 1등을 서로 다르게 꼽는데, 그 어긋남까지가 지금의 지형입니다.</p>
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>모델 · 회사</th>
+            <th>공개</th>
+            <th>가중치</th>
+            <th>AA 지능지수<span class="th-sub">독립 · 0~100</span></th>
+            <th>Arena<span class="th-sub">독립 · 사람 투표</span></th>
+            <th>Epoch ECI<span class="th-sub">독립 · 지수</span></th>
+            <th>제조사가 내세운 숫자<span class="th-sub">자체 발표</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><b>Claude Fable 5.1</b><br>앤트로픽</td><td>9/1</td><td>비공개</td><td class="n">57</td><td class="n">1504</td><td class="n">163</td><td>Terminal-Bench 4.0 · 55.8%</td></tr>
+          <tr><td><b>GPT-6 Astra</b><br>오픈AI</td><td>9/3</td><td>비공개</td><td class="n">55</td><td class="n">—</td><td class="n">169</td><td>Terminal-Bench 4.0 「최고」 · 수치 미공개</td></tr>
+          <tr><td><b>Claude Opus 5</b><br>앤트로픽</td><td>7/24</td><td>비공개</td><td class="n">54</td><td class="n">1493</td><td class="n">—</td><td>Terminal-Bench 4.0 · 52.3%</td></tr>
+          <tr><td><b>Muse Spark 1.3</b><br>메타</td><td>9월</td><td>비공개</td><td class="n">53</td><td class="n">—</td><td class="n">—</td><td>Terminal-Bench 2.1 · 88.8</td></tr>
+          <tr><td><b>Gemini 3.8 Flash</b><br>구글</td><td>9/2</td><td>비공개</td><td class="n">47</td><td class="n">1494</td><td class="n">—</td><td>HLE-Verified · 54.9%</td></tr>
+          <tr><td><b>Qwen3.8</b><br>알리바바</td><td>8월</td><td>공개</td><td class="n">47</td><td class="n">—</td><td class="n">—</td><td>Terminal-Bench 2.1 · 86.6</td></tr>
+          <tr><td><b>DeepSeek V4 Pro</b><br>딥시크</td><td>8/13판</td><td>공개(MIT)</td><td class="n">42</td><td class="n">—</td><td class="n">—</td><td>Terminal-Bench 2.1 · 87.9</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note">2026년 9월 7일 확인. 「—」는 그 채점표에 그 모델이 아직 오르지 않았거나 20위 안에 없다는 표시입니다. <b>같은 모델도 얼마나 오래 생각하게 하느냐에 따라 점수가 달라집니다.</b> 표의 숫자는 저마다 가장 세게 돌렸을 때의 값입니다. 설정을 낮추면 열 점 가까이 내려갑니다. 앞에서 본 「생각하는 시간」이 여기서 숫자로 드러납니다. <b>AA 지능지수</b>는 평가사 Artificial Analysis가 열 가지 시험(에이전트 업무·코딩·과학 추론·긴 문서 읽기)을 직접 돌려 평균 낸 점수, v4.2. <b>Arena</b>는 사람이 두 답을 나란히 보고 나은 쪽을 고른 팔백만 표로 매긴 점수(9월 2일자, 체스 레이팅 방식). <b>Epoch ECI</b>는 연구소 Epoch AI가 오십여 개 시험을 이어 붙여 만든 한 눈금(GPT-5를 150으로 둠). 마지막 칸은 회사가 스스로 고른 시험과 스스로 낸 숫자입니다. <b>Terminal-Bench</b>는 명령창에서 코딩 과제를 끝까지 해내는지 보는 시험인데 2.1과 4.0은 문제가 다른 판이라 서로 견줄 수 없습니다. <b>HLE</b>는 여러 학문의 전문가급 문제를 모은 시험입니다. 가중치 「공개」는 모델의 숫자 자체를 내려받아 제 컴퓨터에서 돌릴 수 있다는 뜻입니다.</p>
 
 
     <p class="note">트리비움은 중세 학교의 세 갈래 길입니다. 도로시 세이어즈는 1947년 옥스퍼드 강연에서 이 길을 배움의 세 단계로 읽었습니다. 문법 <span class="en">Grammar</span>, 사실을 익히는 단계. 논리 <span class="en">Logic</span>, 따져 묻는 단계. 수사 <span class="en">Rhetoric</span>, 내 말로 꺼내는 단계. 이 책을 그 세 계단으로 정리한 TRIVIUM입니다. 읽기 전에 열어도, 읽은 뒤에 열어도 좋습니다. 앞의 두 계단은 책과 서평·저자 인터뷰에서 확인한 것만 담았습니다. 출처는 맨 아래에 적어 두었습니다.</p>
 
     <h2>문법 <span class="en">Grammar</span> · 이 책을 펴기 전에</h2>
     <div class="rule"></div>
-    <p>저자 스티븐 위트는 음악 산업이 디지털에 무너지는 과정을 쓴 『How Music Got Free』로 알려진 기자입니다. 이 책은 2025년 <b>파이낸셜 타임스 올해의 비즈니스 책</b>으로 뽑혔습니다. 이코노미스트가 고른 그해의 책에도 들었고요.</p>
-    <p>먼저 한 사람의 앞부분을 짚어 둡니다. 1963년 타이완에서 태어나 태국에서 얼마간 자랐습니다. 아홉 살 무렵 형과 함께 미국으로 보내졌습니다. 그런데 부모가 넣은 켄터키의 기숙학교가 <b>문제 청소년을 받는 곳이었습니다.</b> 착오였어요. 뒤에 나올 이야기가 온통 앞을 내다본 판단으로 채워지는데, 그 삶의 첫 장은 서류 한 장의 착오로 열립니다. 그 학교에서 몇 해를 보냈습니다. 나중에 오리건에서 고등학교를 다니며 탁구를 잘 쳤어요. 오리건 주립대에서 전기공학을 공부했고요.</p>
+    <p>저자 스티븐 위트는 음악 산업이 디지털에 무너지는 과정을 쓴 『How Music Got Free』로 알려진 기자입니다. 이 책은 2025년 <b>파이낸셜 타임스 올해의 비즈니스 책</b>으로 뽑혔습니다. 이코노미스트가 고른 그해의 책에도 들었습니다.</p>
+    <p>먼저 한 사람의 앞부분을 짚어 둡니다. 1963년 타이완에서 태어나 태국에서 얼마간 자랐습니다. 아홉 살 무렵 형과 함께 미국으로 보내졌습니다. 그런데 부모가 넣은 켄터키의 기숙학교가 <b>문제 청소년을 받는 곳이었습니다.</b> 착오였습니다. 뒤에 나올 이야기가 온통 앞을 내다본 판단으로 채워지는데, 그 삶의 첫 장은 서류 한 장의 착오로 열립니다. 그 학교에서 몇 해를 보냈습니다. 나중에 오리건에서 고등학교를 다니며 탁구를 잘 쳤습니다. 오리건 주립대에서 전기공학을 공부했습니다.</p>
     <p>열다섯에 오리건에서 <b>데니스</b>의 접시를 날랐습니다. 1993년, 서른 살에 크리스 말라초우스키·커티스 프리엠과 회사를 세우기로 한 자리도 데니스였습니다. 다른 가게, <b>같은 이름의 식당</b>이었습니다.</p>
-    <p>1990년대에 첫 제품이 실패하며 회사가 거의 무너집니다. 그 뒤로 그는 <b>「우리 회사는 망하기 삼십 일 전이다」</b>라는 말을 계속 합니다. 위기가 지나간 뒤에도요.</p>
-    <p>이 책의 한가운데에 있는 낱말이 <b>쿠다</b> <span class="gk">CUDA</span>입니다. 2006년에 내놓은 소프트웨어예요. 게임 화면을 그리는 카드를, 익숙한 프로그래밍 언어로 일반 계산에도 쓰게 해 줍니다.</p>
-    <p>여기서 <b>병렬</b>이라는 말을 잡아 두세요. 보통 프로세서는 계산을 하나씩 차례로 합니다. 화면을 그리는 칩은 그럴 수가 없어요. 픽셀 수백만 개를 동시에 칠해야 하니까요. 그래서 작은 계산기를 수천 개 붙여 <b>한꺼번에</b> 굴리는 구조가 됩니다. 그 구조가 나중에 다른 데 쓰입니다.</p>
-    <p>쿠다는 십 년 가까이 <b>돈을 벌지 못했습니다.</b> 월가는 확실한 게임 시장에 집중하라고 했어요. 그가 이 일을 부르던 이름이 <b>「0억 달러 시장」</b> <span class="en">zero-billion-dollar market</span>입니다. 지금은 시장이 없다, 언젠가 생긴다, 하고 투자자들에게 말했다고 해요.</p>
-    <p>2012년에 토론토 제프리 힌턴 연구실의 <b>알렉스 크리제프스키</b>가 이미지 인식 대회에 신경망을 내놓습니다. <b>알렉스넷</b> <span class="en">AlexNet</span>이에요. 특별한 장비를 쓴 것이 아니라 <b>가게에서 파는 오백 달러짜리 게임용 카드 두 장</b>에 쿠다를 얹어 훈련시켰습니다. 결과가 조금 나은 정도가 아니라 다른 방법들을 낡은 것으로 만들어 버렸어요.</p>
-    <p>왜 하필 그 카드였을까요. 신경망을 훈련시키는 계산의 대부분이 <b>행렬을 곱하는 일</b>입니다. 픽셀을 한꺼번에 칠하는 일과 모양이 같아요. 십 년 동안 게임을 위해 갈고닦은 구조가, 아무도 예상 못 한 자리에 딱 맞았어요.</p>
-    <p>2017년에 구글에서 <b>트랜스포머</b> <span class="en">Transformer</span>가 나옵니다. 문장의 낱말들을 차례로 보는 대신 서로의 관계를 <b>동시에</b> 봅니다. 여기서 다시 병렬이에요. 오늘 우리가 쓰는 큰 언어 모델들이 이 구조 위에 서 있습니다.</p>
-    <p>마지막으로 조직 하나. 그에게 직접 보고하는 사람이 <b>예순 명 안팎</b>입니다. 보통 회사는 여덟에서 열둘이에요. <b>이인자도 후계자도 두지 않습니다.</b> 대신 모든 직원이 지금 눈에 걸리는 것 다섯 가지를 적어 그에게 직접 보냅니다. 한 일을 보고하는 것이 아니라, 아직 작은 신호를 작을 때 올려 보내는 것입니다.</p>
+    <p>1990년대에 첫 제품이 실패하며 회사가 거의 무너집니다. 그 뒤로 그는 <b>「우리 회사는 망하기 삼십 일 전이다」</b>라는 말을 계속 합니다. 위기가 지나간 뒤에도 그랬습니다.</p>
+    <p>이 책의 한가운데에 있는 낱말이 <b>쿠다</b> <span class="gk">CUDA</span>입니다. 2006년에 내놓은 소프트웨어입니다. 게임 화면을 그리는 카드를, 익숙한 프로그래밍 언어로 일반 계산에도 쓰게 해 줍니다.</p>
+    <p>여기서 <b>병렬</b>이라는 말을 잡아 두세요. 보통 프로세서는 계산을 하나씩 차례로 합니다. 화면을 그리는 칩은 그럴 수가 없습니다. 픽셀 수백만 개를 동시에 칠해야 합니다. 그래서 작은 계산기를 수천 개 붙여 <b>한꺼번에</b> 굴리는 구조가 됩니다. 그 구조가 나중에 다른 데 쓰입니다.</p>
+    <p>쿠다는 십 년 가까이 <b>돈을 벌지 못했습니다.</b> 월가는 확실한 게임 시장에 집중하라고 했습니다. 그가 이 일을 부르던 이름이 <b>「0억 달러 시장」</b> <span class="en">zero-billion-dollar market</span>입니다. 지금은 시장이 없다, 언젠가 생긴다, 하고 투자자들에게 말했다고 합니다.</p>
+    <p>2012년에 토론토 제프리 힌턴 연구실의 <b>알렉스 크리제프스키</b>가 이미지 인식 대회에 신경망을 내놓습니다. <b>알렉스넷</b> <span class="en">AlexNet</span>입니다. 특별한 장비를 쓴 것이 아니라 <b>가게에서 파는 오백 달러짜리 게임용 카드 두 장</b>에 쿠다를 얹어 훈련시켰습니다. 결과가 조금 나은 정도가 아니라 다른 방법들을 낡은 것으로 만들어 버렸습니다.</p>
+    <p>왜 하필 그 카드였을까. 신경망을 훈련시키는 계산의 대부분이 <b>행렬을 곱하는 일</b>입니다. 픽셀을 한꺼번에 칠하는 일과 모양이 같습니다. 십 년 동안 게임을 위해 갈고닦은 구조가, 아무도 예상 못 한 자리에 딱 맞았습니다.</p>
+    <p>2017년에 구글에서 <b>트랜스포머</b> <span class="en">Transformer</span>가 나옵니다. 문장의 낱말들을 차례로 보는 대신 서로의 관계를 <b>동시에</b> 봅니다. 여기서 다시 병렬입니다. 오늘 우리가 쓰는 큰 언어 모델들이 이 구조 위에 서 있습니다.</p>
+    <p>마지막으로 조직 하나. 그에게 직접 보고하는 사람이 <b>예순 명 안팎</b>입니다. 보통 회사는 여덟에서 열둘입니다. <b>이인자도 후계자도 두지 않습니다.</b> 대신 모든 직원이 지금 눈에 걸리는 것 다섯 가지를 적어 그에게 직접 보냅니다. 한 일을 보고하는 것이 아니라, 아직 작은 신호를 작을 때 올려 보내는 것입니다.</p>
 
     <h2>논리 <span class="en">Logic</span> · 십 년을 어떻게 견디는가</h2>
     <div class="rule"></div>
-    <p>이 이야기에는 결과가 먼저 알려져 있습니다. 이 회사는 지금 AI를 돌리는 칩을 거의 다 팝니다. 그래서 읽기가 어렵기도 해요. <b>이미 이긴 사람의 과거는 무엇이든 지혜로 보입니다.</b></p>
+    <p>이 이야기에는 결과가 먼저 알려져 있습니다. 이 회사는 지금 AI를 돌리는 칩을 거의 다 팝니다. 그래서 읽기가 어렵기도 합니다. <b>이미 이긴 사람의 과거는 무엇이든 지혜로 보입니다.</b></p>
     <p>그러니 결과를 잠시 내려놓고 물어 보면 좋겠습니다. <b>돈이 되지 않는 일을 십 년 하는 회사는 무엇으로 그 십 년을 버티는가.</b></p>
-    <p>「0억 달러 시장」이라는 말이 재미있는 자리가 여기예요. 보통 사업은 있는 수요를 찾아갑니다. 그는 수요가 없다고 <b>먼저 인정하고</b> 시작합니다. 없다는 것을 알면서 하는 일과, 있을 거라고 믿으며 하는 일은 다릅니다. 뒤의 것은 틀리면 착각이 되지만, 앞의 것은 처음부터 내기예요.</p>
-    <p>그 십 년을 지탱한 말이 <b>「망하기 삼십 일 전」</b>입니다. 회사가 잘될 때도 그 말을 합니다. 위기가 없는데 위기감을 유지하는 것이지요. 그런데 이 말은 두 가지로 읽힙니다. 사람을 오래 긴장 속에 두는 방식이기도 합니다. 동시에 <b>당장 돈이 안 되는 일을 지킬 명분</b>이기도 하고요. 망하기 직전이라고 믿는 회사만이 십 년 뒤를 위해 지금을 쓸 수 있다는 것은, 생각해 보면 앞뒤가 이상합니다.</p>
-    <p>알렉스넷 대목이 이 책에서 가장 조심스럽게 읽어야 할 자리입니다. <b>그 신경망은 이 회사가 만든 것이 아닙니다.</b> 남이, 다른 목적으로, 가게에서 산 게임 카드로 해냈어요. 회사가 한 일은 그 카드를 만들어 둔 것과, 쿠다를 공짜로 나눠 준 것뿐입니다.</p>
-    <p>그렇다면 이것은 <b>혜안일까요, 운일까요.</b> 둘 다라고 말하면 쉽지만 그 쉬움이 답을 지웁니다. 준비가 없었다면 그 일은 일어나지 않았습니다. 그러나 준비만으로 그 일이 일어나지도 않았어요. 그 사이에 무엇이 있는지가 이 책의 진짜 물음입니다.</p>
-    <p>공짜로 나눠 준 것이 나중에 <b>담이 됩니다.</b> 쿠다는 값을 받지 않지만 열려 있지도 않습니다. 이 회사의 칩에서만 돕니다. 예산 없는 연구실이 이 카드로 공부를 하고, 그 위에서 논문이 나오고, 그 논문을 읽은 다음 세대가 다시 그 위에 짓습니다. 시간이 지나면 세상의 연구가 통째로 한 회사의 바닥에 얹혀 있게 돼요. 경쟁자가 더 좋은 칩을 만들어도 소용이 없습니다. <b>사람들이 이미 그 위에서 배웠으니까요.</b></p>
-    <p>조직 이야기도 그 옆에 놓아 보세요. 예순 명이 직접 보고하고 이인자가 없습니다. 정보가 차례로 흐르지 않고 <b>한꺼번에</b> 들어오게 한 것이지요. 칩에서 한 일과 회사에서 한 일의 모양이 닮았습니다. 다만 닮았다고 해서 옳다는 뜻은 아니고요. 이인자를 두지 않는다는 것은 <b>그가 없을 때를 준비하지 않는다</b>는 뜻이기도 합니다.</p>
+    <p>「0억 달러 시장」이라는 말이 여기서 재미있어집니다. 보통 사업은 있는 수요를 찾아갑니다. 그는 수요가 없다고 <b>먼저 인정하고</b> 시작합니다. 없다는 것을 알면서 하는 일과, 있을 거라고 믿으며 하는 일은 다릅니다. 뒤의 것은 틀리면 착각이 되지만, 앞의 것은 처음부터 내기입니다.</p>
+    <p>그 십 년을 지탱한 말이 <b>「망하기 삼십 일 전」</b>입니다. 회사가 잘될 때도 그 말을 합니다. 위기가 없는데 위기감을 유지합니다. 그런데 이 말은 두 가지로 읽힙니다. 사람을 오래 긴장 속에 두는 방식이기도 합니다. 동시에 <b>당장 돈이 안 되는 일을 지킬 명분</b>이기도 합니다. 망하기 직전이라고 믿는 회사만이 십 년 뒤를 위해 지금을 쓸 수 있다는 것은, 생각해 보면 앞뒤가 이상합니다.</p>
+    <p>알렉스넷 대목이 이 책에서 가장 조심스럽게 읽어야 할 자리입니다. <b>그 신경망은 이 회사가 만든 것이 아닙니다.</b> 남이, 다른 목적으로, 가게에서 산 게임 카드로 해냈습니다. 회사가 한 일은 그 카드를 만들어 둔 것과, 쿠다를 공짜로 나눠 준 것뿐입니다.</p>
+    <p>그렇다면 이것은 <b>혜안입니까, 운입니까.</b> 둘 다라고 말하면 쉽지만 그 쉬움이 답을 지웁니다. 준비가 없었다면 그 일은 일어나지 않았습니다. 그러나 준비만으로 그 일이 일어나지도 않았습니다. 그 사이에 무엇이 있는지가 이 책의 진짜 물음입니다.</p>
+    <p>공짜로 나눠 준 것이 나중에 <b>담이 됩니다.</b> 쿠다는 값을 받지 않지만 열려 있지도 않습니다. 이 회사의 칩에서만 돕니다. 예산 없는 연구실이 이 카드로 공부를 하고, 그 위에서 논문이 나오고, 그 논문을 읽은 다음 세대가 다시 그 위에 짓습니다. 시간이 지나면 세상의 연구가 통째로 한 회사의 바닥에 얹혀 있게 됩니다. 경쟁자가 더 좋은 칩을 만들어도 소용이 없습니다. <b>사람들이 이미 그 위에서 배운 뒤입니다.</b></p>
+    <p>조직 이야기도 그 옆에 놓아 보세요. 예순 명이 직접 보고하고 이인자가 없습니다. 정보가 차례로 흐르지 않고 <b>한꺼번에</b> 들어오게 했습니다. 칩에서 한 일과 회사에서 한 일의 모양이 닮았습니다. 다만 닮았다고 해서 옳다는 뜻은 아닙니다. 이인자를 두지 않는다는 것은 <b>그가 없을 때를 준비하지 않는다</b>는 뜻이기도 합니다.</p>
     <p>이 이야기에는 그늘도 함께 놓입니다. 칩을 만드는 공장이 대만 한곳에 몰려 있다는 것, 데이터센터가 먹는 전기가 가파르게 는다는 것, 그리고 뒤를 이을 사람이 없다는 것. <b>모두 그를 여기까지 오게 한 것들의 뒷면입니다.</b></p>
-    <p>그런데 서평들이 한결같이 짚는 대목은 따로 있습니다. 저자가 AI의 위험을 묻자 그가 <b>화를 내며 자리를 끝내 버리는 장면</b>이에요. 삼 년을 곁에서 지켜본 기자가 마지막에 얻은 것이 답이 아니라 그 반응이었습니다.</p>
-    <p>그러니 마지막 물음은 주인공이 아니라 <b>책을 쓴 사람 쪽</b>으로 돌려도 좋겠습니다. 오래 곁에 있으면 더 잘 보게 될까요, 아니면 묻기 어려워질까요. 그 화를 그대로 실은 것은 정직일까요, 아니면 끝내 답을 듣지 못했다는 고백일까요.</p>
+    <p>저자가 AI의 위험을 묻자 그가 <b>화를 내며 자리를 끝내 버리는 장면</b>이 있습니다. 삼 년을 곁에서 지켜본 기자가 마지막에 얻은 것이 답이 아니라 그 반응이었습니다.</p>
+    <p>그러니 마지막 물음은 주인공이 아니라 <b>책을 쓴 사람 쪽</b>으로 돌려도 좋겠습니다. 오래 곁에 있으면 더 잘 보게 됩니까, 아니면 묻기 어려워집니까. 그 화를 그대로 실은 것은 정직입니까, 아니면 끝내 답을 듣지 못했다는 고백입니까.</p>
     <p>같은 물음이 우리에게도 옵니다. <b>우리는 이 사람의 십 년을 지혜로 읽고 있습니까, 결과를 알고 나서 거꾸로 읽고 있습니까.</b></p>
 
     <h2>수사 <span class="en">Rhetoric</span> · 토요일 아침에 함께</h2>
@@ -154,10 +283,6 @@ footer .sig { font-family: 'Noto Serif KR', serif; color: #1A4A35; font-size: 14
       <li><b>진행자는 답하지 않고 묻기만 합니다.</b> 진행자도 답을 모르는 물음을 들고 옵니다. 그래서 함께 찾습니다.</li>
     </ol>
     <p style="margin-top:24px">이 다섯은 이런 책에서 특히 힘을 냅니다. 저자도 주인공도 살아 있고 회사는 지금도 움직이고 있어서, 본문 밖에 들은 이야기와 시세와 소문이 많습니다. 그것들을 잠시 내려놓고 책이 실제로 무엇을 썼는지에 머무를 때 이야기가 열립니다.</p>
-    <blockquote class="quote">
-      <p>사람들은 걸핏하면 신들을 탓하곤 하지.<br>그러나 그들은 그들 자신의 몫 이상의 고통을 스스로 부른다.</p>
-      <cite>호메로스, 『오뒷세이아』 제1권 — 지난 자리에서</cite>
-    </blockquote>
     <p class="lead" style="margin-top:28px">춤추는 별을 낳으려면 내면에 혼돈을 지녀야 한다고 니체는 썼습니다. 서로 다르게 읽은 대목이 부딪히는 작은 혼돈에서, 생각이 생각을 낳는 아침이 되시기를 바랍니다.</p>
 
     <div class="zoom">
@@ -172,6 +297,7 @@ footer .sig { font-family: 'Noto Serif KR', serif; color: #1A4A35; font-size: 14
     <p>디퍼 리딩 · 전체 디퍼 함께 · 토요일 아침과 일요일 밤</p>
     <p style="margin-top:14px">함께 읽는 책 · 스티븐 위트, 『엔비디아 젠슨 황, 생각하는 기계』(원제 <span class="en">The Thinking Machine: Jensen Huang, Nvidia, and the World's Most Coveted Microchip</span>, 2025).<br>
     문법 계단의 사실은 책 소개와 서평·저자 인터뷰에서 확인한 것만 담았습니다 — 2025년 파이낸셜 타임스 올해의 비즈니스 책 선정, 이코노미스트 올해의 책, 존 노튼(가디언)·퍼블리셔스 위클리·뉴욕 타임스 서평, 그리고 「0억 달러 시장」·알렉스넷·쿠다에 관한 공개 기록. <b>확인되지 않은 수치는 싣지 않았습니다.</b><br>
+    「기계는 어떻게 생각하는가」는 2026년 9월 7일에 웹으로 확인한 것만 담았습니다 — 트랜스포머: Vaswani 외, 「Attention Is All You Need」(arXiv 1706.03762, 2017) · 추론 모델: OpenAI o1-preview 공개(2024-09-12, 「Learning to Reason with LLMs」) · 워크플로우/에이전트 구분: Anthropic, 「Building Effective Agents」(2024-12-19) · 컨텍스트 엔지니어링: Anthropic, 「Effective Context Engineering for AI Agents」(2025-09-29) · RAG: Lewis 외(arXiv 2005.11401, 2020) · 그래프 RAG: Edge 외(arXiv 2404.16130, 2024). 표의 독립 점수: Artificial Analysis Intelligence Index v4.2(artificialanalysis.ai, 9/7 확인) · Arena Text Leaderboard(arena.ai, 2026-09-02자, 7,999,020표) · Epoch AI Capabilities Index(epoch.ai, 9/7 확인). 제조사 발표 수치: Anthropic 「Claude Fable and Mythos 5.1」(anthropic.com) · OpenAI 「GPT-6 Astra」 발표문(2026-09-03) · Google 「Introducing Gemini 3.8 Flash」(blog.google, 2026-09-02) · Meta Muse Spark 1.3 모델 페이지(developer.meta.com) · Qwen3.8-2.4T-A95B 및 DeepSeek-V4-Pro-0813 모델 카드(huggingface.co). <b>확인하지 못한 수치는 「—」로 비웠습니다.</b><br>
     「함께 읽는 자리의 약속 다섯」은 The Great Books Foundation의 Shared Inquiry&trade;에서 배운 방법입니다. 시카고대학 총장 로버트 허친스와 철학자 모티머 애들러가 1947년 시카고에 세운 비영리 교육재단으로, 고전을 함께 읽고 질문으로 이야기하는 독서 모임을 지금까지 이어 오고 있습니다.</p>
     <p style="margin-top:14px">&copy; 2026 DEEPER. All rights reserved.</p>
   </div>
